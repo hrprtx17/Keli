@@ -1,20 +1,33 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { auth } from '@/auth'
+import { NextResponse } from 'next/server'
 
-export function middleware(request: NextRequest) {
-  // Add professional routing/auth middleware logic here
-  return NextResponse.next();
-}
+export default auth((req) => {
+  const isLoggedIn = !!req.auth
+  const isAuthPage = 
+    req.nextUrl.pathname.startsWith('/login') ||
+    req.nextUrl.pathname.startsWith('/register')
+  const isDashboard = 
+    req.nextUrl.pathname.startsWith('/dashboard') ||
+    req.nextUrl.pathname.startsWith('/agents') ||
+    req.nextUrl.pathname.startsWith('/tickets') ||
+    req.nextUrl.pathname.startsWith('/settings') ||
+    req.nextUrl.pathname.startsWith('/billing')
+
+  if (isDashboard && !isLoggedIn) {
+    return NextResponse.redirect(
+      new URL('/login', req.nextUrl)
+    )
+  }
+  if (isAuthPage && isLoggedIn) {
+    return NextResponse.redirect(
+      new URL('/dashboard', req.nextUrl)
+    )
+  }
+  return NextResponse.next()
+})
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap.xml, robots.txt (metadata files)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
-  ],
-};
+    '/((?!api|_next/static|_next/image|favicon.ico|widget).*)'
+  ]
+}
