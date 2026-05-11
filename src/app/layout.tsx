@@ -1,17 +1,27 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionProvider from "@/providers/SessionProvider";
+import { ThemeProviderWrapper } from "@/providers/ThemeProvider";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "AgentDesk | The AI Support Platform",
-  description: "Automate customer service with intelligent AI agents.",
+  title: "AgentDesk | AI Customer Support Platform",
+  description: "Train custom AI agents on your data. Deploy to your website in minutes.",
 };
 
 export default function RootLayout({
@@ -20,18 +30,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} dark h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col font-sans">
-        <SessionProvider>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
-        </SessionProvider>
+    <html lang="en" className={`${inter.variable} ${poppins.variable} antialiased`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        <ThemeProviderWrapper>
+          <SessionProvider>
+            <QueryProvider>
+              {children}
+              <Toaster richColors closeButton theme="light" />
+            </QueryProvider>
+          </SessionProvider>
+        </ThemeProviderWrapper>
       </body>
     </html>
   );
 }
-

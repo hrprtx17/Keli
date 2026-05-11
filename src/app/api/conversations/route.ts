@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDB } from '@/lib/db';
-import Ticket from '@/models/Ticket';
+import Conversation from '@/models/Conversation';
 import User from '@/models/User';
 
 async function getWorkspaceId(session: any) {
@@ -16,6 +16,6 @@ export async function GET() {
   await connectDB();
   const workspaceId = await getWorkspaceId(session);
   if (!workspaceId) return NextResponse.json([]);
-  const tickets = await Ticket.find({ workspaceId }).sort({ createdAt: -1 }).limit(50);
-  return NextResponse.json(tickets);
+  const conversations = await Conversation.find({ workspaceId }).sort({ createdAt: -1 }).limit(50);
+  return NextResponse.json(conversations);
 }

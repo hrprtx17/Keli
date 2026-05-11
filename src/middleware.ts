@@ -6,26 +6,30 @@ const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
   const isLoggedIn = !!req.auth
-  const isAuthPage = 
-    req.nextUrl.pathname.startsWith('/login') ||
-    req.nextUrl.pathname.startsWith('/register')
-  const isDashboard = 
-    req.nextUrl.pathname.startsWith('/dashboard') ||
-    req.nextUrl.pathname.startsWith('/agents') ||
-    req.nextUrl.pathname.startsWith('/tickets') ||
-    req.nextUrl.pathname.startsWith('/settings') ||
-    req.nextUrl.pathname.startsWith('/billing')
+  const { pathname } = req.nextUrl
 
-  if (isDashboard && !isLoggedIn) {
-    return NextResponse.redirect(
-      new URL('/login', req.nextUrl)
-    )
+  const isAuthPage =
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/register')
+
+  const isProtectedPage =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/agents') ||
+    pathname.startsWith('/tickets') ||
+    pathname.startsWith('/conversations') ||
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/billing') ||
+    pathname.startsWith('/knowledge') ||
+    pathname.startsWith('/onboarding')
+
+  if (isProtectedPage && !isLoggedIn) {
+    return NextResponse.redirect(new URL('/login', req.nextUrl))
   }
+
   if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(
-      new URL('/dashboard', req.nextUrl)
-    )
+    return NextResponse.redirect(new URL('/agents', req.nextUrl))
   }
+
   return NextResponse.next()
 })
 

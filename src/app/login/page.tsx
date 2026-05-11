@@ -25,7 +25,7 @@ export default function LoginPage() {
     if (res?.error) {
       alert('Invalid credentials');
     } else {
-      router.push('/dashboard');
+      router.push('/agents');
     }
   };
 

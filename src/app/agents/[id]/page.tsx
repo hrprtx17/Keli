@@ -3,179 +3,300 @@ import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { Bot, ArrowLeft, Save, RefreshCw, Sparkles, Zap, Trash2, CornerDownLeft, Mic, Send, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
+import Link from 'next/link';
 
-export default function AgentDetailPage() {
+export default function AgentPlaygroundPage() {
   const params = useParams();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const id = params.id as string;
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const [formData, setFormData] = useState<any>({
+    name: '',
+    systemPrompt: '',
+    description: '',
+    widgetConfig: {
+      primaryColor: '#F97316',
+      welcomeMessage: 'Hi! What can I help you with?',
+      showBranding: true
+    }
+  });
 
   const { data: agent, isLoading } = useQuery({
     queryKey: ['agent', id],
     queryFn: async () => {
       const res = await fetch(`/api/agents/${id}`);
-      if (!res.ok) throw new Error('Failed to fetch agent');
+      if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     }
   });
 
-  if (isLoading) {
-    return <DashboardLayout><div className="p-8 text-muted-foreground">Loading agent...</div></DashboardLayout>;
-  }
+  useEffect(() => {
+    if (agent) {
+      setFormData({
+        name: agent.name || '',
+        description: agent.description || '',
+        systemPrompt: agent.systemPrompt || '',
+        widgetConfig: {
+          primaryColor: agent.widgetConfig?.primaryColor || '#F97316',
+          welcomeMessage: agent.widgetConfig?.welcomeMessage || 'Hi! What can I help you with?',
+          showBranding: agent.widgetConfig?.showBranding !== false
+        }
+      });
+    }
+  }, [agent]);
 
-  if (!agent) {
-    return <DashboardLayout><div className="p-8 text-muted-foreground">Agent not found</div></DashboardLayout>;
-  }
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/agents/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error('Update failed');
+      toast.success('Agent configuration committed');
+      queryClient.invalidateQueries({ queryKey: ['agent', id] });
+    } catch (err) {
+      toast.error('Commit error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) return <DashboardLayout><div className="p-8 animate-pulse h-full"><div className="h-full bg-muted rounded-xl" /></div></DashboardLayout>;
+  if (!agent) return <DashboardLayout><div className="p-8">Agent not initialized.</div></DashboardLayout>;
 
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{agent.name}</h1>
-          <p className="text-muted-foreground mt-1">Manage and configure this agent.</p>
+      <div className="flex flex-col h-full min-h-screen -m-4 sm:-m-6 md:-m-8 lg:-m-10 overflow-hidden">
+        
+        {/* Sub Header breadcrumb explicitly tailored like user's top bar */}
+        <div className="flex items-center justify-between px-6 h-14 border-b bg-card shrink-0">
+           <div className="flex items-center gap-3 text-[13px]">
+              <Link href="/agents" className="text-muted-foreground hover:text-foreground transition-colors">Agents</Link>
+              <span className="text-muted-foreground/50">/</span>
+              <span className="font-semibold flex items-center gap-1.5">
+                 {agent.name} 
+                 <span className="bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Agent</span>
+              </span>
+           </div>
+           <div className="flex items-center gap-3">
+              <Button 
+                onClick={handleSave} 
+                disabled={isSaving}
+                className="bg-black hover:bg-zinc-800 text-white font-bold text-xs h-8 px-4 rounded-lg shadow-sm"
+              >
+                 {isSaving ? <RefreshCw className="h-3 w-3 animate-spin mr-1.5"/> : <Save className="h-3 w-3 mr-1.5"/>}
+                 Save
+              </Button>
+           </div>
+        </div>
+
+        {/* Split Window Context */}
+        <div className="flex flex-1 overflow-hidden bg-card">
+           
+           {/* LEFT PANE: Configurations (Matches the scrolling left context form) */}
+           <div className="w-full md:w-[360px] lg:w-[420px] border-r border-border/60 overflow-y-auto bg-card custom-scrollbar relative">
+             <div className="p-6 space-y-8 pb-20">
+                
+                {/* Model Config Box */}
+                <div className="space-y-3">
+                   <Label className="text-[13px] font-bold text-foreground/80">Model Base</Label>
+                   <div className="relative rounded-lg border bg-card p-3 flex items-center justify-between group cursor-default hover:border-primary/40 transition-colors">
+                      <div className="flex items-center gap-3">
+                         <div className="h-8 w-8 bg-muted/50 border rounded-lg flex items-center justify-center"><Sparkles className="h-4 w-4 text-primary" /></div>
+                         <div>
+                           <p className="text-[13px] font-bold">Llama 3.1 - 8B</p>
+                           <p className="text-[10px] text-muted-foreground">Standard inference engine</p>
+                         </div>
+                      </div>
+                      <span className="text-[10px] font-black text-muted-foreground uppercase border px-1.5 rounded bg-muted">Fixed</span>
+                   </div>
+                </div>
+
+                {/* Action / Widget Theme Setup */}
+                <div className="space-y-3">
+                   <div className="flex items-center justify-between">
+                      <Label className="text-[13px] font-bold text-foreground/80">Widget Theme</Label>
+                   </div>
+                   <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground/70">Primary Color</span>
+                        <div className="flex gap-2">
+                           <div className="relative h-9 w-9 shrink-0 rounded-lg border overflow-hidden">
+                              <input 
+                                type="color" 
+                                className="absolute inset-[-10px] w-[150%] h-[150%] cursor-pointer"
+                                value={formData.widgetConfig.primaryColor}
+                                onChange={e => setFormData({...formData, widgetConfig: {...formData.widgetConfig, primaryColor: e.target.value}})}
+                              />
+                           </div>
+                           <Input 
+                              value={formData.widgetConfig.primaryColor}
+                              onChange={e => setFormData({...formData, widgetConfig: {...formData.widgetConfig, primaryColor: e.target.value}})}
+                              className="h-9 text-xs font-mono"
+                           />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                         <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground/70">Identity</span>
+                         <Input 
+                           value={formData.name} 
+                           onChange={e => setFormData({...formData, name: e.target.value})}
+                           className="h-9 text-xs"
+                         />
+                      </div>
+                   </div>
+                </div>
+
+                {/* Instructions / System Prompt (Exactly matches the text area shown on screenshot) */}
+                <div className="space-y-3">
+                   <div className="flex items-center justify-between">
+                      <Label className="text-[13px] font-bold text-foreground/80">Instructions (System prompt)</Label>
+                      <button className="text-muted-foreground hover:text-foreground"><RefreshCw className="h-3 w-3"/></button>
+                   </div>
+                   <div className="border rounded-xl bg-muted/5 overflow-hidden focus-within:ring-2 ring-primary/20 ring-offset-0 border-border/80 shadow-inner-sm">
+                      <div className="h-10 border-b bg-muted/30 px-3 flex items-center text-[12px] font-bold text-muted-foreground justify-between">
+                         <span>Base Instructions</span>
+                         <ChevronRight className="h-3 w-3 rotate-90" />
+                      </div>
+                      <textarea 
+                        className="w-full min-h-[350px] p-4 text-[13px] font-medium leading-relaxed bg-transparent border-0 focus:ring-0 resize-none custom-scrollbar text-foreground"
+                        placeholder="Define how the AI should act..."
+                        value={formData.systemPrompt}
+                        onChange={e => setFormData({...formData, systemPrompt: e.target.value})}
+                      />
+                   </div>
+                </div>
+
+                {/* Danger Area */}
+                <div className="pt-6 border-t border-dashed">
+                   <Button 
+                     variant="ghost" 
+                     size="sm" 
+                     className="w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 font-bold text-xs"
+                     onClick={() => {
+                       if (window.confirm("Verify permanent removal")) {
+                          fetch(`/api/agents/${id}`, { method: 'DELETE' }).then(() => router.push('/agents'));
+                       }
+                     }}
+                   >
+                     <Trash2 className="h-3.5 w-3.5"/> Destroy Agent Context
+                   </Button>
+                </div>
+
+             </div>
+           </div>
+
+           {/* RIGHT PANE: PLAYGROUND CANVAS (Matches dotted canvas window perfectly) */}
+           <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-[#fafafa] dark:bg-zinc-950">
+              
+              {/* Grid Dot Pattern Canvas Overlay */}
+              <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.6]"
+                   style={{ 
+                     backgroundImage: `radial-gradient(circle, #e5e7eb 1.5px, transparent 1.5px)`, 
+                     backgroundSize: '24px 24px' 
+                   }} 
+              />
+              <div className="absolute inset-0 dark:hidden z-0 pointer-events-none opacity-[0.4]"
+                   style={{ 
+                     backgroundImage: `radial-gradient(circle, #000000 1px, transparent 1px)`, 
+                     backgroundSize: '24px 24px' 
+                   }} 
+              />
+
+              {/* Live Previsualization Widget (Matches exact physical aesthetics of visual preview) */}
+              <div className="relative z-10 w-full max-w-[420px] h-[650px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl shadow-black/10 border flex flex-col overflow-hidden animate-in zoom-in-95 duration-500">
+                  
+                  {/* Widget Top Bar (Dynamically colored via state) */}
+                  <div className="h-16 w-full px-5 flex items-center justify-between shrink-0 transition-colors duration-500" 
+                       style={{ backgroundColor: formData.widgetConfig.primaryColor }}>
+                     <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                           <Zap className="h-4.5 w-4.5 text-white fill-current" />
+                        </div>
+                        <span className="font-bold text-white text-[15px] tracking-wide">{formData.name || 'X1 Chat'}</span>
+                     </div>
+                     <button className="text-white/70 hover:text-white"><RefreshCw className="h-4 w-4" /></button>
+                  </div>
+
+                  {/* Message Content View */}
+                  <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-card">
+                     
+                     {/* AI First Message (Uses State Greeting) */}
+                     <div className="flex flex-col items-start space-y-1 max-w-[85%] animate-in slide-in-from-bottom-2 duration-300">
+                        <div className="px-4 py-3 rounded-2xl rounded-tl-none bg-muted text-foreground text-sm font-medium leading-relaxed border">
+                           {formData.widgetConfig.welcomeMessage || 'Hi! What can I help you with?'}
+                        </div>
+                     </div>
+
+                     {/* Sample User Mock Message */}
+                     <div className="flex flex-col items-end space-y-1 max-w-[85%] ml-auto animate-in slide-in-from-bottom-4 duration-500 delay-150">
+                        <div className="px-4 py-3 rounded-2xl rounded-tr-none text-white text-sm font-medium leading-relaxed"
+                             style={{ backgroundColor: formData.widgetConfig.primaryColor }}>
+                           Tell me how AgentDesk boosts conversion.
+                        </div>
+                     </div>
+
+                  </div>
+
+                  {/* Footer Branding & Input */}
+                  <div className="px-4 py-3 border-t bg-card flex flex-col items-center shrink-0 gap-3">
+                     {formData.widgetConfig.showBranding && (
+                       <div className="text-[10px] font-bold text-muted-foreground/60 flex items-center gap-1 select-none">
+                          <div className="h-3.5 w-3.5 bg-muted rounded flex items-center justify-center">A</div> Powered by AgentDesk
+                       </div>
+                     )}
+                     <div className="w-full relative">
+                        <div className="h-11 w-full rounded-full border bg-muted/10 px-4 flex items-center gap-2 focus-within:ring-1 ring-primary transition-all group">
+                           <input 
+                              type="text" 
+                              placeholder="Message..." 
+                              className="flex-1 h-full bg-transparent text-sm font-medium placeholder:text-muted-foreground outline-none border-0"
+                           />
+                           <Mic className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+                           <button className="h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
+                             <Send className="h-3.5 w-3.5" />
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+
+              </div>
+           </div>
+
         </div>
       </div>
-
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="training">Training</TabsTrigger>
-          <TabsTrigger value="widget">Widget</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Conversations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{agent.totalConversations}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Messages Sent</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{agent.totalMessages}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Model</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-lg font-bold">{agent.model}</div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="training" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Knowledge Base</CardTitle>
-              <CardDescription>Train your agent by uploading PDFs, adding URLs, or pasting text.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex space-x-2">
-                <Button variant="outline">Upload PDF</Button>
-                <Button variant="outline">Add URL</Button>
-                <Button variant="outline">Add Text</Button>
-              </div>
-              <div className="border border-dashed rounded-md p-8 text-center text-muted-foreground">
-                No data sources added yet.
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="widget" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Widget Configuration</CardTitle>
-                <CardDescription>Customize how the widget appears on your website.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Primary Color</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input type="color" className="w-12 h-10 p-1 bg-background" defaultValue={agent.widgetConfig?.primaryColor || '#F97316'} />
-                    <Input defaultValue={agent.widgetConfig?.primaryColor || '#F97316'} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Welcome Message</Label>
-                  <Input defaultValue={agent.widgetConfig?.welcomeMessage || 'Hello! How can I help you today?'} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label>Show Branding</Label>
-                  <Switch defaultChecked={agent.widgetConfig?.showBranding !== false} />
-                </div>
-                <Button className="w-full">Save Changes</Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Embed Code</CardTitle>
-                <CardDescription>Copy and paste this snippet before the closing body tag.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <pre className="bg-muted p-4 rounded-md overflow-x-auto text-sm text-muted-foreground">
-{`<script 
-  src="https://agentdesk.vercel.app/widget/embed.js"
-  data-agent="${agent._id}"
-  data-color="${agent.widgetConfig?.primaryColor || '#F97316'}">
-</script>`}
-                  </pre>
-                  <Button variant="secondary" className="absolute top-2 right-2 h-8 text-xs">Copy</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="settings" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Agent Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Name</Label>
-                <Input defaultValue={agent.name} />
-              </div>
-              <div className="space-y-2">
-                <Label>System Prompt (Instructions)</Label>
-                <textarea 
-                  className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  placeholder="You are a helpful customer support assistant..."
-                  defaultValue={agent.systemPrompt}
-                />
-              </div>
-              <Button>Save Settings</Button>
-            </CardContent>
-          </Card>
-          
-          <Card className="border-destructive border">
-            <CardHeader>
-              <CardTitle className="text-destructive">Danger Zone</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">Deleting this agent will permanently remove it and all its associated knowledge base data.</p>
-              <Button variant="destructive">Delete Agent</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </DashboardLayout>
   );
+}
+
+// In case it wasn't defined elsewhere in scope, adding standard scrollbar concealment Utility within TS
+function styleFix() {
+  return (
+    <style>{`
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 5px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e5e7eb;
+        border-radius: 10px;
+      }
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #3f3f46;
+      }
+    `}</style>
+  )
 }
