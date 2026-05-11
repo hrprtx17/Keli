@@ -26,15 +26,26 @@ export default function PlansPage() {
 
   const handleCheckout = async (type: 'premium' | 'addon') => {
     setCheckingOut(type);
+    setToastMsg(''); // reset previous
     try {
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type })
       });
-      const data = await res.json();
-      if (data.checkoutUrl) window.location.href = data.checkoutUrl;
-      else { setToastMsg(data.error || 'Checkout failed.'); setTimeout(() => setToastMsg(''), 4000); }
+      
+      const data = await res.json().catch(() => ({ error: 'Invalid server response format' }));
+      
+      if (res.ok && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setToastMsg(data.error || `Checkout failed with status ${res.status}`);
+        setTimeout(() => setToastMsg(''), 6000);
+      }
+    } catch (err: any) {
+      console.error('Checkout exception:', err);
+      setToastMsg(`System exception: ${err.message || 'Failed to connect to backend API'}`);
+      setTimeout(() => setToastMsg(''), 6000);
     } finally {
       setCheckingOut(null);
     }

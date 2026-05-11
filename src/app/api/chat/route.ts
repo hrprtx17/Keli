@@ -140,30 +140,27 @@ export async function POST(req: Request) {
       await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
     }
 
-    // Atomic Deduct credit
-    await (await import('@/models/Workspace')).default.findOneAndUpdate(
-      { _id: workspace._id },
-      [
-        {
-          $set: {
-            "usage.creditsUsedThisMonth": {
-              $cond: {
-                if: { $lt: ["$usage.creditsUsedThisMonth", "$usage.monthlyCredits"] },
-                then: { $add: ["$usage.creditsUsedThisMonth", 1] },
-                else: "$usage.creditsUsedThisMonth"
-              }
-            },
-            "usage.addonCredits": {
-              $cond: {
-                if: { $gte: ["$usage.creditsUsedThisMonth", "$usage.monthlyCredits"] },
-                then: { $subtract: ["$usage.addonCredits", 1] },
-                else: "$usage.addonCredits"
+    // Atomic Deduct credit (Wrapped in fail-safe so it never blocks user response)
+    try {
+      await (await import('@/models/Workspace')).default.findOneAndUpdate(
+        { _id: workspace._id },
+        [
+          {
+            $set: {
+              "usage.creditsUsedThisMonth": {
+                $cond: {
+                  if: { $lt: ["$usage.creditsUsedThisMonth", "$usage.monthlyCredits"] },
+                  then: { $add: [{ $ifNull: ["$usage.creditsUsedThisMonth", 0] }, 1] },
+                  else: { $ifNull: ["$usage.creditsUsedThisMonth", 0] }
+                }
               }
             }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (cErr) {
+      console.error('Non-blocking Credit Decoupler Log:', cErr);
+    }
 
     return NextResponse.json({ reply: aiReply, conversationId: convId });
   } catch (error: any) {

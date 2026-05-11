@@ -30,6 +30,54 @@ export default function AgentPlaygroundPage() {
     }
   });
 
+  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
+  const [inputVal, setInputVal] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic scroll capture hook
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [chatHistory, chatLoading]);
+
+  const sendMessage = async () => {
+    if (!inputVal.trim() || chatLoading) return;
+    
+    const userMsg = { role: 'user', content: inputVal.trim() };
+    setChatHistory(prev => [...prev, userMsg]);
+    setInputVal('');
+    setChatLoading(true);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMsg.content,
+          agentId: id,
+          conversationId
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (data.reply) {
+        setChatHistory(prev => [...prev, { role: 'assistant', content: data.reply }]);
+        if (data.conversationId) setConversationId(data.conversationId);
+      } else if (data.error) {
+        setChatHistory(prev => [...prev, { role: 'assistant', content: `⚠️ Error: ${data.error}` }]);
+      }
+    } catch (err) {
+      toast.error('Transmission failure');
+      setChatHistory(prev => [...prev, { role: 'assistant', content: '⚠️ Network communication error.' }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const { data: agent, isLoading } = useQuery({
     queryKey: ['agent', id],
     queryFn: async () => {
@@ -229,46 +277,75 @@ export default function AgentPlaygroundPage() {
                      <button className="text-white/70 hover:text-white"><RefreshCw className="h-4 w-4" /></button>
                   </div>
 
-                  {/* Message Content View */}
-                  <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-card">
+                  {/* Live Message Content View */}
+                  <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-card custom-scrollbar" ref={chatContainerRef}>
                      
-                     {/* AI First Message (Uses State Greeting) */}
+                     {/* AI Greeting */}
                      <div className="flex flex-col items-start space-y-1 max-w-[85%] animate-in slide-in-from-bottom-2 duration-300">
                         <div className="px-4 py-3 rounded-2xl rounded-tl-none bg-muted text-foreground text-sm font-medium leading-relaxed border">
                            {formData.widgetConfig.welcomeMessage || 'Hi! What can I help you with?'}
                         </div>
                      </div>
 
-                     {/* Sample User Mock Message */}
-                     <div className="flex flex-col items-end space-y-1 max-w-[85%] ml-auto animate-in slide-in-from-bottom-4 duration-500 delay-150">
-                        <div className="px-4 py-3 rounded-2xl rounded-tr-none text-white text-sm font-medium leading-relaxed"
-                             style={{ backgroundColor: formData.widgetConfig.primaryColor }}>
-                           Tell me how AgentDesk boosts conversion.
+                     {/* Real Thread Iterator */}
+                     {chatHistory.map((msg, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`flex flex-col space-y-1 max-w-[85%] animate-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'ml-auto items-end' : 'items-start'}`}
+                        >
+                           <div 
+                             className={`px-4 py-3 rounded-2xl text-sm font-medium leading-relaxed ${
+                               msg.role === 'user' 
+                                 ? 'rounded-tr-none text-white shadow-sm' 
+                                 : 'rounded-tl-none bg-muted text-foreground border'
+                             }`}
+                             style={msg.role === 'user' ? { backgroundColor: formData.widgetConfig.primaryColor } : {}}
+                           >
+                              {msg.content}
+                           </div>
                         </div>
-                     </div>
+                     ))}
+
+                     {chatLoading && (
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs animate-pulse font-medium ml-1">
+                           <div className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                           <div className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                           <div className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce"></div>
+                        </div>
+                     )}
 
                   </div>
 
-                  {/* Footer Branding & Input */}
+                  {/* Footer Input Loop */}
                   <div className="px-4 py-3 border-t bg-card flex flex-col items-center shrink-0 gap-3">
                      {formData.widgetConfig.showBranding && (
                        <div className="text-[10px] font-bold text-muted-foreground/60 flex items-center gap-1 select-none">
-                          <div className="h-3.5 w-3.5 bg-muted rounded flex items-center justify-center">A</div> Powered by AgentDesk
+                          <div className="h-3.5 w-3.5 bg-muted rounded flex items-center justify-center font-black">A</div> Powered by AgentDesk
                        </div>
                      )}
-                     <div className="w-full relative">
-                        <div className="h-11 w-full rounded-full border bg-muted/10 px-4 flex items-center gap-2 focus-within:ring-1 ring-primary transition-all group">
+                     <form 
+                       onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+                       className="w-full relative"
+                     >
+                        <div className="h-11 w-full rounded-full border bg-muted/10 px-4 flex items-center gap-2 focus-within:ring-2 ring-primary/20 border-border/80 transition-all group shadow-inner-sm">
                            <input 
                               type="text" 
-                              placeholder="Message..." 
+                              value={inputVal}
+                              onChange={(e) => setInputVal(e.target.value)}
+                              disabled={chatLoading}
+                              placeholder="Ask anything..." 
                               className="flex-1 h-full bg-transparent text-sm font-medium placeholder:text-muted-foreground outline-none border-0"
                            />
-                           <Mic className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground" />
-                           <button className="h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
+                           <button 
+                             type="submit"
+                             disabled={!inputVal.trim() || chatLoading}
+                             className="h-7 w-7 rounded-full flex items-center justify-center text-white transition-all disabled:opacity-50 shadow-sm"
+                             style={{ backgroundColor: formData.widgetConfig.primaryColor }}
+                           >
                              <Send className="h-3.5 w-3.5" />
                            </button>
                         </div>
-                     </div>
+                     </form>
                   </div>
 
               </div>

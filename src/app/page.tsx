@@ -1,389 +1,606 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
-import { Bot, Sun, Moon, Menu, X, ChevronRight, MessageSquare, Zap, Shield, BarChart3, Star, Check } from 'lucide-react';
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion';
+import { 
+  Bot, Sun, Moon, Menu, X, ChevronRight, MessageSquare, Zap, Shield, 
+  BarChart3, Star, Check, UploadCloud, Code2, Rocket, Globe, Users, 
+  ArrowRight, PlayCircle, Sparkles, Mail, Headphones, FileText, Briefcase
+} from 'lucide-react';
 
-const TYPING_WORDS = ['Scale.', 'Growth.', 'Efficiency.', 'Velocity.', 'Automation.'];
+// --- COMPONENT: TYPING EFFECT LOOP ---
+const TYPING_WORDS = ['online', 'replying', 'learning', 'helping', 'converting', 'supporting'];
 
-function useTypingEffect(words: string[], speed = 80, pause = 1800) {
-  const [display, setDisplay] = useState('');
-  const [wordIdx, setWordIdx] = useState(0);
-  const [phase, setPhase] = useState<'typing' | 'pausing' | 'deleting'>('typing');
-  const ref = useRef({ charIdx: 0, wordIdx: 0, phase: 'typing' as 'typing' | 'pausing' | 'deleting' });
+function TypingText() {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
 
   useEffect(() => {
-    const tick = () => {
-      const { charIdx, wordIdx: wIdx, phase: p } = ref.current;
-      const word = words[wIdx];
-      if (p === 'typing') {
-        const next = word.slice(0, charIdx + 1);
-        setDisplay(next);
-        ref.current.charIdx++;
-        if (ref.current.charIdx === word.length) {
-          ref.current.phase = 'pausing';
-        }
-      } else if (p === 'pausing') {
-        ref.current.phase = 'deleting';
-      } else {
-        const next = word.slice(0, charIdx - 1);
-        setDisplay(next);
-        ref.current.charIdx--;
-        if (ref.current.charIdx === 0) {
-          ref.current.wordIdx = (wIdx + 1) % words.length;
-          setWordIdx(ref.current.wordIdx);
-          ref.current.phase = 'typing';
-        }
-      }
-    };
+    if (subIndex === TYPING_WORDS[index].length + 1 && !reverse) {
+      const timer = setTimeout(() => setReverse(true), 1500);
+      return () => clearTimeout(timer);
+    }
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % TYPING_WORDS.length);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 60 : 100);
 
-    const delay = ref.current.phase === 'pausing' ? pause : ref.current.phase === 'deleting' ? speed / 2 : speed;
-    const timer = setTimeout(tick, delay);
-    return () => clearTimeout(timer);
-  }, [display, words, speed, pause]);
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse]);
 
-  return display;
-}
-
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="w-9 h-9" />;
   return (
-    <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="w-9 h-9 flex items-center justify-center rounded-full border border-border bg-background hover:bg-muted transition-colors"
-      aria-label="Toggle theme"
-    >
-      {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-    </button>
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400 inline-block min-w-[150px]">
+      {TYPING_WORDS[index].substring(0, subIndex)}
+      <span className="text-orange-400 animate-pulse">|</span>
+    </span>
   );
 }
 
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
+// --- MAIN LANDING PAGE ---
+export default function LandingPage() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const typedWord = useTypingEffect(TYPING_WORDS);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [priceAnnual, setPriceAnnual] = useState(false);
+
+  const { scrollYProgress } = useScroll();
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    setMounted(true);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const features = [
-    {
-      icon: Zap,
-      title: 'Lightning Fast Setup',
-      desc: 'Upload PDFs, paste a URL, or type text. Your AI agent learns your business in minutes, not days.',
-    },
-    {
-      icon: MessageSquare,
-      title: 'Embeddable Chat Widget',
-      desc: 'A single line of JavaScript adds your trained AI agent to any website. No engineering required.',
-    },
-    {
-      icon: Shield,
-      title: 'Enterprise Security',
-      desc: 'Domain verification, rate limiting, and atomic credit locking protect you from abuse and overspending.',
-    },
-    {
-      icon: BarChart3,
-      title: 'Real-time Analytics',
-      desc: 'Track conversations, resolution rates, and credit usage from a beautiful unified dashboard.',
-    },
-  ];
-
-  const testimonials = [
-    { name: 'Priya S.', role: 'CTO at Finly', text: 'AgentDesk cut our support ticket volume by 70% in the first week. Absolutely game changing.' },
-    { name: 'Marcus T.', role: 'Founder at ShipFast', text: 'Setup took 15 minutes. Our AI agent now handles FAQs 24/7 and customers love it.' },
-    { name: 'Aisha K.', role: 'Head of Support', text: 'The knowledge base RAG is genuinely impressive. It cites the right docs every single time.' },
-  ];
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 font-sans overflow-x-hidden">
-      {/* Navbar */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-background/95 backdrop-blur-md shadow-sm border-b border-border' : 'bg-transparent'}`}>
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-md">
-              <Bot className="w-5 h-5 text-white" />
+    <div className="relative min-h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 selection:bg-orange-500/30 overflow-x-hidden font-sans antialiased transition-colors duration-300">
+      
+      {/* --- GLOBAL AMBIENT GLOWS --- */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-500/10 dark:bg-orange-600/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-400/10 dark:bg-orange-500/10 rounded-full blur-[120px]" />
+      </div>
+
+      {/* --- NAVBAR --- */}
+      <motion.nav 
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+          scrolled 
+            ? 'bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 py-3 shadow-sm' 
+            : 'bg-transparent py-5'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform transition group-hover:rotate-6">
+              <Bot className="w-5 h-5 text-white stroke-[2.5px]" />
             </div>
-            <span className="text-xl font-bold tracking-tight">AgentDesk</span>
+            <span className="font-black text-xl tracking-tighter">Agent Desk</span>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
-            <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-            <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Reviews</a>
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+            {['Features', 'How It Works', 'Pricing', 'Reviews'].map((item) => (
+              <a key={item} href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-zinc-900 dark:hover:text-white transition-colors relative group">
+                {item}
+                <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-orange-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+              </a>
+            ))}
           </div>
 
-          <div className="hidden md:flex items-center space-x-3">
-            <ThemeToggle />
-            <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2">Sign In</Link>
+          {/* Action Right */}
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <Link href="/login" className="hidden sm:block text-sm font-bold hover:text-orange-500 transition-colors">Login</Link>
             <Link href="/register">
-              <Button className="rounded-full px-6 bg-primary hover:bg-primary/90 text-white shadow-md">
-                Start Free
-              </Button>
+              <motion.button 
+                whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(249, 115, 22, 0.3)' }}
+                whileTap={{ scale: 0.95 }}
+                className="px-5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white rounded-full text-sm font-bold shadow-md flex items-center gap-2"
+              >
+                Try Now <ArrowRight className="w-4 h-4" />
+              </motion.button>
             </Link>
-          </div>
-
-          {/* Mobile */}
-          <div className="flex md:hidden items-center space-x-2">
-            <ThemeToggle />
-            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-md hover:bg-muted transition-colors">
-              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-background border-b border-border px-6 pb-6 space-y-4">
-            <a href="#features" className="block text-sm font-medium py-2" onClick={() => setMenuOpen(false)}>Features</a>
-            <a href="#pricing" className="block text-sm font-medium py-2" onClick={() => setMenuOpen(false)}>Pricing</a>
-            <a href="#testimonials" className="block text-sm font-medium py-2" onClick={() => setMenuOpen(false)}>Reviews</a>
-            <div className="flex flex-col space-y-2 pt-2">
-              <Link href="/login"><Button variant="outline" className="w-full">Sign In</Button></Link>
-              <Link href="/register"><Button className="w-full bg-primary text-white">Start Free</Button></Link>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 px-6 overflow-hidden">
-        {/* Background Glow */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full bg-primary/10 blur-[120px]" />
-        </div>
-
-        <div className="container mx-auto text-center max-w-4xl">
-          <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary font-medium mb-8 shadow-sm">
-            <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse" />
-            Now live — AgentDesk 1.0
-          </div>
-
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight mb-6">
-            AI Support Agents
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-400 to-amber-500">
-              Built for{' '}
-              <span className="inline-block min-w-[180px]">
-                {typedWord}
-                <span className="animate-pulse text-primary">|</span>
-              </span>
-            </span>
-          </h1>
-
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Train custom AI agents on your docs, deploy a chat widget instantly, and let AI handle your support queue around the clock.
-          </p>
-
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link href="/register">
-              <Button size="lg" className="h-14 px-10 text-base rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/30 transition-all hover:scale-105">
-                Start for free
-                <ChevronRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-            <a href="#features">
-              <Button size="lg" variant="outline" className="h-14 px-10 text-base rounded-full">
-                See how it works
-              </Button>
-            </a>
-          </div>
-
-          <p className="text-xs text-muted-foreground mt-4">No credit card required · Free plan includes 500 AI credits</p>
-        </div>
-
-        {/* Dashboard Preview */}
-        <div className="mt-20 container mx-auto max-w-5xl">
-          <div className="rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
-            <div className="bg-muted/50 px-4 py-3 flex items-center gap-2 border-b border-border">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-              </div>
-              <div className="flex-1 text-center text-xs text-muted-foreground font-mono">agentdesk.ai/dashboard</div>
-            </div>
-            <div className="flex h-80">
-              {/* Sidebar Mock */}
-              <div className="w-48 border-r border-border bg-muted/30 p-4 space-y-2 hidden sm:block">
-                {['Dashboard', 'Agents', 'Knowledge Base', 'Conversations', 'Billing'].map((item, i) => (
-                  <div key={item} className={`h-8 rounded-md flex items-center px-3 text-xs font-medium ${i === 0 ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-muted'}`}>
+        {/* Mobile Dropdown Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 overflow-hidden z-50 shadow-lg"
+            >
+              <div className="px-6 py-6 flex flex-col gap-5">
+                {['Features', 'How It Works', 'Pricing', 'Reviews'].map((item) => (
+                  <a 
+                    key={item} 
+                    href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-base font-bold text-zinc-700 dark:text-zinc-300 hover:text-orange-500 py-2 transition-colors"
+                  >
                     {item}
-                  </div>
+                  </a>
                 ))}
+                <hr className="border-zinc-100 dark:border-zinc-800 my-2" />
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-base font-bold text-zinc-700 dark:text-zinc-300 py-2">Login</Link>
+                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <button className="w-full py-4 bg-orange-600 text-white rounded-xl font-bold text-base">
+                    Try Now
+                  </button>
+                </Link>
               </div>
-              {/* Content Mock */}
-              <div className="flex-1 p-6 space-y-4 bg-background">
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+
+      {/* --- HERO SECTION --- */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6 overflow-hidden">
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05]" 
+             style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+        
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
+          {/* Left Column */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-left"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-wider mb-6">
+              <Sparkles className="w-3 h-3" /> AI Support Core v2.0
+            </div>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6">
+              Your AI Support Team Is Always <br />
+              <TypingText />
+            </h1>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400 font-medium mb-10 max-w-xl leading-relaxed">
+              Agent Desk injects intelligent adaptive layers into your website. Answer customers instantly, automate complex ticketing workflows, and 10x your resolution rates.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <Link href="/register">
+                <motion.button whileHover={{ scale: 1.03 }} className="h-14 px-8 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full font-bold shadow-xl flex items-center gap-2">
+                  Get Started
+                </motion.button>
+              </Link>
+              <a href="#how-it-works">
+                <motion.button whileHover={{ scale: 1.03 }} className="h-14 px-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full font-bold shadow-sm flex items-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+                  How It Works
+                </motion.button>
+              </a>
+            </div>
+
+            <div className="mt-12 grid grid-cols-3 gap-6 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-8">
+              {[
+                { val: '↓ 90%', label: 'Resolution Time' },
+                { val: '↓ 65%', label: 'Operational Cost' },
+                { val: '↑ 98%', label: 'CSAT Score' },
+              ].map((stat, i) => (
+                <div key={i}>
+                  <div className="text-2xl font-black text-orange-600 dark:text-orange-500">{stat.val}</div>
+                  <div className="text-xs font-bold text-zinc-500 uppercase mt-1">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right Column: Premium Mockup */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="absolute -inset-4 bg-gradient-to-br from-orange-500/20 to-amber-500/20 blur-2xl rounded-full opacity-50" />
+            <div className="relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden aspect-[4/3] flex flex-col">
+              <div className="h-12 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 px-4 flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 bg-red-400 rounded-full" />
+                  <div className="w-3 h-3 bg-amber-400 rounded-full" />
+                  <div className="w-3 h-3 bg-emerald-400 rounded-full" />
+                </div>
+                <div className="mx-auto text-xs font-bold text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-4 py-1 rounded-lg flex items-center gap-1.5">
+                  <Bot className="w-3 h-3" /> AgentDesk Admin console
+                </div>
+              </div>
+              <div className="flex-1 p-6 bg-[#fafafa] dark:bg-zinc-950 flex flex-col gap-6">
                 <div className="grid grid-cols-3 gap-4">
-                  {['1,247 Chats', '94% Resolved', '500 Credits'].map((label) => (
-                    <div key={label} className="rounded-lg border border-border bg-card p-3">
-                      <div className="h-2 w-12 bg-muted rounded mb-2 animate-pulse" />
-                      <div className="text-sm font-semibold">{label}</div>
+                   {[1,2,3].map(i => (
+                     <div key={i} className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm animate-pulse" style={{ animationDelay: `${i*200}ms` }}>
+                        <div className="w-1/2 h-2 bg-zinc-200 dark:bg-zinc-800 rounded mb-3" />
+                        <div className="w-full h-4 bg-orange-500/20 rounded" />
+                     </div>
+                   ))}
+                </div>
+                <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                   <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold">A</div>
+                      <div className="font-bold text-sm">Training Neural Model</div>
+                   </div>
+                   <div className="space-y-3">
+                      <div className="h-3 w-3/4 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" />
+                      <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" style={{ animationDelay: '300ms' }} />
+                      <div className="h-3 w-2/3 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" style={{ animationDelay: '600ms' }} />
+                   </div>
+                   {/* Floating chat pop over mockup */}
+                   <div className="absolute bottom-4 right-4 w-48 bg-orange-500 text-white p-3 rounded-2xl shadow-xl shadow-orange-500/20 font-medium text-xs border border-orange-400 animate-bounce-slow">
+                      👋 Hi, welcome! How can our AI agent assist you today?
+                   </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* --- LOGO STRIP --- */}
+      <section className="py-10 bg-zinc-50 dark:bg-zinc-900/20 border-y border-zinc-200 dark:border-zinc-800/50">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-xs font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-8">Trusted by forward-thinking startups globally</p>
+          <div className="flex flex-wrap justify-center gap-12 md:gap-20 opacity-50 grayscale dark:invert brightness-0 transition-all">
+             <span className="font-black text-xl italic">Vercel</span>
+             <span className="font-black text-xl tracking-tighter">Linear</span>
+             <span className="font-black text-xl tracking-wide">Stripe</span>
+             <span className="font-black text-xl">Raycast</span>
+             <span className="font-black text-xl uppercase tracking-widest">Supabase</span>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FEATURES SECTION --- */}
+      <section id="features" className="py-24 px-6 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-sm font-black uppercase text-orange-500 tracking-widest mb-3">Superpowers</h2>
+            <h3 className="text-3xl md:text-5xl font-black tracking-tight">Everything you need to automate</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: Bot, t: 'AI Customer Support', d: 'Leverage bleeding-edge language models for human-like accuracy.' },
+              { icon: FileText, t: 'Smart Knowledge Base', d: 'Instantly hydrate AI using existing docs, URLs, and TXT files.' },
+              { icon: ArrowRight, t: 'Live Chat Escalation', d: 'Smooth handoffs to real teammates whenever humans are preferred.' },
+              { icon: Globe, t: 'Multi-platform Grid', d: 'Deploy on WhatsApp, Discord, Telegram, and Native Web Widgets.' },
+              { icon: Zap, t: 'AI Ticket Creation', d: 'Automatically open internal support tickets from AI chatter triggers.' },
+              { icon: BarChart3, t: 'Analytics Dashboard', d: 'Track resolved tickets, user happiness, and node activity live.' },
+            ].map((f, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ y: -5 }}
+                className="group relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 shadow-sm transition-all duration-300 hover:shadow-orange-500/10 hover:border-orange-500/30"
+              >
+                <div className="w-12 h-12 bg-zinc-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mb-6 transition-colors group-hover:bg-orange-500/10 group-hover:text-orange-500">
+                  <f.icon className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-bold mb-2">{f.t}</h4>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">{f.d}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- HOW IT WORKS SECTION REMASTERED --- */}
+      <section id="how-it-works" className="py-24 bg-zinc-50 dark:bg-[#050506] text-zinc-900 dark:text-white border-y border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
+         <div className="absolute inset-0 bg-orange-600/5 opacity-[0.2] dark:opacity-30" style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '40px 40px', color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }} />
+         <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="text-center mb-20">
+               <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">Go live in 3 steps</h2>
+               <p className="text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto text-lg font-medium">No complex deployments. Pure intelligence ready in minutes.</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 relative">
+               {/* Connector Line */}
+               <div className="hidden lg:block absolute top-1/2 left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-orange-500 via-orange-500/20 to-transparent -translate-y-1/2 z-0 opacity-30" />
+               
+               {[
+                 { step: 1, icon: UploadCloud, t: 'Train Your AI', d: 'Paste your website link or upload document PDF files to ingest logic.' },
+                 { step: 2, icon: Code2, t: 'Embed Anywhere', d: 'Copy/paste one line of script or iframe to ship your active agent.' },
+                 { step: 3, icon: Rocket, t: 'Automate & Scale', d: 'Sit back as AI resolves thousands of queries autonomously 24/7.' },
+               ].map((s, i) => (
+                 <div key={i} className="relative z-10 text-center flex flex-col items-center">
+                    <div className="w-20 h-20 rounded-full bg-white dark:bg-zinc-900 border-2 border-orange-500/50 flex items-center justify-center text-orange-500 shadow-xl shadow-orange-500/10 mb-8 transition-transform hover:scale-105 hover:border-orange-500">
+                       <s.icon className="w-8 h-8" />
                     </div>
-                  ))}
-                </div>
-                <div className="rounded-lg border border-border bg-card p-4 h-40">
-                  <div className="h-2 w-20 bg-muted rounded mb-4 animate-pulse" />
-                  <div className="flex items-end gap-2 h-24">
-                    {[60, 80, 45, 90, 70, 95, 65].map((h, i) => (
-                      <div key={i} className="flex-1 rounded-t-sm bg-primary/20" style={{ height: `${h}%` }} />
-                    ))}
+                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-black absolute -top-2 right-1/2 translate-x-12 shadow-md">0{s.step}</div>
+                    <h4 className="text-2xl font-bold mb-4">{s.t}</h4>
+                    <p className="text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed px-6">{s.d}</p>
+                 </div>
+               ))}
+            </div>
+         </div>
+      </section>
+
+      {/* --- PRICING SECTION --- */}
+      {/* --- PRICING SECTION REMASTERED --- */}
+      <section id="pricing" className="py-24 px-6 relative overflow-hidden">
+         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[120px] pointer-events-none" />
+         <div className="max-w-5xl mx-auto relative z-10">
+            <div className="text-center mb-16">
+               <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-tight">Transparent Scale-pricing</h2>
+               
+               {/* Smooth Toggle Container */}
+               <div className="inline-flex items-center bg-white dark:bg-zinc-900 p-1.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-lg">
+                  <button 
+                    onClick={() => setPriceAnnual(false)} 
+                    className={`relative px-8 py-3 text-sm font-bold rounded-xl transition-all ${!priceAnnual ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 hover:text-zinc-500'}`}
+                  >
+                     {!priceAnnual && <motion.div layoutId="active-tab" className="absolute inset-0 bg-zinc-100 dark:bg-zinc-800 rounded-xl shadow-sm z-0" />}
+                     <span className="relative z-10">Monthly</span>
+                  </button>
+                  <button 
+                    onClick={() => setPriceAnnual(true)} 
+                    className={`relative px-8 py-3 text-sm font-bold rounded-xl transition-all flex items-center gap-2 ${priceAnnual ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 hover:text-zinc-500'}`}
+                  >
+                     {priceAnnual && <motion.div layoutId="active-tab" className="absolute inset-0 bg-zinc-100 dark:bg-zinc-800 rounded-xl shadow-sm z-0" />}
+                     <span className="relative z-10">Yearly</span>
+                     <span className="relative z-10 text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-full shadow-md animate-pulse">Save 10%</span>
+                  </button>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+               {/* FREE PLAN */}
+               <div className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-10 shadow-sm flex flex-col h-full transition-all hover:scale-[1.01] hover:bg-white/80 dark:hover:bg-zinc-900/80">
+                  <div className="mb-10">
+                     <h3 className="font-bold text-xl mb-3 text-zinc-900 dark:text-zinc-100">Free</h3>
+                     <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6 font-medium">Perfect for testing and small projects.</p>
+                     <div className="flex items-baseline gap-1">
+                        <span className="text-5xl font-black tracking-tighter text-zinc-900 dark:text-white">$0</span>
+                        <span className="text-zinc-400 text-sm font-bold ml-1">/mo</span>
+                     </div>
                   </div>
-                </div>
-              </div>
+                  <ul className="space-y-4 mb-12 flex-1">
+                     {[
+                        '5,000 AI Credits/month',
+                        '1 AI Agent',
+                        'Basic Website Widget',
+                        'Limited Chat History',
+                        'Community Support',
+                        'Basic Analytics',
+                        '1 Team Member',
+                        'Standard Response Speed'
+                     ].map((f, i) => (
+                       <li key={i} className="flex items-start gap-3 text-sm font-medium text-zinc-600 dark:text-zinc-300">
+                          <Check className="w-5 h-5 text-emerald-500 dark:text-orange-500/80 shrink-0 stroke-[2.5px]" /> {f}
+                       </li>
+                     ))}
+                  </ul>
+                  <Link href="/register">
+                     <button className="w-full py-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 font-bold text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center">
+                        Start Free
+                     </button>
+                  </Link>
+               </div>
+
+               {/* PREMIUM PLAN */}
+               <div className="relative bg-zinc-950 text-white dark:bg-[#0a0a0b] border-2 border-orange-500 shadow-[0_0_60px_rgba(249,115,22,0.2)] rounded-[32px] p-10 flex flex-col h-full transition-all hover:scale-[1.02] overflow-hidden group">
+                  {/* Subtle glowing gradient background inside card */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-transparent pointer-events-none group-hover:opacity-70 transition-opacity" />
+                  
+                  {/* Most Popular Badge */}
+                  <div className="absolute top-6 right-6 bg-orange-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg shadow-orange-500/30 z-10">
+                     Most Popular
+                  </div>
+                  
+                  <div className="mb-10 relative z-10">
+                     <h3 className="font-bold text-xl mb-3 text-orange-500 flex items-center gap-2">Premium <Sparkles className="w-4 h-4 fill-current" /></h3>
+                     <p className="text-zinc-400 text-sm mb-6 font-medium">Built for startups and growing businesses.</p>
+                     <div className="flex items-baseline gap-1 overflow-hidden h-[60px]">
+                        <span className="text-5xl font-black tracking-tighter text-white flex items-center">
+                           $
+                           <AnimatePresence mode="wait">
+                              <motion.span
+                                 key={priceAnnual ? '313' : '29'}
+                                 initial={{ y: 20, opacity: 0 }}
+                                 animate={{ y: 0, opacity: 1 }}
+                                 exit={{ y: -20, opacity: 0 }}
+                                 transition={{ duration: 0.2 }}
+                                 className="inline-block"
+                              >
+                                 {priceAnnual ? '313' : '29'}
+                              </motion.span>
+                           </AnimatePresence>
+                        </span>
+                        <AnimatePresence mode="wait">
+                           <motion.span 
+                              key={priceAnnual ? '/year' : '/mo'}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="text-zinc-400 text-sm font-bold ml-1"
+                           >
+                              {priceAnnual ? '/year' : '/mo'}
+                           </motion.span>
+                        </AnimatePresence>
+                     </div>
+                     {priceAnnual && (
+                        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="text-orange-500/90 text-xs font-black mt-2 flex items-center gap-2">
+                           <span className="line-through opacity-60">Was $348</span>
+                           <span className="bg-orange-500/10 text-[10px] px-2 py-0.5 rounded border border-orange-500/20">10% OFF</span>
+                        </motion.div>
+                     )}
+                  </div>
+                  
+                  <ul className="grid grid-cols-1 sm:grid-cols-1 gap-y-4 mb-12 flex-1 relative z-10">
+                     {[
+                        '20,000 AI Credits/month',
+                        '5 AI Agents',
+                        'Unlimited Chat History',
+                        'AI Ticket Automation',
+                        'Human Handoff',
+                        'Slack + Zendesk Integrations',
+                        'Advanced Analytics Dashboard',
+                        'Priority AI Response Speed',
+                        'Multi-Website Support',
+                        'Team Inbox',
+                        'Custom Branding',
+                        'Priority Support'
+                     ].map((f, i) => (
+                       <li key={i} className="flex items-start gap-3 text-sm font-medium text-zinc-200 hover:text-white transition-colors">
+                          <Check className="w-5 h-5 text-orange-500 shrink-0 stroke-[3px]" /> {f}
+                       </li>
+                     ))}
+                  </ul>
+                  
+                  <Link href="/plans" className="relative z-10">
+                     <button className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 text-white font-bold text-base shadow-xl shadow-orange-600/20 hover:shadow-orange-500/40 hover:brightness-110 transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]">
+                        Upgrade Now <ArrowRight className="w-5 h-5" />
+                     </button>
+                  </Link>
+               </div>
             </div>
-          </div>
-        </div>
+         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="py-24 px-6">
-        <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Everything you need to automate support</h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">From AI training to widget deployment, AgentDesk handles the entire support stack.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {features.map((f) => (
-              <div key={f.title} className="rounded-2xl border border-border bg-card p-8 hover:border-primary/40 hover:shadow-md transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                  <f.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{f.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{f.desc}</p>
+      {/* --- TESTIMONIALS --- */}
+      <section id="reviews" className="py-24 bg-zinc-50 dark:bg-zinc-900/30 overflow-hidden">
+         <div className="max-w-7xl mx-auto px-6 text-center mb-12">
+            <h2 className="text-3xl font-black">Loved by top founders</h2>
+         </div>
+         
+         {/* Carousel Marquee effect wrapper */}
+         <div className="flex gap-6 overflow-x-hidden relative group">
+            <div className="flex gap-6 animate-marquee-infinite whitespace-nowrap py-4 flex-nowrap">
+               {[
+                 { n: 'Sarah J.', r: 'CTO @ Fintech', q: "Agent Desk slashed our support queue in hours. Pure wizardry." },
+                 { n: 'Alex K.', r: 'Founder @ SaaSify', q: "Best integration I've ever written. Hand-offs are instant." },
+                 { n: 'Elena V.', r: 'Growth @ Ecom', q: "The AI handles 90% of requests. Conversion rate jumped instantly." },
+                 { n: 'Mike D.', r: 'Lead @ Agency', q: "Absolutely vital component for modern enterprise apps. High-end UI." },
+                 { n: 'Sarah J.', r: 'CTO @ Fintech', q: "Agent Desk slashed our support queue in hours. Pure wizardry." },
+                 { n: 'Alex K.', r: 'Founder @ SaaSify', q: "Best integration I've ever written. Hand-offs are instant." },
+               ].map((t, i) => (
+                 <div key={i} className="w-[350px] inline-block flex-shrink-0 whitespace-normal bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-3xl shadow-sm">
+                    <div className="flex gap-1 text-orange-500 mb-4">
+                       {[1,2,3,4,5].map(s => <Star key={s} className="w-3.5 h-3.5 fill-current" />)}
+                    </div>
+                    <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-6 italic leading-relaxed">"{t.q}"</p>
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-black text-sm">{t.n[0]}</div>
+                       <div>
+                          <div className="font-bold text-sm">{t.n}</div>
+                          <div className="text-xs text-zinc-500 font-medium">{t.r}</div>
+                       </div>
+                    </div>
+                 </div>
+               ))}
+            </div>
+         </div>
+      </section>
+
+      {/* --- FINAL CTA BANNER REMASTERED --- */}
+      <section className="py-24 px-6">
+         <div className="max-w-5xl mx-auto bg-gradient-to-br from-[#fff2eb] via-[#fffbf9] to-[#fff2eb] dark:from-[#27272a] dark:to-[#18181b] rounded-[48px] border border-orange-200/30 dark:border-zinc-800 p-12 md:p-24 text-center text-zinc-900 dark:text-white shadow-xl relative overflow-hidden">
+            <div className="absolute -right-20 -top-20 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+               <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 leading-[1.1]">
+                  Ready to transform support?
+               </h2>
+               <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-12 text-lg font-medium leading-relaxed px-4">
+                  Join thousands of teams delivering superhuman support at a fraction <br className="hidden md:block" /> of the cost.
+               </p>
+               <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+                  <Link href="/register">
+                     <motion.button 
+                        whileHover={{ scale: 1.03, y: -2 }} 
+                        className="h-14 px-10 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl font-bold text-base shadow-lg shadow-orange-500/30 transition-all"
+                     >
+                        Get Started for Free
+                     </motion.button>
+                  </Link>
+                  <Link href="/login">
+                     <motion.button 
+                        whileHover={{ scale: 1.03 }} 
+                        className="h-14 px-10 bg-white text-zinc-900 border border-zinc-200 rounded-2xl font-bold text-base shadow-sm hover:bg-zinc-50 transition-all"
+                     >
+                        Sign Up Now
+                     </motion.button>
+                  </Link>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* --- FOOTER --- */}
+      <footer className="bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800/50 pt-20 pb-10 px-6">
+         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-16">
+            <div className="col-span-2">
+               <div className="flex items-center gap-2.5 mb-6">
+                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white"><Bot className="w-5 h-5" /></div>
+                  <span className="font-black text-lg">Agent Desk</span>
+               </div>
+               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Injecting autonomous atomic intelligence into scaling workflows worldwide.</p>
+            </div>
+            {[
+              { t: 'Product', links: ['Features', 'Pricing', 'Widget', 'Integrations'] },
+              { t: 'Company', links: ['About', 'Careers', 'Blog', 'Media Kit'] },
+              { t: 'Support', links: ['Documentation', 'API Access', 'Guides', 'Status'] },
+            ].map((group, i) => (
+              <div key={i}>
+                 <h5 className="font-bold text-sm mb-6 text-zinc-900 dark:text-white">{group.t}</h5>
+                 <ul className="space-y-4">
+                    {group.links.map(l => (
+                      <li key={l}><a href="#" className="text-sm font-medium text-zinc-500 hover:text-orange-500 transition-colors">{l}</a></li>
+                    ))}
+                 </ul>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-24 px-6 bg-muted/30">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Simple, honest pricing</h2>
-            <p className="text-muted-foreground text-lg">Start free. Upgrade when you're ready.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Free */}
-            <div className="rounded-2xl border border-border bg-card p-8">
-              <div className="mb-6">
-                <h3 className="text-xl font-bold mb-1">Free</h3>
-                <p className="text-muted-foreground text-sm">Perfect to get started</p>
-              </div>
-              <div className="mb-8">
-                <span className="text-5xl font-bold">$0</span>
-                <span className="text-muted-foreground ml-2">/month</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {['1 AI Agent', '500 AI Credits/month', 'Chat Widget Embed', 'Basic Analytics', 'Community Support'].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-sm">
-                    <Check className="w-4 h-4 text-primary shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register">
-                <Button variant="outline" className="w-full rounded-full">Get started free</Button>
-              </Link>
+         </div>
+         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-800/50 text-xs font-bold text-zinc-400 uppercase tracking-wider">
+            <p>© 2026 AgentDesk Inc. All rights reserved.</p>
+            <div className="flex gap-6">
+               <a href="#">Privacy</a>
+               <a href="#">Terms</a>
+               <a href="#">GDPR</a>
             </div>
-
-            {/* Premium */}
-            <div className="rounded-2xl border-2 border-primary bg-card p-8 relative shadow-lg shadow-primary/10">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span className="bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-full">MOST POPULAR</span>
-              </div>
-              <div className="mb-6">
-                <h3 className="text-xl font-bold mb-1">Premium</h3>
-                <p className="text-muted-foreground text-sm">For growing businesses</p>
-              </div>
-              <div className="mb-8">
-                <span className="text-5xl font-bold">$29</span>
-                <span className="text-muted-foreground ml-2">/month</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {['5 AI Agents', '20,000 AI Credits/month', 'Domain Verification', 'Priority Support', 'Credit Top-ups Available', 'Custom Widget Branding'].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-sm">
-                    <Check className="w-4 h-4 text-primary shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/register">
-                <Button className="w-full rounded-full bg-primary hover:bg-primary/90 text-white shadow-md">
-                  Start free, upgrade anytime
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="py-24 px-6">
-        <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Loved by support teams</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t) => (
-              <div key={t.name} className="rounded-2xl border border-border bg-card p-6 hover:shadow-md transition-shadow">
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-primary text-primary" />)}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">"{t.text}"</p>
-                <div>
-                  <div className="font-semibold text-sm">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 px-6 bg-muted/30">
-        <div className="container mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-6">
-            Ready to automate your support?
-          </h2>
-          <p className="text-muted-foreground text-lg mb-10">
-            Join hundreds of businesses using AgentDesk to resolve tickets faster.
-          </p>
-          <Link href="/register">
-            <Button size="lg" className="h-14 px-12 text-base rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/30 hover:scale-105 transition-all">
-              Start for free — no credit card needed
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border py-12 px-6">
-        <div className="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
-              <Bot className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold">AgentDesk</span>
-          </div>
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} AgentDesk. All rights reserved.</p>
-          <div className="flex gap-6 text-sm text-muted-foreground">
-            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
-          </div>
-        </div>
+         </div>
       </footer>
+
+      {/* Define simple infinite marquee animation custom style */}
+      <style jsx global>{`
+         @keyframes marquee-infinite {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+         }
+         .animate-marquee-infinite {
+            display: flex;
+            width: max-content;
+            animation: marquee-infinite 40s linear infinite;
+         }
+         .animate-marquee-infinite:hover {
+            animation-play-state: paused;
+         }
+         @keyframes bounce-slow {
+            0%, 100% { transform: translateY(-5%); }
+            50% { transform: translateY(0); }
+         }
+         .animate-bounce-slow {
+            animation: bounce-slow 3s ease-in-out infinite;
+         }
+      `}</style>
     </div>
   );
 }

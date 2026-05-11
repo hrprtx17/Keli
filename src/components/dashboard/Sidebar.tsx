@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import {
   Bot, MessageSquare, Ticket, BookOpen, Settings, LogOut, ChevronRight, Zap, 
-  Activity, BarChart3, Database, Code, Globe, Users, PlayCircle, HelpCircle, LayoutDashboard, Timer, ChevronDown
+  Activity, BarChart3, Database, Code, Globe, Users, PlayCircle, HelpCircle, LayoutDashboard, Timer, ChevronDown, Rocket
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
@@ -103,6 +103,13 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
              <NavLink href="/knowledge" icon={Database}>
                 <div className="flex items-center justify-between w-full pr-0.5">
                   <span>Data Sources</span>
+                  <ChevronDown className="h-3 w-3 opacity-30" />
+                </div>
+             </NavLink>
+
+             <NavLink href="/deploy" icon={Rocket}>
+                <div className="flex items-center justify-between w-full pr-0.5">
+                  <span>Deploy</span>
                   <ChevronDown className="h-3 w-3 opacity-30" />
                 </div>
              </NavLink>

@@ -122,7 +122,7 @@ export default function DashboardPage() {
                       contentStyle={{ backgroundColor: '#fff', border: '1px solid #e4e4e7', borderRadius: '16px', fontSize: '12px', fontWeight: '600', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                       itemStyle={{ color: 'hsl(var(--primary))' }}
                     />
-                    <Area type="monotone" dataKey="conversations" stroke="hsl(var(--primary))" strokeWidth={2.5} fill="url(#conv)" dot={{ r: 4, fill: '#fff', stroke: 'hsl(var(--primary))', strokeWidth: 2 }} activeDot={{ r: 6, shadow: '0px 0px 10px rgba(0,0,0,0.2)' }} />
+                    <Area type="monotone" dataKey="conversations" stroke="hsl(var(--primary))" strokeWidth={2.5} fill="url(#conv)" dot={{ r: 4, fill: '#fff', stroke: 'hsl(var(--primary))', strokeWidth: 2 }} activeDot={{ r: 6, strokeWidth: 2 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}

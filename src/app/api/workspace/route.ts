@@ -73,6 +73,30 @@ export async function POST(req: Request) {
   }
 }
 
+export async function DELETE() {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    await connectDB();
+    const wsId = await resolveWorkspaceId(session);
+    if (!wsId) return NextResponse.json({ error: 'No active workspace context found.' }, { status: 404 });
+
+    // Nuclear wipe: Remove workspace.
+    await Workspace.findByIdAndDelete(wsId);
+    
+    // Cleanup references for safety
+    await User.updateOne(
+      { email: session.user?.email },
+      { $unset: { workspaceId: "" } }
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: 'Deletion routing failure.' }, { status: 500 });
+  }
+}
+
 async function handleCreateWorkspace(req: Request, dbUser: any, name: string, slug: string) {
   const existing = await Workspace.findOne({ slug });
   if (existing) {
