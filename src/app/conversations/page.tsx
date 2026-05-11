@@ -2,22 +2,22 @@
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function TicketsPage() {
+export default function ConversationsPage() {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Support Tickets</h1>
-          <p className="text-muted-foreground mt-1">Manage escalated tickets that require human intervention.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Conversations</h1>
+          <p className="text-muted-foreground mt-1">View chat histories between your AI agents and users.</p>
         </div>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Open Tickets</CardTitle>
+          <CardTitle>Recent Conversations</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8 text-muted-foreground">
-            No open tickets right now.
+            Conversation history will appear here.
           </div>
         </CardContent>
       </Card>

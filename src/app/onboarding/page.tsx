@@ -101,9 +101,8 @@ export default function OnboardingPage() {
             </div>
             <div className="space-y-4">
               {[
-                { id: 'free', name: 'Free', price: '$0', desc: '1 Agent, 1,000 msgs/mo' },
-                { id: 'pro', name: 'Pro', price: '$19', desc: '5 Agents, 10,000 msgs/mo' },
-                { id: 'business', name: 'Business', price: '$49', desc: 'Unlimited Agents, 50,000 msgs/mo' }
+                { id: 'free', name: 'Free', price: '$0', desc: '1 Agent, 500 Credits/mo' },
+                { id: 'premium', name: 'Premium', price: '$29', desc: '5 Agents, 20,000 Credits/mo' }
               ].map(p => (
                 <div 
                   key={p.id} 
