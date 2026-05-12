@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   Bot, Loader2, Globe, Zap, Sparkles, ArrowRight, 
   MessageSquare, Check, Server, Layers, HelpCircle, FileText 
@@ -178,7 +178,7 @@ export default function OnboardingPage() {
   const hostname = website.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
   // Fast high-end spring animations
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -194,7 +194,7 @@ export default function OnboardingPage() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 12, scale: 0.985 },
     visible: { 
       opacity: 1, 

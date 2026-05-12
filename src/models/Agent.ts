@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
-export interface IAgent extends Document {
+export interface IAgent {
   workspaceId: mongoose.Types.ObjectId
   name: string
   description?: string

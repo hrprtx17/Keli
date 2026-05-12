@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
-export default function DeployPage() {
+function DeployPageContent() {
   const searchParams = useSearchParams();
   const agentId = searchParams.get('agentId');
   const [copied, setCopied] = useState<string | null>(null);
@@ -247,5 +247,13 @@ export default function DeployPage() {
 
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function DeployPage() {
+  return (
+    <Suspense fallback={<DashboardLayout><div className="p-12 flex justify-center"><div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div></DashboardLayout>}>
+      <DeployPageContent />
+    </Suspense>
   );
 }

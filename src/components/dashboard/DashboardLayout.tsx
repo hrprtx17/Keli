@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Sidebar } from './Sidebar';
 import { Menu, X, ChevronRight } from 'lucide-react';
 
@@ -10,7 +10,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Desktop sidebar (hidden on mobile) */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar />
+        <Suspense fallback={<div className="w-[260px] bg-[#FAFAFA]" />}>
+          <Sidebar />
+        </Suspense>
       </div>
 
       {/* Mobile sidebar backdrop overlay */}
@@ -23,7 +25,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile sidebar sliding drawer */}
       <div className={`fixed inset-y-0 left-0 z-50 flex transition duration-300 transform lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar onNavClick={() => setSidebarOpen(false)} />
+        <Suspense fallback={<div className="w-[260px] bg-[#FAFAFA]" />}>
+          <Sidebar onNavClick={() => setSidebarOpen(false)} />
+        </Suspense>
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden">

@@ -1,16 +1,16 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { toast } from 'sonner';
 import { 
   Database, FileText, Globe, UploadCloud, Bot, Trash2, 
   RefreshCcw, Loader2, AlertCircle, ChevronRight, Link as LinkIcon, Blocks
 } from 'lucide-react';
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0, y: 10 },
   visible: { 
     opacity: 1, y: 0,
@@ -18,12 +18,12 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 8, scale: 0.99 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 350, damping: 28 } }
 };
 
-export default function KnowledgePage() {
+function KnowledgePageContent() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const urlAgentId = searchParams.get('agentId');
@@ -611,5 +611,13 @@ export default function KnowledgePage() {
 
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function KnowledgePage() {
+  return (
+    <Suspense fallback={<DashboardLayout><div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div></DashboardLayout>}>
+      <KnowledgePageContent />
+    </Suspense>
   );
 }

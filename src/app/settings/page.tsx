@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -279,5 +279,13 @@ export default function SettingsPage() {
 
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<DashboardLayout><div className="p-12 flex justify-center"><RefreshCw className="w-6 h-6 animate-spin text-gray-400" /></div></DashboardLayout>}>
+      <SettingsPageContent />
+    </Suspense>
   );
 }
