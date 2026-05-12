@@ -98,9 +98,7 @@ export async function POST(req: Request) {
 
     let relevantChunks: string[] = [];
     try {
-      if (process.env.HUGGINGFACE_API_KEY) {
-        relevantChunks = await searchKnowledge(message, agent._id.toString());
-      }
+      relevantChunks = await searchKnowledge(message, agent._id.toString(), agent.workspaceId.toString());
     } catch (e) {
       console.error('RAG Error:', e);
     }

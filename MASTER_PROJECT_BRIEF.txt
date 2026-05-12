@@ -1,0 +1,130 @@
+# AgentDesk: Master Project Brief & Full Audit
+
+================================================================================
+EXECUTIVE SUMMARY & FINAL VERDICT
+================================================================================
+| Category                | Score     |
+| ----------------------- | --------- |
+| Overall Architecture    | 4.5 / 10  |
+| Production Readiness    | 3.0 / 10  |
+| Security Maturity       | 6.0 / 10  |
+| AI/RAG Quality          | 2.0 / 10  |
+| SaaS Maturity           | 7.0 / 10  |
+
+Biggest Technical Weakness: The RAG implementation is a fatal prototype that fakes file ingestion and calculates dynamic embeddings during the request pipeline, creating infinite blocking lag.
+CTO Recommendation: DO NOT SCALE OR LAUNCH. The UI is premium, but the vector engine is non-existent. Immediate refactor of lib/rag.ts is mandatory.
+
+================================================================================
+SECTION 1 — PRODUCT POSITIONING
+================================================================================
+- Core Category: No-Code AI Support Platform / B2B SaaS Widget builder.
+- Target Audience: SMBs and startup support teams needing Tier-1 automation.
+- Differentiator: Exceptional frontend visual aesthetic coupled with extreme inference speed via Groq.
+- Market Comparison: 
+  - vs Chatbase: UI matches up, backend ingestion fails by comparison.
+  - vs Intercom AI: Dramatically more affordable, but lacks mature ticketing workflows.
+
+================================================================================
+SECTION 2 — FULL TECH STACK ANALYSIS
+================================================================================
+- Frontend: Next.js 16.2 (App Router), React 19, Tailwind CSS v4, Framer Motion, React Query, Zustand.
+- Backend: Next.js Node/Edge Serverless Runtimes.
+- Database: MongoDB Atlas via Mongoose ODM. 
+- Authentication: Next-Auth v5 Beta (Auth.js) - Credentials & Google OAuth.
+- AI Stack: Groq (LLaMA 3) for inference, HuggingFace Inference API for on-the-fly embeddings.
+- Critical Flaw: No Vector Database implemented. In-memory raw JS loops are used.
+- Payments: DodoPayments for webhooks and billing subscriptions.
+
+================================================================================
+SECTION 3 — CURRENT FEATURE INVENTORY
+================================================================================
+FULLY IMPLEMENTED:
+- Auth Flow: Robust JWT middleware protection.
+- Agent Dashboard: Functional UI for prompt tuning, tone adjustment, model selection.
+- Deployment UI: Clear snippet generator for script/iframe installs.
+- Atomic Billing: Reliable credit decrement via Mongo aggregation logic.
+
+PARTIALLY IMPLEMENTED / FAKED:
+- Ingestion (CRITICAL FAIL): Frontend strictly hardcodes text "Simulate vectors for..." sending mock data to DB. No actual PDF/URL parsing occurs.
+- Vector Persistence: Embeddings are generated per-request and deleted immediately.
+- Analytics: Extremely superficial counts only. No tracking or visualization.
+
+================================================================================
+SECTION 4 — AI & RAG PIPELINE ANALYSIS
+================================================================================
+Process: Message -> api/chat -> lookup data sources -> searchKnowledge() -> Groq.
+FORENSIC AUDIT OF lib/rag.ts:
+1. Fetches all text documents for agent from Mongo.
+2. Splits every text document in runtime using regex.
+3. For every single chunk, executes a network fetch to Hugging Face API to generate an embedding.
+4. Performs Array.reduce Cosine Similarity in raw JS memory.
+5. Sorts and returns Top-3 to inject into prompt.
+SCALABILITY RATING: FATAL. 100 chunks would trigger 100 sequential external HTTP requests per single user chat message, timing out the gateway.
+
+================================================================================
+SECTION 5 — DATA INGESTION SYSTEM
+================================================================================
+- Support: PDF-parse and Cheerio are in dependencies but NEVER imported.
+- Extraction Quality: 0%. It does not extract.
+- Database State: The content field just saves a mock filename string instead of real vectors.
+
+================================================================================
+SECTION 6 — MULTI-TENANCY & SECURITY AUDIT
+================================================================================
+- Isolation: Clean workspaceId and agentId scoping guards queries correctly.
+- Widget Security: Explicit domain Referer checks limit third-party hijacking.
+- Vulnerabilities: 
+  - RateLimiter throttles Mongo: High traffic would cause write locks and kill the app.
+  - Information Leakage: GET /api/agents dumps the full object including potentially private properties to the client.
+
+================================================================================
+SECTION 7 — CREDITS & BILLING SYSTEM
+================================================================================
+- Status: High Quality.
+- Decrement Logic: Uses atomic Mongo $cond increment commands to ensure users cannot overdraw single free credits across parallel requests.
+- Webhooks: Correctly constructed via Dodo SDK with secret verification.
+
+================================================================================
+SECTION 8 — DEPLOYMENT & WIDGET SYSTEM
+================================================================================
+- Logic: An iframe endpoint at /widget/chat hosted inside users DOM via embed.js.
+- Friction: The instructions copy hardcoded 'agentdesk.ai' addresses which breaks dev-mode testing workflows unless manual rewrites happen.
+
+================================================================================
+SECTION 9 — ANALYTICS & OBSERVABILITY
+================================================================================
+- Depth: Surface level counts only.
+- Missing: Token counting, Cost tracking per customer, Hallucination analytics, Latency monitoring.
+
+================================================================================
+SECTION 10 — USER EXPERIENCE & ONBOARDING
+================================================================================
+- Flow: Premium visuals, smooth Framer Motion loading states, excellent color hierarchy.
+- Trust Deficit: The system tells users "Synced Successfully" on empty fake uploads. When the bot hallucinates 5 seconds later, retention probability hits 0%.
+
+================================================================================
+SECTION 11 — SCALABILITY ANALYSIS
+================================================================================
+- Likely Failure Points: 
+  1. The nested HTTP Loop in lib/rag.ts (Instant death upon traffic increase).
+  2. Mongo connection pooling limitations under continuous rate-limit hammering.
+
+================================================================================
+SECTION 12 — BUSINESS MODEL
+================================================================================
+- Setup: Monthly subscriptions and token addons are logically ready.
+- Hazard: Product cannot defend pricing without an actual retrieval engine.
+
+================================================================================
+SECTION 13 — ROADMAP RECOMMENDATIONS
+================================================================================
+PHASE 1 (SURGERY):
+- Activate pdf-parse imports in datasources route.
+- Integrate a vector persistence layer (Mongo Atlas Vector or Pinecone).
+- Save embeddings at upload-time, not at chat-time.
+PHASE 2 (STABILITY):
+- Shift rate limiting off MongoDB and onto Upstash/Redis.
+- Implement true LLM streaming via Vercel AI SDK.
+PHASE 3 (ENTERPRISE):
+- Full human agent chat takeover / Live Inbox implementation.
+- Implement proper web crawlers via firecrawl/cheerio.

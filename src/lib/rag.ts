@@ -1,75 +1,91 @@
-// Simple text chunking
-export function chunkText(text: string): string[] {
-  const chunks: string[] = []
-  const sentences = text.split(/[.!?]+/)
-  let chunk = ''
-  for (const sentence of sentences) {
-    if ((chunk + sentence).length > 500) {
-      if (chunk) chunks.push(chunk.trim())
-      chunk = sentence
-    } else {
-      chunk += sentence + '. '
-    }
+import { pipeline } from '@xenova/transformers';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import KnowledgeChunk from '@/models/KnowledgeChunk';
+import mongoose from 'mongoose';
+
+let extractor: any = null;
+
+// Singleton strategy for local model initialization
+async function getExtractor() {
+  if (!extractor) {
+    // Force lazy dynamic model load upon first invocation
+    extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
   }
-  if (chunk) chunks.push(chunk.trim())
-  return chunks.filter(c => c.length > 50)
+  return extractor;
 }
 
-// Use Hugging Face free API for embeddings
-export async function getEmbedding(
-  text: string
-): Promise<number[]> {
-  const res = await fetch(
-    'https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2',
-    {
-      method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ inputs: text })
-    }
-  )
-  return res.json()
+export async function chunkText(text: string, chunkSize: number = 1000, overlap: number = 200): Promise<string[]> {
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize,
+    chunkOverlap: overlap,
+  });
+  
+  // Clean whitespace normalizer before passing to splitter
+  const normalizedText = text.replace(/\s+/g, ' ').trim();
+  
+  // Returns raw strings
+  return await splitter.splitText(normalizedText);
 }
 
-// Cosine similarity search
-export function cosineSimilarity(a: number[], b: number[]) {
-  const dot = a.reduce((sum, v, i) => sum + v * b[i], 0)
-  const magA = Math.sqrt(a.reduce((s, v) => s + v*v, 0))
-  const magB = Math.sqrt(b.reduce((s, v) => s + v*v, 0))
-  return dot / (magA * magB)
+export async function getEmbedding(text: string): Promise<number[]> {
+  const generateEmbedding = await getExtractor();
+  const output = await generateEmbedding(text, { pooling: 'mean', normalize: true });
+  // Convert Float32Array output tensor structure into Standard Number Array for MongoDB compatibility
+  return Array.from(output.data);
 }
 
-// Find relevant chunks
 export async function searchKnowledge(
   query: string,
   agentId: string,
-  topK = 3
+  workspaceId: string,
+  topK = 5
 ): Promise<string[]> {
-  const DataSource = (await import('@/models/DataSource')).default
-  const queryEmbedding = await getEmbedding(query)
-  
-  const sources = await DataSource.find({ 
-    agentId, 
-    status: 'ready' 
-  })
-  
-  const allChunks: { text: string; score: number }[] = []
-  
-  for (const source of sources) {
-    const chunks = chunkText(source.content)
-    for (const chunk of chunks) {
-      const emb = await getEmbedding(chunk)
-      if (Array.isArray(emb)) {
-        const score = cosineSimilarity(queryEmbedding, emb)
-        allChunks.push({ text: chunk, score })
+  const startTime = Date.now();
+  try {
+    const queryEmbedding = await getEmbedding(query);
+    const embeddingTime = Date.now();
+    
+    // Construct accurate Vector Search MongoDB Aggregation Pipeline
+    const results = await KnowledgeChunk.aggregate([
+      {
+        $vectorSearch: {
+          index: "vector_index", 
+          path: "embedding",
+          queryVector: queryEmbedding,
+          numCandidates: 100,
+          limit: topK,
+          filter: {
+             agentId: new mongoose.Types.ObjectId(agentId),
+             workspaceId: new mongoose.Types.ObjectId(workspaceId)
+          }
+        }
+      },
+      {
+        $project: {
+          text: 1,
+          score: { $meta: "vectorSearchScore" }
+        }
       }
-    }
+    ]);
+
+    const searchTime = Date.now();
+    const totalElapsed = searchTime - startTime;
+
+    console.log(`\n[RAG DEBUG] Retrieval Stats -----------------`);
+    console.log(`- Embed Time: ${embeddingTime - startTime}ms`);
+    console.log(`- Search Time: ${searchTime - embeddingTime}ms`);
+    console.log(`- Total Time: ${totalElapsed}ms`);
+    console.log(`- Chunks Found: ${results.length}`);
+    
+    results.forEach((doc, i) => {
+       console.log(`  [Chunk ${i+1}] Score: ${doc.score.toFixed(4)} | Text Snapshot: "${doc.text.substring(0, 60).replace(/\n/g, ' ')}..."`);
+    });
+    console.log(`---------------------------------------------\n`);
+
+    return results.map(doc => doc.text);
+  } catch (err) {
+    console.error("CRITICAL VECTOR RETRIEVAL FAILURE:", err);
+    // Graceful degradation - empty context injection avoids crashing overall user response pipeline
+    return [];
   }
-  
-  return allChunks
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK)
-    .map(c => c.text)
 }

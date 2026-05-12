@@ -1,14 +1,16 @@
 'use client';
-import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { Bot, ArrowLeft, Save, RefreshCw, Sparkles, Zap, Trash2, CornerDownLeft, Mic, Send, ChevronRight } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import Link from 'next/link';
+import { 
+  Bot, Save, Loader2, Sparkles, Zap, Trash2, Send,
+  AlertTriangle, MessageSquare, RefreshCw
+} from 'lucide-react';
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
+import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
 export default function AgentPlaygroundPage() {
   const params = useParams();
@@ -17,66 +19,19 @@ export default function AgentPlaygroundPage() {
   const id = params.id as string;
   
   const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  
   const [formData, setFormData] = useState<any>({
     name: '',
     systemPrompt: '',
-    description: '',
     widgetConfig: {
       primaryColor: '#F97316',
-      welcomeMessage: 'Hi! What can I help you with?',
-      showBranding: true
+      welcomeMessage: 'Hi! I’m your AI assistant. Ask me anything about your business, services, or support.',
+      showBranding: false
     }
   });
 
-  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
-  const [inputVal, setInputVal] = useState('');
-  const [chatLoading, setChatLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  // Dynamic scroll capture hook
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
-    }
-  }, [chatHistory, chatLoading]);
-
-  const sendMessage = async () => {
-    if (!inputVal.trim() || chatLoading) return;
-    
-    const userMsg = { role: 'user', content: inputVal.trim() };
-    setChatHistory(prev => [...prev, userMsg]);
-    setInputVal('');
-    setChatLoading(true);
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMsg.content,
-          agentId: id,
-          conversationId
-        })
-      });
-      
-      const data = await res.json();
-      
-      if (data.reply) {
-        setChatHistory(prev => [...prev, { role: 'assistant', content: data.reply }]);
-        if (data.conversationId) setConversationId(data.conversationId);
-      } else if (data.error) {
-        setChatHistory(prev => [...prev, { role: 'assistant', content: `⚠️ Error: ${data.error}` }]);
-      }
-    } catch (err) {
-      toast.error('Transmission failure');
-      setChatHistory(prev => [...prev, { role: 'assistant', content: '⚠️ Network communication error.' }]);
-    } finally {
-      setChatLoading(false);
-    }
-  };
 
   const { data: agent, isLoading } = useQuery({
     queryKey: ['agent', id],
@@ -84,23 +39,62 @@ export default function AgentPlaygroundPage() {
       const res = await fetch(`/api/agents/${id}`);
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
-    }
+    },
+    enabled: !!id
   });
 
   useEffect(() => {
     if (agent) {
       setFormData({
         name: agent.name || '',
-        description: agent.description || '',
         systemPrompt: agent.systemPrompt || '',
         widgetConfig: {
           primaryColor: agent.widgetConfig?.primaryColor || '#F97316',
-          welcomeMessage: agent.widgetConfig?.welcomeMessage || 'Hi! What can I help you with?',
-          showBranding: agent.widgetConfig?.showBranding !== false
+          welcomeMessage: agent.widgetConfig?.welcomeMessage || 'Hi! I’m your AI assistant. Ask me anything about your business, services, or support.',
+          showBranding: false // Removing by mandate
         }
       });
     }
   }, [agent]);
+
+  // Transport config
+  const convIdRef = useRef(conversationId);
+  convIdRef.current = conversationId;
+  const chatTransport = useRef<DefaultChatTransport<any> | null>(null);
+  if (!chatTransport.current) {
+     chatTransport.current = new DefaultChatTransport({
+        api: '/api/chat',
+        body: () => ({
+           agentId: id,
+           conversationId: convIdRef.current
+        })
+     });
+  }
+
+  const { messages, sendMessage, status, append } = useChat({
+    id: `agent-playground-${id}`,
+    transport: chatTransport.current,
+    onError: (err) => toast.error(`Connection failed: ${err.message}`)
+  });
+
+  const isChatLoading = status === 'submitted' || status === 'streaming';
+
+  // Handle Scroll
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [messages, isChatLoading]);
+
+  // Sync convoId
+  useEffect(() => {
+    if (messages.length > 0) {
+      const latest = messages[messages.length - 1];
+      if (latest.metadata && (latest.metadata as any).conversationId && (latest.metadata as any).conversationId !== conversationId) {
+         setConversationId((latest.metadata as any).conversationId);
+      }
+    }
+  }, [messages, conversationId]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -111,269 +105,270 @@ export default function AgentPlaygroundPage() {
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error('Update failed');
-      toast.success('Agent configuration committed');
+      toast.success('Changes saved successfully');
       queryClient.invalidateQueries({ queryKey: ['agent', id] });
     } catch (err) {
-      toast.error('Commit error');
+      toast.error('Error saving changes');
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (isLoading) return <DashboardLayout><div className="p-8 animate-pulse h-full"><div className="h-full bg-muted rounded-xl" /></div></DashboardLayout>;
-  if (!agent) return <DashboardLayout><div className="p-8">Agent not initialized.</div></DashboardLayout>;
+  const handleChatSubmit = async (e?: React.FormEvent, forcedText?: string) => {
+    e?.preventDefault();
+    const text = forcedText || inputValue;
+    if (!text.trim() || isChatLoading) return;
+    if (!forcedText) setInputValue("");
+    
+    try {
+      await sendMessage({ text });
+    } catch (err) { console.error(err); }
+  };
+
+  const resetConversation = async () => {
+     if(window.confirm("Reset current conversational session memory?")) {
+        setConversationId(null);
+        // Hard reload of local chat state is simpler to just re-mount route or call internal method. 
+        // For immediate UI response:
+        window.location.reload(); 
+     }
+  };
+
+  if (isLoading) return <DashboardLayout><div className="p-12 flex justify-center"><Loader2 className="animate-spin text-orange-500" /></div></DashboardLayout>;
+  if (!agent) return <DashboardLayout><div className="p-12 text-center text-gray-500">Agent not initialized.</div></DashboardLayout>;
+
+  const suggestions = [
+    "What services do you offer?",
+    "Explain pricing",
+    "How can I contact support?"
+  ];
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full min-h-screen -m-4 sm:-m-6 md:-m-8 lg:-m-10 overflow-hidden">
+      <div className="max-w-7xl mx-auto pb-16">
         
-        {/* Sub Header breadcrumb explicitly tailored like user's top bar */}
-        <div className="flex items-center justify-between px-6 h-14 border-b bg-card shrink-0">
-           <div className="flex items-center gap-3 text-[13px]">
-              <Link href="/agents" className="text-muted-foreground hover:text-foreground transition-colors">Agents</Link>
-              <span className="text-muted-foreground/50">/</span>
-              <span className="font-semibold flex items-center gap-1.5">
-                 {agent.name} 
-                 <span className="bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Agent</span>
-              </span>
-           </div>
-           <div className="flex items-center gap-3">
-              <Button 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="bg-black hover:bg-zinc-800 text-white font-bold text-xs h-8 px-4 rounded-lg shadow-sm"
-              >
-                 {isSaving ? <RefreshCw className="h-3 w-3 animate-spin mr-1.5"/> : <Save className="h-3 w-3 mr-1.5"/>}
-                 Save
-              </Button>
-           </div>
+        {/* HEADER */}
+        <div className="flex items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">AI Preview</h1>
+            <p className="text-[14px] text-gray-500 mt-1">Test and customize your AI assistant in real time.</p>
+          </div>
+          <button 
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-black text-white px-4 py-2 rounded-lg text-[13px] font-medium flex items-center gap-2 hover:bg-zinc-800 hover:shadow-md shadow-sm transition-all disabled:opacity-50 active:scale-[0.98]"
+          >
+            {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            Save Changes
+          </button>
         </div>
 
-        {/* Split Window Context */}
-        <div className="flex flex-1 overflow-hidden bg-card">
-           
-           {/* LEFT PANE: Configurations (Matches the scrolling left context form) */}
-           <div className="w-full md:w-[360px] lg:w-[420px] border-r border-border/60 overflow-y-auto bg-card custom-scrollbar relative">
-             <div className="p-6 space-y-8 pb-20">
-                
-                {/* Model Config Box */}
-                <div className="space-y-3">
-                   <Label className="text-[13px] font-bold text-foreground/80">Model Base</Label>
-                   <div className="relative rounded-lg border bg-card p-3 flex items-center justify-between group cursor-default hover:border-primary/40 transition-colors">
-                      <div className="flex items-center gap-3">
-                         <div className="h-8 w-8 bg-muted/50 border rounded-lg flex items-center justify-center"><Sparkles className="h-4 w-4 text-primary" /></div>
-                         <div>
-                           <p className="text-[13px] font-bold">Llama 3.1 - 8B</p>
-                           <p className="text-[10px] text-muted-foreground">Standard inference engine</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* MOBILE ORDER HANDLING: Preview renders on TOP in mobile, right in desktop via css order classes */}
+          
+          {/* LEFT PANEL - Config (45% wide grid split) */}
+          <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
+            
+            {/* Card 1: AI Model */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-gray-300 transition-colors">
+               <div className="h-10 w-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                  <Sparkles className="h-5 w-5 text-orange-500" />
+               </div>
+               <div>
+                  <h3 className="text-[14px] font-semibold text-gray-900">AI Model</h3>
+                  <div className="text-[13px] font-medium text-gray-800 mt-0.5">Llama 3.1 8B</div>
+                  <p className="text-[12px] text-gray-500 mt-0.5">Fast conversational responses</p>
+               </div>
+            </div>
+
+            {/* Card 2: Appearance */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+               <h3 className="text-[15px] font-semibold text-gray-900 mb-5">Appearance</h3>
+               <div className="space-y-4">
+                  <div>
+                     <label className="text-[12px] font-medium text-gray-500 block mb-1.5">Assistant Name</label>
+                     <input 
+                       type="text" 
+                       value={formData.name}
+                       onChange={e => setFormData({...formData, name: e.target.value})}
+                       className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-[13px] focus:ring-2 focus:ring-orange-500/10 focus:border-orange-500 transition-all outline-none"
+                     />
+                  </div>
+                  <div>
+                     <label className="text-[12px] font-medium text-gray-500 block mb-1.5">Primary Color</label>
+                     <div className="flex gap-3">
+                        <div className="relative w-10 h-10 rounded-lg border border-gray-200 overflow-hidden shrink-0 shadow-sm">
+                           <input 
+                             type="color" 
+                             className="absolute inset-[-10px] w-[180%] h-[180%] cursor-pointer"
+                             value={formData.widgetConfig.primaryColor}
+                             onChange={e => setFormData({...formData, widgetConfig: {...formData.widgetConfig, primaryColor: e.target.value}})}
+                           />
+                        </div>
+                        <input 
+                          type="text"
+                          value={formData.widgetConfig.primaryColor}
+                          onChange={e => setFormData({...formData, widgetConfig: {...formData.widgetConfig, primaryColor: e.target.value}})}
+                          className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-[13px] font-mono text-gray-700 focus:bg-white transition-all outline-none"
+                        />
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* Card 3: AI Instructions */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+               <h3 className="text-[15px] font-semibold text-gray-900">AI Instructions</h3>
+               <p className="text-[12px] text-gray-500 mt-1 mb-4">Define how your AI should respond and behave.</p>
+               <textarea 
+                  value={formData.systemPrompt}
+                  onChange={e => setFormData({...formData, systemPrompt: e.target.value})}
+                  placeholder="Example: You are a highly effective support agent. Always keep your answers short, friendly, and reference official docs..."
+                  className="w-full min-h-[180px] bg-gray-50 border border-gray-100 rounded-xl p-4 text-[13px] text-gray-800 leading-relaxed focus:bg-white focus:ring-2 focus:ring-orange-500/10 focus:border-orange-400 transition-all outline-none resize-y custom-scrollbar"
+               />
+            </div>
+
+            {/* Card 4: Danger Zone */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+               <h3 className="text-[14px] font-semibold text-gray-900 mb-1">Danger Zone</h3>
+               <p className="text-[12px] text-gray-500 mb-4">Deletes temporary conversation memory and retrains fresh responses.</p>
+               <button 
+                 onClick={resetConversation}
+                 className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-600 bg-white hover:bg-red-50 py-2.5 rounded-xl text-[13px] font-medium transition-all"
+               >
+                  <RefreshCw className="w-3.5 h-3.5" /> Reset AI Memory
+               </button>
+            </div>
+
+          </div>
+
+          {/* RIGHT PANEL - Live Preview (55% wide grid split) */}
+          <div className="lg:col-span-7 order-1 lg:order-2 flex items-center justify-center bg-[#fcfbfa] rounded-[32px] p-4 sm:p-8 md:p-12 border border-gray-200/50 shadow-[inset_0_2px_10px_rgba(0,0,0,0.01)] min-h-[650px]">
+             
+             {/* The Main Chat Box */}
+             <motion.div 
+               initial={{ opacity: 0, y: 20, scale: 0.98 }}
+               animate={{ opacity: 1, y: 0, scale: 1 }}
+               transition={{ type: "spring", stiffness: 260, damping: 20 }}
+               className="w-full max-w-[420px] h-[680px] bg-white rounded-[24px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col overflow-hidden relative"
+             >
+                {/* Preview Chat Header */}
+                <div 
+                  className="px-5 py-4 flex items-center gap-3 border-b border-gray-100 shrink-0 text-white transition-colors duration-500"
+                  style={{ backgroundColor: formData.widgetConfig.primaryColor }}
+                >
+                   <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-sm shrink-0">
+                      <Bot className="h-5 w-5 fill-current" />
+                   </div>
+                   <div>
+                      <div className="text-[15px] font-semibold leading-tight">{formData.name || 'Assistant'}</div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                         <div className="w-2 h-2 bg-white rounded-full animate-pulse opacity-90" />
+                         <span className="text-[11px] font-medium text-white/90">Online</span>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Chat Content Flow Area */}
+                <div 
+                  ref={chatContainerRef}
+                  className="flex-1 overflow-y-auto p-5 space-y-5 bg-[#FAFAFA] custom-scrollbar"
+                >
+                   {/* Initial Welcome Prompt */}
+                   <div className="flex flex-col gap-1 items-start max-w-[85%] animate-in fade-in slide-in-from-bottom-2 duration-500">
+                      <div className="px-4 py-3.5 bg-white border border-gray-100 text-gray-800 text-[14px] font-medium leading-relaxed rounded-2xl rounded-tl-sm shadow-sm">
+                         {formData.widgetConfig.welcomeMessage}
+                      </div>
+                   </div>
+
+                   {/* Dynamic Messages Loop */}
+                   <AnimatePresence initial={false}>
+                      {messages.map((m, idx) => {
+                         const isUser = m.role === 'user';
+                         return (
+                            <motion.div 
+                               key={m.id || idx}
+                               initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                               animate={{ opacity: 1, y: 0, scale: 1 }}
+                               className={`flex flex-col max-w-[85%] ${isUser ? 'ml-auto items-end' : 'items-start'}`}
+                            >
+                               <div 
+                                  className={`px-4 py-3 text-[14px] font-medium leading-relaxed whitespace-pre-wrap ${
+                                    isUser 
+                                      ? 'text-white rounded-2xl rounded-tr-sm shadow-md shadow-black/5' 
+                                      : 'bg-white border border-gray-100 text-gray-800 rounded-2xl rounded-tl-sm shadow-sm'
+                                  }`}
+                                  style={isUser ? { backgroundColor: formData.widgetConfig.primaryColor } : {}}
+                               >
+                                  {m.parts.map((part: any, pIdx) => 
+                                    part.type === 'text' ? <span key={pIdx}>{part.text}</span> : null
+                                  )}
+                               </div>
+                            </motion.div>
+                         )
+                      })}
+                   </AnimatePresence>
+
+                   {/* Typing Loading State */}
+                   {isChatLoading && (
+                      <div className="flex items-start max-w-[85%] animate-in fade-in">
+                         <div className="px-4 py-3 bg-white border border-gray-100 text-gray-500 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-2">
+                            <div className="flex gap-1">
+                               <span className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" />
+                               <span className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                               <span className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                            </div>
                          </div>
                       </div>
-                      <span className="text-[10px] font-black text-muted-foreground uppercase border px-1.5 rounded bg-muted">Fixed</span>
-                   </div>
+                   )}
                 </div>
 
-                {/* Action / Widget Theme Setup */}
-                <div className="space-y-3">
-                   <div className="flex items-center justify-between">
-                      <Label className="text-[13px] font-bold text-foreground/80">Widget Theme</Label>
+                {/* Interactions Bar (Fixed Bottom) */}
+                <div className="bg-white px-4 pt-2 pb-4 border-t border-gray-100 shrink-0">
+                   
+                   {/* Suggestion Chips */}
+                   <div className="flex gap-2 mb-3 overflow-x-auto custom-scrollbar pb-1 -mx-1 px-1">
+                      {suggestions.map((s, i) => (
+                         <button 
+                           key={i} 
+                           onClick={() => handleChatSubmit(undefined, s)}
+                           className="shrink-0 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-gray-600 text-[12px] font-medium rounded-full transition-all shadow-sm whitespace-nowrap active:scale-95"
+                         >
+                            {s}
+                         </button>
+                      ))}
                    </div>
-                   <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground/70">Primary Color</span>
-                        <div className="flex gap-2">
-                           <div className="relative h-9 w-9 shrink-0 rounded-lg border overflow-hidden">
-                              <input 
-                                type="color" 
-                                className="absolute inset-[-10px] w-[150%] h-[150%] cursor-pointer"
-                                value={formData.widgetConfig.primaryColor}
-                                onChange={e => setFormData({...formData, widgetConfig: {...formData.widgetConfig, primaryColor: e.target.value}})}
-                              />
-                           </div>
-                           <Input 
-                              value={formData.widgetConfig.primaryColor}
-                              onChange={e => setFormData({...formData, widgetConfig: {...formData.widgetConfig, primaryColor: e.target.value}})}
-                              className="h-9 text-xs font-mono"
-                           />
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                         <span className="text-[10px] uppercase font-black tracking-wider text-muted-foreground/70">Identity</span>
-                         <Input 
-                           value={formData.name} 
-                           onChange={e => setFormData({...formData, name: e.target.value})}
-                           className="h-9 text-xs"
-                         />
-                      </div>
-                   </div>
-                </div>
 
-                {/* Instructions / System Prompt (Exactly matches the text area shown on screenshot) */}
-                <div className="space-y-3">
-                   <div className="flex items-center justify-between">
-                      <Label className="text-[13px] font-bold text-foreground/80">Instructions (System prompt)</Label>
-                      <button className="text-muted-foreground hover:text-foreground"><RefreshCw className="h-3 w-3"/></button>
-                   </div>
-                   <div className="border rounded-xl bg-muted/5 overflow-hidden focus-within:ring-2 ring-primary/20 ring-offset-0 border-border/80 shadow-inner-sm">
-                      <div className="h-10 border-b bg-muted/30 px-3 flex items-center text-[12px] font-bold text-muted-foreground justify-between">
-                         <span>Base Instructions</span>
-                         <ChevronRight className="h-3 w-3 rotate-90" />
-                      </div>
-                      <textarea 
-                        className="w-full min-h-[350px] p-4 text-[13px] font-medium leading-relaxed bg-transparent border-0 focus:ring-0 resize-none custom-scrollbar text-foreground"
-                        placeholder="Define how the AI should act..."
-                        value={formData.systemPrompt}
-                        onChange={e => setFormData({...formData, systemPrompt: e.target.value})}
-                      />
-                   </div>
-                </div>
-
-                {/* Danger Area */}
-                <div className="pt-6 border-t border-dashed">
-                   <Button 
-                     variant="ghost" 
-                     size="sm" 
-                     className="w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 font-bold text-xs"
-                     onClick={() => {
-                       if (window.confirm("Verify permanent removal")) {
-                          fetch(`/api/agents/${id}`, { method: 'DELETE' }).then(() => router.push('/agents'));
-                       }
-                     }}
+                   {/* Main Floating Input */}
+                   <form 
+                     onSubmit={handleChatSubmit}
+                     className="relative flex items-center bg-white border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all rounded-2xl px-2 py-1.5 group focus-within:border-gray-300"
                    >
-                     <Trash2 className="h-3.5 w-3.5"/> Destroy Agent Context
-                   </Button>
+                      <input 
+                        type="text" 
+                        placeholder="Ask your AI assistant..."
+                        value={inputValue}
+                        onChange={e => setInputValue(e.target.value)}
+                        disabled={isChatLoading}
+                        className="flex-1 bg-transparent border-0 outline-none px-3 py-2 text-[14px] font-medium text-gray-800 placeholder:text-gray-400"
+                      />
+                      <button 
+                        type="submit"
+                        disabled={!inputValue.trim() || isChatLoading}
+                        className="h-9 w-9 rounded-xl flex items-center justify-center text-white shadow-md disabled:opacity-40 disabled:shadow-none transition-all active:scale-95 shrink-0"
+                        style={{ backgroundColor: formData.widgetConfig.primaryColor }}
+                      >
+                         <Send className="h-4 w-4" />
+                      </button>
+                   </form>
                 </div>
 
-             </div>
-           </div>
-
-           {/* RIGHT PANE: PLAYGROUND CANVAS (Matches dotted canvas window perfectly) */}
-           <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-[#fafafa] dark:bg-zinc-950">
-              
-              {/* Grid Dot Pattern Canvas Overlay */}
-              <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.6]"
-                   style={{ 
-                     backgroundImage: `radial-gradient(circle, #e5e7eb 1.5px, transparent 1.5px)`, 
-                     backgroundSize: '24px 24px' 
-                   }} 
-              />
-              <div className="absolute inset-0 dark:hidden z-0 pointer-events-none opacity-[0.4]"
-                   style={{ 
-                     backgroundImage: `radial-gradient(circle, #000000 1px, transparent 1px)`, 
-                     backgroundSize: '24px 24px' 
-                   }} 
-              />
-
-              {/* Live Previsualization Widget (Matches exact physical aesthetics of visual preview) */}
-              <div className="relative z-10 w-full max-w-[420px] h-[650px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl shadow-black/10 border flex flex-col overflow-hidden animate-in zoom-in-95 duration-500">
-                  
-                  {/* Widget Top Bar (Dynamically colored via state) */}
-                  <div className="h-16 w-full px-5 flex items-center justify-between shrink-0 transition-colors duration-500" 
-                       style={{ backgroundColor: formData.widgetConfig.primaryColor }}>
-                     <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                           <Zap className="h-4.5 w-4.5 text-white fill-current" />
-                        </div>
-                        <span className="font-bold text-white text-[15px] tracking-wide">{formData.name || 'X1 Chat'}</span>
-                     </div>
-                     <button className="text-white/70 hover:text-white"><RefreshCw className="h-4 w-4" /></button>
-                  </div>
-
-                  {/* Live Message Content View */}
-                  <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-card custom-scrollbar" ref={chatContainerRef}>
-                     
-                     {/* AI Greeting */}
-                     <div className="flex flex-col items-start space-y-1 max-w-[85%] animate-in slide-in-from-bottom-2 duration-300">
-                        <div className="px-4 py-3 rounded-2xl rounded-tl-none bg-muted text-foreground text-sm font-medium leading-relaxed border">
-                           {formData.widgetConfig.welcomeMessage || 'Hi! What can I help you with?'}
-                        </div>
-                     </div>
-
-                     {/* Real Thread Iterator */}
-                     {chatHistory.map((msg, idx) => (
-                        <div 
-                          key={idx} 
-                          className={`flex flex-col space-y-1 max-w-[85%] animate-in slide-in-from-bottom-2 duration-300 ${msg.role === 'user' ? 'ml-auto items-end' : 'items-start'}`}
-                        >
-                           <div 
-                             className={`px-4 py-3 rounded-2xl text-sm font-medium leading-relaxed ${
-                               msg.role === 'user' 
-                                 ? 'rounded-tr-none text-white shadow-sm' 
-                                 : 'rounded-tl-none bg-muted text-foreground border'
-                             }`}
-                             style={msg.role === 'user' ? { backgroundColor: formData.widgetConfig.primaryColor } : {}}
-                           >
-                              {msg.content}
-                           </div>
-                        </div>
-                     ))}
-
-                     {chatLoading && (
-                        <div className="flex items-center gap-2 text-muted-foreground text-xs animate-pulse font-medium ml-1">
-                           <div className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                           <div className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                           <div className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce"></div>
-                        </div>
-                     )}
-
-                  </div>
-
-                  {/* Footer Input Loop */}
-                  <div className="px-4 py-3 border-t bg-card flex flex-col items-center shrink-0 gap-3">
-                     {formData.widgetConfig.showBranding && (
-                       <div className="text-[10px] font-bold text-muted-foreground/60 flex items-center gap-1 select-none">
-                          <div className="h-3.5 w-3.5 bg-muted rounded flex items-center justify-center font-black">A</div> Powered by AgentDesk
-                       </div>
-                     )}
-                     <form 
-                       onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                       className="w-full relative"
-                     >
-                        <div className="h-11 w-full rounded-full border bg-muted/10 px-4 flex items-center gap-2 focus-within:ring-2 ring-primary/20 border-border/80 transition-all group shadow-inner-sm">
-                           <input 
-                              type="text" 
-                              value={inputVal}
-                              onChange={(e) => setInputVal(e.target.value)}
-                              disabled={chatLoading}
-                              placeholder="Ask anything..." 
-                              className="flex-1 h-full bg-transparent text-sm font-medium placeholder:text-muted-foreground outline-none border-0"
-                           />
-                           <button 
-                             type="submit"
-                             disabled={!inputVal.trim() || chatLoading}
-                             className="h-7 w-7 rounded-full flex items-center justify-center text-white transition-all disabled:opacity-50 shadow-sm"
-                             style={{ backgroundColor: formData.widgetConfig.primaryColor }}
-                           >
-                             <Send className="h-3.5 w-3.5" />
-                           </button>
-                        </div>
-                     </form>
-                  </div>
-
-              </div>
-           </div>
+             </motion.div>
+          </div>
 
         </div>
       </div>
     </DashboardLayout>
   );
-}
-
-// In case it wasn't defined elsewhere in scope, adding standard scrollbar concealment Utility within TS
-function styleFix() {
-  return (
-    <style>{`
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 5px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 10px;
-      }
-      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #3f3f46;
-      }
-    `}</style>
-  )
 }

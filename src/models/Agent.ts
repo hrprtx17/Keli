@@ -11,7 +11,10 @@ export interface IAgent extends Document {
     temperature: number
     maxTokens: number
     language: string
-    tone: 'professional' | 'friendly' | 'formal'
+    tone: string
+    role: string
+    guidelines: string[]
+    linkUsage: 'normal' | 'high'
   }
   widgetConfig: {
     primaryColor: string
@@ -39,7 +42,10 @@ const AgentSchema = new Schema<IAgent>({
     temperature: { type: Number, default: 0.7 },
     maxTokens: { type: Number, default: 500 },
     language: { type: String, default: 'auto' },
-    tone: { type: String, enum: ['professional', 'friendly', 'formal'], default: 'professional' }
+    tone: { type: String, default: 'professional' },
+    role: { type: String, default: 'Helpful Assistant' },
+    guidelines: { type: [String], default: [] },
+    linkUsage: { type: String, enum: ['normal', 'high'], default: 'normal' }
   },
   widgetConfig: {
     primaryColor: { type: String, default: '#F97316' },
