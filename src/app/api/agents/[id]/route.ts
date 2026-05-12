@@ -10,11 +10,11 @@ async function resolveWorkspaceId(session: any): Promise<string | null> {
   return dbUser?.workspaceId?.toString() || null;
 }
 
-export async function GET(req: Request, context: { params: { id: string } }) {
+export async function GET(req: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   
-  const { id } = await Promise.resolve(context.params);
+  const { id } = await context.params;
 
   await connectDB();
   const workspaceId = await resolveWorkspaceId(session);
@@ -25,11 +25,11 @@ export async function GET(req: Request, context: { params: { id: string } }) {
   return NextResponse.json(agent);
 }
 
-export async function PATCH(req: Request, context: { params: { id: string } }) {
+export async function PATCH(req: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { id } = await Promise.resolve(context.params);
+  const { id } = await context.params;
 
   const body = await req.json();
   await connectDB();
@@ -58,11 +58,11 @@ export async function PATCH(req: Request, context: { params: { id: string } }) {
 // Fallback for clients that might hit PUT instead of PATCH
 export { PATCH as PUT };
 
-export async function DELETE(req: Request, context: { params: { id: string } }) {
+export async function DELETE(req: Request, context: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { id } = await Promise.resolve(context.params);
+  const { id } = await context.params;
 
   await connectDB();
   const workspaceId = await resolveWorkspaceId(session);

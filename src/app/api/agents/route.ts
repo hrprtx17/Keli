@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     return NextResponse.json(newAgent, { status: 201 });
   } catch (error) {
     console.error('Agent create error:', error);
-    if (error instanceof z.ZodError) return NextResponse.json({ error: error.errors }, { status: 400 });
+    if (error instanceof z.ZodError) return NextResponse.json({ error: (error as any).errors || (error as any).issues }, { status: 400 });
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

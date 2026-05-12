@@ -71,7 +71,7 @@ export default function AgentPlaygroundPage() {
      });
   }
 
-  const { messages, sendMessage, status, append } = useChat({
+  const { messages, sendMessage, status } = useChat({
     id: `agent-playground-${id}`,
     transport: chatTransport.current,
     onError: (err) => toast.error(`Connection failed: ${err.message}`)
@@ -301,7 +301,7 @@ export default function AgentPlaygroundPage() {
                                   }`}
                                   style={isUser ? { backgroundColor: formData.widgetConfig.primaryColor } : {}}
                                >
-                                  {m.parts.map((part: any, pIdx) => 
+                                  {m.parts.map((part: any, pIdx: number) => 
                                     part.type === 'text' ? <span key={pIdx}>{part.text}</span> : null
                                   )}
                                </div>

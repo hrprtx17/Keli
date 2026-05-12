@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, message: 'Account created successfully' });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ error: ((error as any).errors || (error as any).issues)[0].message }, { status: 400 });
     }
     console.error('Register error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

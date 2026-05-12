@@ -16,8 +16,14 @@ export async function POST(req: Request) {
   let event;
   try {
     const dodo = new DodoPayments({ bearerToken: process.env.DODO_API_KEY || '' });
-    // Assuming Dodo SDK supports webhook construction. If not, fallback to raw parsing
-    event = dodo.webhooks ? await dodo.webhooks.constructEvent(payloadText, signature, process.env.DODO_WEBHOOK_SECRET || '') : JSON.parse(payloadText);
+    if (dodo.webhooks && process.env.DODO_WEBHOOK_SECRET) {
+      event = dodo.webhooks.unwrap(payloadText, { 
+        headers: { 'webhook-signature': signature }, 
+        key: process.env.DODO_WEBHOOK_SECRET 
+      });
+    } else {
+      event = JSON.parse(payloadText);
+    }
   } catch (err: any) {
     SecurityLog.create({
       eventType: 'webhook_failure',
