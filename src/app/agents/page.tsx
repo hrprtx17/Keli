@@ -21,7 +21,7 @@ export default function RedirectToWorkspace() {
       if (agents.length > 0) {
         router.replace(`/agents/${agents[0]._id}`);
       } else {
-        router.replace('/agents/new');
+        router.replace('/onboarding');
       }
     }
   }, [agents, isLoading, router]);

@@ -536,7 +536,7 @@ export default function LandingPage() {
                         whileHover={{ scale: 1.03 }} 
                         className="h-14 px-10 bg-white text-zinc-900 border border-zinc-200 rounded-2xl font-bold text-base shadow-sm hover:bg-zinc-50 transition-all"
                      >
-                        Sign Up Now
+                        Login to Dashboard
                      </motion.button>
                   </Link>
                </div>

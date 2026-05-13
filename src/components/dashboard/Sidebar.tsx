@@ -45,10 +45,14 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
     staleTime: 60_000,
   });
 
-  // Ensure there's always an active agent if agents exist
+  // Ensure there's always an active agent if agents exist, otherwise force onboarding
   useEffect(() => {
-    if (agents?.length > 0 && !activeAgentId && pathname !== '/onboarding') {
-      router.replace(`/agents/${agents[0]._id}`);
+    if (agents) {
+      if (agents.length > 0 && !activeAgentId && pathname !== '/onboarding') {
+        router.replace(`/agents/${agents[0]._id}`);
+      } else if (agents.length === 0 && pathname !== '/onboarding') {
+        router.replace('/onboarding');
+      }
     }
   }, [agents, activeAgentId, pathname, router]);
 
