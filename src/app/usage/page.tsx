@@ -51,10 +51,10 @@ export default function UsagePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Usage</h1>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all px-3 py-1.5">
+            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all px-3 py-1.5">
               All agents <ChevronDown className="h-3.5 w-3.5 opacity-60" />
             </div>
-            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all px-3 py-1.5">
+            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all px-3 py-1.5">
               <CalendarDays className="h-3.5 w-3.5 opacity-60" />
               {dateRangeStr}
             </div>

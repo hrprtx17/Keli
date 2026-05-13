@@ -318,7 +318,7 @@ function KnowledgePageContent() {
                                      onClick={() => setActiveTab('website')}
                                      className="border border-gray-200 dark:border-zinc-800 rounded-xl p-4 text-left flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-zinc-950/50 hover:border-gray-300 dark:hover:border-zinc-700 transition-all hover:shadow-sm"
                                    >
-                                      <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-850 text-gray-600 dark:text-zinc-400 flex items-center justify-center shrink-0">
+                                      <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 text-gray-600 dark:text-zinc-400 flex items-center justify-center shrink-0">
                                          <LinkIcon className="w-4 h-4"/>
                                       </div>
                                       <div>
@@ -449,14 +449,14 @@ function KnowledgePageContent() {
                        <div className="overflow-x-auto">
                           <table className="w-full text-left border-collapse">
                              <thead>
-                                <tr className="text-[12px] font-medium text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-850 bg-gray-50/50 dark:bg-zinc-950/50">
+                                <tr className="text-[12px] font-medium text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-950/50">
                                    <th className="px-6 py-3">Source</th>
                                    <th className="px-6 py-3">Status</th>
                                    <th className="px-6 py-3">Size</th>
                                    <th className="px-6 py-3 text-right">Actions</th>
                                 </tr>
                              </thead>
-                             <tbody className="divide-y divide-gray-50 dark:divide-zinc-850">
+                             <tbody className="divide-y divide-gray-50 dark:divide-zinc-800">
                                 {isLoadingData ? (
                                    [1, 2].map(k => (
                                       <tr key={k} className="animate-pulse">
@@ -489,7 +489,7 @@ function KnowledgePageContent() {
                                          <tr key={source._id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-950/50 transition-colors group">
                                             <td className="px-6 py-4 min-w-[220px]">
                                                <div className="flex items-center gap-3">
-                                                  <div className={`w-8 h-8 rounded-md flex items-center justify-center border shrink-0 ${isUrl ? 'bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-850 text-gray-500 dark:text-zinc-400' : 'bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-850 text-gray-500 dark:text-zinc-400'}`}>
+                                                  <div className={`w-8 h-8 rounded-md flex items-center justify-center border shrink-0 ${isUrl ? 'bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400' : 'bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400'}`}>
                                                      {isUrl ? <Globe className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                                                   </div>
                                                   <div className="min-w-0">
@@ -598,7 +598,7 @@ function KnowledgePageContent() {
                           { t: 'AI Model', v: 'GPT-4 Optimized' },
                           { t: 'Storage', v: 'Secure Vector DB' }
                        ].map((inf, i) => (
-                          <div key={i} className="flex justify-between items-center text-[13px] border-b border-gray-50 dark:border-zinc-850 pb-2.5 last:border-0 last:pb-0">
+                          <div key={i} className="flex justify-between items-center text-[13px] border-b border-gray-50 dark:border-zinc-800 pb-2.5 last:border-0 last:pb-0">
                              <span className="text-gray-500 dark:text-zinc-400">{inf.t}</span>
                              <span className="text-gray-900 dark:text-zinc-100 font-medium">{inf.v}</span>
                           </div>

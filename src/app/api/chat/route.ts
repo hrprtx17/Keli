@@ -158,7 +158,7 @@ export async function POST(req: Request) {
     console.error('Deployment AI Engine Exception:', error);
     return NextResponse.json(
       { 
-        error: 'Engine Processing Exception', 
+        error: `Engine Exception: ${error.message || 'Fatal termination'}`, 
         details: error.message || 'Fatal handler termination'
       }, 
       { status: 500 }

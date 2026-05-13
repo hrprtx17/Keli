@@ -8,6 +8,7 @@ export interface IWorkspace extends Document {
   allowedDomains: string[]
   usage: {
     monthlyCredits: number
+    creditsUsedThisMonth: number
     addonCredits: number
     resetDate: Date
   }
@@ -29,6 +30,7 @@ const WorkspaceSchema = new Schema<IWorkspace>({
   allowedDomains: [{ type: String }],
   usage: {
     monthlyCredits: { type: Number, default: 500 }, // 500 free credits
+    creditsUsedThisMonth: { type: Number, default: 0 },
     addonCredits: { type: Number, default: 0 },
     resetDate: { type: Date, default: () => new Date(new Date().setMonth(new Date().getMonth() + 1)) }
   },

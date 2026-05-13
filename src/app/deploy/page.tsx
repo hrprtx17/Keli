@@ -399,7 +399,7 @@ function DeployPageContent() {
                               <div className="flex-1 p-3 space-y-3 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-950/20 flex flex-col justify-end">
                                  <div className="flex items-start gap-1.5">
                                     <div className="w-5 h-5 bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center rounded-[6px] shrink-0 mt-0.5"><Sparkles className="w-2.5 h-2.5 text-zinc-400" /></div>
-                                    <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-850 rounded-[12px] rounded-tl-sm px-2.5 py-2 text-[10px] font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed shadow-sm max-w-[80%] break-words">
+                                    <div className="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-[12px] rounded-tl-sm px-2.5 py-2 text-[10px] font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed shadow-sm max-w-[80%] break-words">
                                        {welcomeMessage || 'Introduce your assistant...'}
                                     </div>
                                  </div>
@@ -457,7 +457,7 @@ function DeployPageContent() {
 
                   <div className="space-y-1.5 max-h-[180px] overflow-y-auto pr-1 select-none">
                      {activeDomains.map((d: string) => (
-                        <div key={d} className="flex items-center justify-between bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-850 px-3 py-1.5 rounded-xl group transition-colors hover:border-gray-200 dark:hover:border-zinc-800">
+                        <div key={d} className="flex items-center justify-between bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 px-3 py-1.5 rounded-xl group transition-colors hover:border-gray-200 dark:hover:border-zinc-800">
                            <div className="flex items-center gap-2 min-w-0">
                               <div className="w-1 h-1 rounded-full bg-emerald-500 shrink-0" />
                               <span className="text-[11px] font-bold text-gray-600 dark:text-zinc-300 truncate">{d}</span>
@@ -479,7 +479,7 @@ function DeployPageContent() {
                </div>
 
                {/* QUICK DOCS CARD */}
-               <div className="bg-zinc-950 border border-zinc-850 rounded-[24px] p-5 sm:p-6 text-white relative overflow-hidden group">
+               <div className="bg-zinc-950 border border-zinc-800 rounded-[24px] p-5 sm:p-6 text-white relative overflow-hidden group">
                   <div className="absolute top-[-50px] right-[-50px] w-32 h-32 bg-orange-500/20 rounded-full blur-2xl group-hover:bg-orange-500/30 transition-colors duration-500" />
                   <div className="relative z-10 flex flex-col">
                      <div className="w-8 h-8 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center mb-3.5 shadow-inner text-orange-400">

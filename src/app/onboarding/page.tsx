@@ -499,7 +499,7 @@ export default function OnboardingPage() {
                           className={`relative p-3 sm:p-5 aspect-[4/3.2] rounded-[14px] sm:rounded-[18px] border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 group ${
                              isSel 
                               ? 'border-black bg-black shadow-md sm:scale-[1.02]' 
-                              : 'border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-850'
+                              : 'border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800'
                           }`}
                         >
                            <Icon className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${isSel ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}`} />

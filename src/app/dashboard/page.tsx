@@ -11,7 +11,7 @@ const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 function StatCard({ title, value, sub, icon: Icon, loading }: any) {
   return (
     <Card className="rounded-2xl shadow-sm border-gray-200/80 dark:border-zinc-800 group bg-white dark:bg-zinc-900">
-      <CardHeader className="flex flex-row items-center justify-between pb-3 px-6 pt-6 border-b border-gray-50/50 dark:border-zinc-850">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 px-6 pt-6 border-b border-gray-50/50 dark:border-zinc-800">
         <CardTitle className="text-[12px] font-semibold tracking-wider uppercase text-gray-500 dark:text-zinc-400">{title}</CardTitle>
         <div className="h-8 w-8 rounded-lg bg-gray-50 dark:bg-zinc-800 flex items-center justify-center">
           <Icon className="h-4 w-4 text-gray-400 dark:text-zinc-500" />
@@ -100,7 +100,7 @@ export default function InsightsPage() {
 
         {/* Main Chart */}
         <Card className="rounded-3xl shadow-sm border-gray-200/80 dark:border-zinc-800 overflow-hidden flex flex-col bg-white dark:bg-zinc-900">
-          <CardHeader className="pb-6 p-6 border-b border-gray-50/50 dark:border-zinc-850">
+          <CardHeader className="pb-6 p-6 border-b border-gray-50/50 dark:border-zinc-800">
             <CardTitle className="text-[15px] font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-2">
               <PieChart className="h-4 w-4 text-orange-500" />
               Temporal Flow Pattern
@@ -123,13 +123,14 @@ export default function InsightsPage() {
                       <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="name" stroke="#6b7280" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dy={10} />
-                  <YAxis stroke="#6b7280" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dx={-5} />
+                  <XAxis dataKey="name" stroke="currentColor" className="text-gray-400 dark:text-zinc-500" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dy={10} />
+                  <YAxis stroke="currentColor" className="text-gray-400 dark:text-zinc-500" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dx={-5} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #f3f4f6', borderRadius: '12px', fontSize: '12px', fontWeight: '500', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}
+                    contentStyle={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '12px', fontSize: '12px', fontWeight: '500', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', color: 'var(--color-foreground)' }}
                     itemStyle={{ color: '#f97316' }}
+                    labelStyle={{ color: 'var(--color-foreground)' }}
                   />
-                  <Area type="monotone" dataKey="conversations" stroke="#f97316" strokeWidth={2.5} fill="url(#conv)" dot={{ r: 4, fill: '#fff', stroke: '#f97316', strokeWidth: 2 }} activeDot={{ r: 6, strokeWidth: 2 }} />
+                  <Area type="monotone" dataKey="conversations" stroke="#f97316" strokeWidth={2.5} fill="url(#conv)" dot={{ r: 4, fill: 'var(--color-background)', stroke: '#f97316', strokeWidth: 2 }} activeDot={{ r: 6, strokeWidth: 2 }} />
                 </AreaChart>
               </ResponsiveContainer>
             )}
