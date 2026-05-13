@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",
+        source: "/:path*",
         headers: [
           {
             key: "X-DNS-Prefetch-Control",
@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/api/widget/(.*)",
+        source: "/api/widget/:path*",
         headers: [
           {
             key: "Access-Control-Allow-Origin",
