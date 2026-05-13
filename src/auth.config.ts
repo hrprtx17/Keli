@@ -1,3 +1,25 @@
+// Programmatically enforce correct NextAuth/Auth.js base URL in production/serverless environments
+if (process.env.NODE_ENV === 'production' || process.env.NETLIFY === 'true' || process.env.VERCEL === '1') {
+  let deploymentUrl = process.env.URL || process.env.DEPLOY_PRIME_URL;
+  
+  if (!deploymentUrl && process.env.VERCEL_URL) {
+    deploymentUrl = `https://${process.env.VERCEL_URL}`;
+  }
+  
+  if (deploymentUrl) {
+    const cleanUrl = deploymentUrl.startsWith('http') ? deploymentUrl.replace(/\/+$/, '') : `https://${deploymentUrl.replace(/\/+$/, '')}`;
+    
+    // Enforce correct URL across NextAuth versions to override any stale localhost settings
+    process.env.AUTH_URL = cleanUrl;
+    process.env.NEXTAUTH_URL = cleanUrl;
+    
+    // Fallback override for absolute backend-constructed links
+    if (!process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_APP_URL.includes('localhost')) {
+      process.env.NEXT_PUBLIC_APP_URL = cleanUrl;
+    }
+  }
+}
+
 import type { NextAuthConfig } from 'next-auth'
 
 export const authConfig = {

@@ -1,14 +1,19 @@
-import { pipeline } from '@xenova/transformers';
+import { pipeline, env } from '@xenova/transformers';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import KnowledgeChunk from '@/models/KnowledgeChunk';
 import mongoose from 'mongoose';
+import path from 'path';
+
+// Configure Transformers.js for optimized serverless usage with bundled local models
+env.allowRemoteModels = false;
+env.localModelPath = path.join(process.cwd(), 'models');
 
 let extractor: any = null;
 
 // Singleton strategy for local model initialization
 async function getExtractor() {
   if (!extractor) {
-    // Force lazy dynamic model load upon first invocation
+    // Load local bundled model immediately and reliably
     extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
   }
   return extractor;

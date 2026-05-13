@@ -84,25 +84,37 @@ export async function POST(req: Request) {
           }
         });
 
-        let savedCount = 0;
-        // Sequential vector calculations to prevent runtime stack overflows on massive batches
-        for (const chunkPkg of totalChunksPayload) {
-           const vec = await getEmbedding(chunkPkg.text);
-           
-           await KnowledgeChunk.create({
-             agentId,
-             workspaceId: (session.user as any).workspaceId,
-             dataSourceId: source._id,
-             text: chunkPkg.text,
-             embedding: vec,
-             metadata: chunkPkg.metadata
-           });
+        // Process embeddings in concurrent batches of 5 to maximize CPU and network performance
+        const batchSize = 5;
+        const chunksToInsert: any[] = [];
+        
+        for (let i = 0; i < totalChunksPayload.length; i += batchSize) {
+          const currentBatch = totalChunksPayload.slice(i, i + batchSize);
+          
+          // Run slice concurrent vector generations
+          const batchResults = await Promise.all(
+            currentBatch.map(async (chunkPkg) => {
+              const vec = await getEmbedding(chunkPkg.text);
+              return {
+                agentId,
+                workspaceId: (session.user as any).workspaceId,
+                dataSourceId: source._id,
+                text: chunkPkg.text,
+                embedding: vec,
+                metadata: chunkPkg.metadata
+              };
+            })
+          );
+          
+          chunksToInsert.push(...batchResults);
+          
+          // Send progress status ticks
+          sendStatus('Embedding', { current: chunksToInsert.length, total: totalChunksPayload.length });
+        }
 
-           savedCount++;
-           // Send periodic tick (throttled to prevent flooding output cache)
-           if (savedCount % 2 === 0 || savedCount === totalChunksPayload.length) {
-              sendStatus('Embedding', { current: savedCount, total: totalChunksPayload.length });
-           }
+        // Perform a single high-speed bulk database write instead of multiple consecutive roundtrips
+        if (chunksToInsert.length > 0) {
+          await KnowledgeChunk.insertMany(chunksToInsert);
         }
 
         // Finalize parent state

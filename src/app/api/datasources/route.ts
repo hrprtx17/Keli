@@ -110,23 +110,32 @@ export async function POST(req: Request) {
           metadata: { size: file.size, type: file.type }
         });
 
-        const vectorDocs = [];
-        let current = 0;
-
-        for (const text of chunks) {
-          current++;
-          const vector = await getEmbedding(text);
-          vectorDocs.push({
-            agentId,
-            workspaceId,
-            dataSourceId: source._id,
-            text,
-            embedding: vector
-          });
-          // Periodically flush sub-stage percentage counter to front-end
-          if (current % 5 === 0 || current === chunks.length) {
-             sendStatus('Embedding', { current, total: chunks.length });
-          }
+        const vectorDocs: any[] = [];
+        
+        // Process file chunks in parallelized batches to maximize CPU throughput
+        const batchSize = 5;
+        
+        for (let i = 0; i < chunks.length; i += batchSize) {
+          const currentBatch = chunks.slice(i, i + batchSize);
+          
+          // Compute concurrent embeddings for current slice
+          const batchResults = await Promise.all(
+            currentBatch.map(async (textChunk) => {
+              const vector = await getEmbedding(textChunk);
+              return {
+                agentId,
+                workspaceId,
+                dataSourceId: source._id,
+                text: textChunk,
+                embedding: vector
+              };
+            })
+          );
+          
+          vectorDocs.push(...batchResults);
+          
+          // Send realtime feedback tracking status
+          sendStatus('Embedding', { current: vectorDocs.length, total: chunks.length });
         }
 
         sendStatus('Training'); // Step 5 active
