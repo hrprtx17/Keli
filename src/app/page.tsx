@@ -61,8 +61,6 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (!mounted) return null;
-
   return (
     <div className="relative min-h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 selection:bg-orange-500/30 overflow-x-hidden font-sans antialiased transition-colors duration-300">
       
@@ -106,7 +104,7 @@ export default function LandingPage() {
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {mounted && theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <Link href="/login" className="hidden sm:block text-sm font-bold hover:text-orange-500 transition-colors">Login</Link>
             <Link href="/register">
@@ -306,7 +304,7 @@ export default function LandingPage() {
 
       {/* --- HOW IT WORKS SECTION REMASTERED --- */}
       <section id="how-it-works" className="py-24 bg-zinc-50 dark:bg-[#050506] text-zinc-900 dark:text-white border-y border-zinc-200 dark:border-zinc-800 relative overflow-hidden">
-         <div className="absolute inset-0 bg-orange-600/5 opacity-[0.2] dark:opacity-30" style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '40px 40px', color: theme === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }} />
+         <div className="absolute inset-0 bg-orange-600/5 opacity-[0.2] dark:opacity-30 text-zinc-900/5 dark:text-white/5" style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="text-center mb-20">
                <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">Go live in 3 steps</h2>

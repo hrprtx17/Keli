@@ -6,6 +6,7 @@ export const authConfig = {
     error: '/login'
   },
   session: { strategy: 'jwt' },
+  trustHost: true,
   callbacks: {
     jwt: async ({ token, user }) => {
       if (user) {
