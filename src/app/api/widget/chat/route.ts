@@ -7,7 +7,6 @@ import { searchKnowledge } from '@/lib/rag';
 import { rateLimit } from '@/lib/rate-limit';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 // CORS Headers
 const corsHeaders = {
@@ -121,6 +120,7 @@ export async function POST(req: Request) {
 
     let aiReply = 'I apologize, I am unable to respond at the moment.';
     try {
+      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
       const completion = await groq.chat.completions.create({
         messages: [
           { role: 'system', content: systemPrompt },
