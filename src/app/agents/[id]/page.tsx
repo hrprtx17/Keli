@@ -8,8 +8,7 @@ import {
   Bot, Save, Loader2, Sparkles, Zap, Trash2, Send,
   AlertTriangle, MessageSquare, RefreshCw
 } from 'lucide-react';
-import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport } from 'ai';
+
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
 export default function AgentPlaygroundPage() {
@@ -57,44 +56,15 @@ export default function AgentPlaygroundPage() {
     }
   }, [agent]);
 
-  // Transport config
-  const convIdRef = useRef(conversationId);
-  convIdRef.current = conversationId;
-  const chatTransport = useRef<DefaultChatTransport<any> | null>(null);
-  if (!chatTransport.current) {
-     chatTransport.current = new DefaultChatTransport({
-        api: '/api/chat',
-        body: () => ({
-           agentId: id,
-           conversationId: convIdRef.current
-        })
-     });
-  }
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
 
-  const { messages, sendMessage, status } = useChat({
-    id: `agent-playground-${id}`,
-    transport: chatTransport.current,
-    onError: (err) => toast.error(`Connection failed: ${err.message}`)
-  });
-
-  const isChatLoading = status === 'submitted' || status === 'streaming';
-
-  // Handle Scroll
+  // Handle Scroll to bottom on new messages or status change
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages, isChatLoading]);
-
-  // Sync convoId
-  useEffect(() => {
-    if (messages.length > 0) {
-      const latest = messages[messages.length - 1];
-      if (latest.metadata && (latest.metadata as any).conversationId && (latest.metadata as any).conversationId !== conversationId) {
-         setConversationId((latest.metadata as any).conversationId);
-      }
-    }
-  }, [messages, conversationId]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -118,11 +88,34 @@ export default function AgentPlaygroundPage() {
     e?.preventDefault();
     const text = forcedText || inputValue;
     if (!text.trim() || isChatLoading) return;
-    if (!forcedText) setInputValue("");
     
+    const userMsg = { role: 'user', parts: [{ type: 'text', text }] };
+    setMessages(prev => [...prev, userMsg]);
+    setIsChatLoading(true);
+    if (!forcedText) setInputValue("");
+
     try {
-      await sendMessage({ text });
-    } catch (err) { console.error(err); }
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMsg],
+          agentId: id,
+          conversationId
+        })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Chat engine offline');
+
+      setMessages(prev => [...prev, { role: 'assistant', parts: [{ type: 'text', text: data.reply }] }]);
+      if (data.conversationId) setConversationId(data.conversationId);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Connection failure');
+    } finally {
+      setIsChatLoading(false);
+    }
   };
 
   const resetConversation = async () => {
@@ -301,9 +294,13 @@ export default function AgentPlaygroundPage() {
                                   }`}
                                   style={isUser ? { backgroundColor: formData.widgetConfig.primaryColor } : {}}
                                >
-                                  {m.parts.map((part: any, pIdx: number) => 
-                                    part.type === 'text' ? <span key={pIdx}>{part.text}</span> : null
-                                  )}
+                                   {m.parts && Array.isArray(m.parts) ? (
+                                     m.parts.map((part: any, pIdx: number) => 
+                                       part.type === 'text' ? <span key={pIdx}>{part.text}</span> : null
+                                     )
+                                   ) : (
+                                     <span>{m.content || (m as any).text || ''}</span>
+                                   )}
                                </div>
                             </motion.div>
                          )

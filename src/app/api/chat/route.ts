@@ -8,8 +8,7 @@ import Workspace from '@/models/Workspace';
 import { auth } from '@/auth';
 import { searchKnowledge } from '@/lib/rag';
 import { rateLimit } from '@/lib/rate-limit';
-import { createGroq } from '@ai-sdk/groq';
-import { streamText, createUIMessageStreamResponse } from 'ai';
+import Groq from 'groq-sdk';
 
 export const maxDuration = 30;
 
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: 'Valid messages array and Agent ID required' }, { status: 400 });
     }
 
-    // Bulletproof extraction of promptText to ensure context indexing never receives empty inputs
+    // Secure retrieval of latest user prompt
     const latestMsg = uiMessages[uiMessages.length - 1];
     let promptText = '';
     if (Array.isArray(latestMsg.parts)) {
@@ -49,24 +48,21 @@ export async function POST(req: Request) {
     
     await connectDB();
 
-    // Ensure user identity linkage is retrieved safely
     const workspaceId = await resolveWorkspaceId(session);
-    if (!workspaceId) {
-      return NextResponse.json({ error: 'Workspace resolution lock failed.' }, { status: 403 });
-    }
+    if (!workspaceId) return NextResponse.json({ error: 'Workspace context failure' }, { status: 403 });
 
     const agent = await Agent.findOne({ _id: agentId, workspaceId });
     if (!agent) return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
 
     const workspace = await Workspace.findById(workspaceId);
-    if (!workspace) return NextResponse.json({ error: 'Workspace context invalid' }, { status: 404 });
+    if (!workspace) return NextResponse.json({ error: 'Workspace invalid' }, { status: 404 });
 
     const monthlyCredits = workspace.usage?.monthlyCredits || 0;
     const usedThisMonth = workspace.usage?.creditsUsedThisMonth || 0;
     const addonCredits = workspace.usage?.addonCredits || 0;
     
     if (usedThisMonth >= monthlyCredits && addonCredits <= 0) {
-      return NextResponse.json({ error: '⚠️ AI credits exhausted.' }, { status: 403 });
+      return NextResponse.json({ error: 'AI credits exhausted. Please upgrade.' }, { status: 403 });
     }
 
     let convId = reqConvId;
@@ -96,85 +92,79 @@ export async function POST(req: Request) {
         relevantChunks = await searchKnowledge(promptText, agent._id.toString(), workspaceId);
       }
     } catch (e) {
-      console.error('[RAG Failure Recovery]', e);
+      console.error('[Dashboard RAG Recovery]', e);
     }
     
     const contextStr = relevantChunks.length > 0 
-      ? `\n\nRelevant Context:\n${relevantChunks.join('\n---\n')}` 
+      ? `\n\nRelevant Knowledge Context:\n${relevantChunks.join('\n---\n')}` 
       : '';
 
-    const systemPrompt = (agent.systemPrompt || 'You are a helpful assistant.') + contextStr;
+    const systemPrompt = (agent.systemPrompt || 'You are a helpful AI assistant.') + contextStr;
 
-    // Stabilized UI to core mapping to circumvent complex object transformation issues
-    const modelMessages = uiMessages.map((msg: any) => {
-      let c = '';
-      if (Array.isArray(msg.parts)) {
-        c = msg.parts.map((p: any) => p.type === 'text' ? p.text : '').filter(Boolean).join('\n');
-      }
-      if (!c && msg.content) c = msg.content;
-      if (!c && msg.text) c = msg.text;
-      return {
-        role: (msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system') ? msg.role : 'user',
-        content: c || ''
-      };
-    });
+    // Build standard message history
+    const prevMessages = await Message.find({ conversationId: convId })
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .lean();
+    
+    const formattedMessages = prevMessages.reverse().map(m => ({
+      role: m.role as 'user' | 'assistant' | 'system',
+      content: m.content
+    }));
 
-    // Explicit provider allocation with runtime environment propagation
-    const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json({ error: 'Environment Error: GROQ_API_KEY not set in deployment settings.' }, { status: 500 });
+    }
 
-    const result = streamText({
-      model: groq(agent.model || 'llama-3.1-8b-instant'),
-      system: systemPrompt,
-      messages: modelMessages,
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...formattedMessages
+      ],
+      model: agent.model || 'llama-3.1-8b-instant',
       temperature: agent.config?.temperature || 0.7,
-      maxOutputTokens: agent.config?.maxTokens || 800,
-      onFinish: async ({ text }) => {
-         try {
-           await Message.create({
-             conversationId: convId,
-             agentId: agent._id,
-             role: 'assistant',
-             content: text
-           });
-           
-           await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
-
-           await Workspace.findOneAndUpdate(
-             { _id: workspace._id },
-             [
-               {
-                 $set: {
-                   "usage.creditsUsedThisMonth": {
-                     $cond: {
-                       if: { $lt: ["$usage.creditsUsedThisMonth", "$usage.monthlyCredits"] },
-                       then: { $add: [{ $ifNull: ["$usage.creditsUsedThisMonth", 0] }, 1] },
-                       else: { $ifNull: ["$usage.creditsUsedThisMonth", 0] }
-                     }
-                   }
-                 }
-               }
-             ]
-           );
-         } catch (saveErr) {
-           console.error('[Finalize Error Ignored]', saveErr);
-         }
-      }
+      max_tokens: agent.config?.maxTokens || 600,
     });
 
-    // Ensure atomic return of UI response stream
-    return createUIMessageStreamResponse({
-       stream: result.toUIMessageStream({
-          messageMetadata: () => ({ conversationId: convId.toString() })
-       })
+    const aiReply = completion.choices[0]?.message?.content || 'No response from engine.';
+
+    await Message.create({
+      conversationId: convId,
+      agentId: agent._id,
+      role: 'assistant',
+      content: aiReply
     });
+
+    await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
+
+    // Atomic Deduct Credit
+    await Workspace.findOneAndUpdate(
+      { _id: workspace._id },
+      [
+        {
+          $set: {
+            "usage.creditsUsedThisMonth": {
+              $cond: {
+                if: { $lt: ["$usage.creditsUsedThisMonth", "$usage.monthlyCredits"] },
+                then: { $add: [{ $ifNull: ["$usage.creditsUsedThisMonth", 0] }, 1] },
+                else: { $ifNull: ["$usage.creditsUsedThisMonth", 0] }
+              }
+            }
+          }
+        }
+      ]
+    );
+
+    return NextResponse.json({ reply: aiReply, conversationId: convId });
 
   } catch (error: any) {
-    console.error('Production AI Pipeline Fault:', error);
+    console.error('Deployment AI Engine Exception:', error);
     return NextResponse.json(
       { 
-        error: 'Internal Pipeline Disruption', 
-        details: error.message,
-        stage: 'Execution'
+        error: 'Engine Processing Exception', 
+        details: error.message || 'Fatal handler termination'
       }, 
       { status: 500 }
     );
