@@ -1,23 +1,6 @@
-import { pipeline, env } from '@xenova/transformers';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import KnowledgeChunk from '@/models/KnowledgeChunk';
 import mongoose from 'mongoose';
-import path from 'path';
-
-// Configure Transformers.js for optimized serverless usage with bundled local models
-env.allowRemoteModels = false;
-env.localModelPath = path.join(process.cwd(), 'models');
-
-let extractor: any = null;
-
-// Singleton strategy for local model initialization
-async function getExtractor() {
-  if (!extractor) {
-    // Load local bundled model immediately and reliably
-    extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-  }
-  return extractor;
-}
 
 export async function chunkText(text: string, chunkSize: number = 1000, overlap: number = 200): Promise<string[]> {
   const splitter = new RecursiveCharacterTextSplitter({
@@ -33,10 +16,45 @@ export async function chunkText(text: string, chunkSize: number = 1000, overlap:
 }
 
 export async function getEmbedding(text: string): Promise<number[]> {
-  const generateEmbedding = await getExtractor();
-  const output = await generateEmbedding(text, { pooling: 'mean', normalize: true });
-  // Convert Float32Array output tensor structure into Standard Number Array for MongoDB compatibility
-  return Array.from(output.data);
+  const apiKey = process.env.HUGGINGFACE_API_KEY;
+  if (!apiKey) {
+     console.warn('[HuggingFace API Config Missing] Vector generation skipped.');
+     return new Array(384).fill(0); // Guarantee dimensionality match
+  }
+
+  try {
+    const response = await fetch(
+      'https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2',
+      {
+        headers: { 
+          Authorization: `Bearer ${apiKey}`, 
+          'Content-Type': 'application/json' 
+        },
+        method: 'POST',
+        body: JSON.stringify({ inputs: text }),
+      }
+    );
+
+    if (!response.ok) {
+       const errTxt = await response.text();
+       console.error(`HuggingFace HTTP Failure: ${errTxt}`);
+       return new Array(384).fill(0);
+    }
+
+    const result = await response.json();
+    if (Array.isArray(result)) {
+       // Standard feature-extraction can wrap results in nested dimensions [ [0.1, 0.2] ]
+       if (Array.isArray(result[0])) {
+          return result[0];
+       }
+       return result;
+    }
+    console.error('Unexpected embedding structure received:', result);
+    return new Array(384).fill(0);
+  } catch (e) {
+    console.error('HuggingFace generation catch block:', e);
+    return new Array(384).fill(0);
+  }
 }
 
 export async function searchKnowledge(

@@ -2,18 +2,27 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Message from '@/models/Message';
 import Agent from '@/models/Agent';
+import User from '@/models/User';
 import { auth } from '@/auth';
 import mongoose from 'mongoose';
 
+async function resolveWorkspaceId(session: any): Promise<string | null> {
+  if ((session.user as any).workspaceId) return (session.user as any).workspaceId;
+  const dbUser = await User.findOne({ email: session.user?.email });
+  return dbUser?.workspaceId?.toString() || null;
+}
+
 export async function GET() {
   const session = await auth();
-  if (!session || !(session.user as any).workspaceId) {
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     await connectDB();
-    const workspaceId = new mongoose.Types.ObjectId((session.user as any).workspaceId);
+    const wId = await resolveWorkspaceId(session);
+    if (!wId) return NextResponse.json({ error: 'Workspace missing' }, { status: 400 });
+    const workspaceId = new mongoose.Types.ObjectId(wId);
     
     // Calculate date range (last 30 days or similar)
     const endDate = new Date();

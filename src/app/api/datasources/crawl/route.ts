@@ -73,7 +73,7 @@ export async function POST(req: Request) {
         const domain = new URL(url).hostname;
         const source = await DataSource.create({
           agentId,
-          workspaceId: (session.user as any).workspaceId,
+          workspaceId: user.workspaceId,
           type: 'url',
           name: `Site Crawl: ${domain}`,
           content: `Crawl collection of ${pages.length} pages. Origin: ${url}`,
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
               const vec = await getEmbedding(chunkPkg.text);
               return {
                 agentId,
-                workspaceId: (session.user as any).workspaceId,
+                workspaceId: user.workspaceId,
                 dataSourceId: source._id,
                 text: chunkPkg.text,
                 embedding: vec,

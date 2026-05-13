@@ -62,10 +62,8 @@ export async function POST(req: Request) {
         let rawText = '';
 
         if (file.type === 'application/pdf' || nameLower.endsWith('.pdf')) {
-          const { PDFParse } = require('pdf-parse');
-          const parser = new PDFParse({ data: buffer });
-          const result = await parser.getText();
-          await parser.destroy();
+          const pdf = require('pdf-parse');
+          const result = await pdf(buffer);
           rawText = result.text;
         } else if (nameLower.endsWith('.docx')) {
           const mammoth = await import('mammoth');

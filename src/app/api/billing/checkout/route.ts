@@ -2,12 +2,19 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { connectDB } from '@/lib/db';
 import Workspace from '@/models/Workspace';
+import User from '@/models/User';
 import DodoPayments from 'dodopayments';
 
 const dodo = new DodoPayments({
   bearerToken: process.env.DODO_API_KEY || '',
   environment: (process.env.DODO_API_KEY && process.env.DODO_API_KEY.includes('live')) ? 'live_mode' : 'test_mode'
 });
+
+async function resolveWorkspaceId(session: any): Promise<string | null> {
+  if ((session.user as any).workspaceId) return (session.user as any).workspaceId;
+  const dbUser = await User.findOne({ email: session.user?.email });
+  return dbUser?.workspaceId?.toString() || null;
+}
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -17,7 +24,10 @@ export async function POST(req: Request) {
     const { type } = await req.json(); // 'premium' or 'addon'
     
     await connectDB();
-    const workspace = await Workspace.findById((session.user as any).workspaceId);
+    const workspaceId = await resolveWorkspaceId(session);
+    if (!workspaceId) return NextResponse.json({ error: 'Workspace context missing' }, { status: 400 });
+
+    const workspace = await Workspace.findById(workspaceId);
     if (!workspace) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
 
     const productId = type === 'premium' 
