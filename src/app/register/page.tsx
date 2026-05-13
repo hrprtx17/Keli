@@ -60,101 +60,114 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex">
-      {/* Form Side */}
-      <div className="flex w-full md:w-1/2 items-center justify-center bg-background p-8">
-        <div className="w-full max-w-md space-y-8">
-          <Link href="/" className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Bot className="w-5 h-5 text-white" />
+    <div className="relative min-h-screen w-full flex bg-[#F8F8F8] text-[#1A1A1A] antialiased selection:bg-orange-100 selection:text-orange-700 overflow-hidden">
+      
+      {/* Background Components */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div 
+          className="absolute inset-0 opacity-[0.03]" 
+          style={{ backgroundImage: `radial-gradient(#000 1px, transparent 1px)`, backgroundSize: '24px 24px' }} 
+        />
+      </div>
+
+      {/* Left Form Side */}
+      <div className="flex w-full md:w-[45%] lg:w-[40%] items-center justify-center p-6 sm:p-8 relative z-10 bg-white shadow-2xl shadow-black/[0.02] border-r border-gray-100">
+        <div className="w-full max-w-md space-y-8 py-6">
+          
+          <Link href="/" className="inline-flex items-center gap-2.5 group">
+            <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform">
+               <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                 <div className="w-2.5 h-2.5 bg-white rounded-sm rotate-45 shadow-sm" />
+               </div>
             </div>
-            <span className="font-bold text-lg">AgentDesk</span>
+            <span className="font-semibold text-lg tracking-tight text-black">AgentDesk</span>
           </Link>
 
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground">Create your account</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Join for free — no credit card required.
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 leading-[1.1]">Create your account</h1>
+            <p className="mt-2 text-sm font-medium text-gray-500">
+              Get started for free — no credit card required.
             </p>
           </div>
 
           {error && (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <div className="rounded-xl border border-red-100 bg-red-50/50 px-4 py-3 text-[13px] font-medium text-red-600 animate-in fade-in slide-in-from-top-2 duration-200">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                autoFocus
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Work Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-3.5">
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500">Full Name</Label>
                 <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Min. 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
-                  minLength={8}
-                  className="pr-10"
+                  autoFocus
+                  className="h-11 rounded-xl bg-gray-50/50 border-gray-200 px-4 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500">Work Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="h-11 rounded-xl bg-gray-50/50 border-gray-200 px-4 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Min. 8 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="h-11 rounded-xl bg-gray-50/50 border-gray-200 pl-4 pr-11 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full h-11 bg-primary text-white hover:bg-primary/90 shadow-sm"
+            <Button 
+              type="submit" 
+              className="w-full h-11 rounded-xl bg-black text-white hover:bg-zinc-800 hover:shadow-md font-semibold text-[14px] transition-all duration-200 active:scale-[0.99] mt-2" 
               disabled={loading}
             >
-              {loading ? 'Creating account...' : 'Create free account'}
+              {loading ? 'Provisioning account...' : 'Get Started'}
             </Button>
-
-            <div className="relative my-2">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-              </div>
+            
+            <div className="relative my-4 flex items-center gap-4 text-xs text-gray-400 font-medium uppercase tracking-wider">
+              <div className="flex-1 border-t border-gray-100" />
+              <span>Or</span>
+              <div className="flex-1 border-t border-gray-100" />
             </div>
 
             <Button
               type="button"
               variant="outline"
-              className="w-full h-11"
+              className="w-full h-11 rounded-xl border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-2 text-[14px] font-semibold transition-all shadow-sm active:scale-[0.99]"
               onClick={() => signIn('google', { callbackUrl: '/onboarding' })}
             >
-              <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -164,36 +177,47 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-[13px] font-medium text-gray-500">
             Already have an account?{' '}
-            <Link href="/login" className="font-medium text-primary hover:underline">
+            <Link href="/login" className="text-orange-600 hover:text-orange-700 hover:underline transition-colors">
               Sign in
             </Link>
           </p>
         </div>
       </div>
 
-      {/* Hero Side */}
-      <div className="hidden md:flex w-1/2 flex-col justify-center items-center bg-gradient-to-br from-primary/10 via-orange-50 to-background dark:from-primary/20 dark:via-background dark:to-background border-l border-border p-12 text-center">
-        <div className="max-w-md space-y-6">
-          <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center mx-auto shadow-xl shadow-primary/30">
-            <Bot className="w-10 h-10 text-white" />
+      {/* Right Display Side */}
+      <div className="hidden md:flex md:flex-1 flex-col justify-center items-center p-12 text-center relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-transparent to-transparent opacity-60" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/[0.04] rounded-full blur-[120px]" />
+        
+        <div className="max-w-lg space-y-8 relative">
+          <div className="inline-flex items-center justify-center rounded-[24px] bg-white p-5 shadow-xl shadow-black/[0.02] border border-gray-100 mx-auto">
+            <div className="w-16 h-16 rounded-[18px] bg-black flex items-center justify-center text-white text-3xl shadow-lg shadow-orange-500/20 overflow-hidden">
+               <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                 <div className="w-5 h-5 bg-white rounded rotate-45 shadow-sm" />
+               </div>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            The AI support platform that works while you sleep.
-          </h1>
-          <p className="text-muted-foreground leading-relaxed">
-            Train your AI in minutes. Deploy a widget. Resolve support tickets automatically — even at 3am.
-          </p>
-          <div className="grid grid-cols-3 gap-4 pt-4 text-left">
+          
+          <div className="space-y-4">
+            <h2 className="text-[32px] lg:text-[40px] font-bold tracking-tight text-gray-900 leading-[1.15]">
+              The AI support platform that works while you sleep.
+            </h2>
+            <p className="text-[15px] font-medium text-gray-500 max-w-md mx-auto leading-relaxed">
+              Automate responses, index your knowledge base, and deploy enterprise chatbots in minutes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 max-w-md mx-auto pt-4 text-left">
             {[
               { val: '500', label: 'Free Credits' },
-              { val: '< 15min', label: 'Setup time' },
-              { val: '24/7', label: 'AI uptime' }
+              { val: '< 15m', label: 'Setup Time' },
+              { val: '24/7', label: 'AI Uptime' }
             ].map(s => (
-              <div key={s.label} className="rounded-xl border border-border bg-card p-4">
-                <div className="text-xl font-bold text-primary">{s.val}</div>
-                <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+              <div key={s.label} className="rounded-[16px] border border-gray-200/80 bg-white p-3.5 shadow-sm hover:shadow-md transition-shadow">
+                <div className="text-[16px] font-bold text-orange-600 tracking-tight">{s.val}</div>
+                <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-1 leading-tight">{s.label}</div>
               </div>
             ))}
           </div>

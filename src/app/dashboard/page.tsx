@@ -10,18 +10,18 @@ const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function StatCard({ title, value, sub, icon: Icon, loading }: any) {
   return (
-    <Card className="rounded-2xl shadow-sm border-gray-200/80 group bg-white">
-      <CardHeader className="flex flex-row items-center justify-between pb-3 px-6 pt-6 border-b border-gray-50/50">
-        <CardTitle className="text-[12px] font-semibold tracking-wider uppercase text-gray-500">{title}</CardTitle>
-        <div className="h-8 w-8 rounded-lg bg-gray-50 flex items-center justify-center">
-          <Icon className="h-4 w-4 text-gray-400" />
+    <Card className="rounded-2xl shadow-sm border-gray-200/80 dark:border-zinc-800 group bg-white dark:bg-zinc-900">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 px-6 pt-6 border-b border-gray-50/50 dark:border-zinc-850">
+        <CardTitle className="text-[12px] font-semibold tracking-wider uppercase text-gray-500 dark:text-zinc-400">{title}</CardTitle>
+        <div className="h-8 w-8 rounded-lg bg-gray-50 dark:bg-zinc-800 flex items-center justify-center">
+          <Icon className="h-4 w-4 text-gray-400 dark:text-zinc-500" />
         </div>
       </CardHeader>
       <CardContent className="px-6 pb-6 pt-4">
-        <div className="text-3xl font-semibold tracking-tight text-gray-900">
-          {loading ? <div className="h-9 w-20 bg-gray-100 animate-pulse rounded-lg" /> : value}
+        <div className="text-3xl font-semibold tracking-tight text-gray-900 dark:text-zinc-100">
+          {loading ? <div className="h-9 w-20 bg-gray-100 dark:bg-zinc-800 animate-pulse rounded-lg" /> : value}
         </div>
-        <div className="mt-2 text-[13px] font-medium text-gray-500">
+        <div className="mt-2 text-[13px] font-medium text-gray-500 dark:text-zinc-400">
           {sub}
         </div>
       </CardContent>
@@ -56,11 +56,11 @@ export default function InsightsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
            <div>
-              <div className="flex items-center gap-2 text-[11px] font-medium text-orange-600 tracking-wider uppercase mb-2">
+              <div className="flex items-center gap-2 text-[11px] font-medium text-orange-600 dark:text-orange-400 tracking-wider uppercase mb-2">
                  ANALYTICS
               </div>
-              <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Insights</h1>
-              <p className="text-[14px] text-gray-500 mt-2 max-w-lg leading-relaxed">
+              <h1 className="text-3xl font-semibold text-gray-900 dark:text-zinc-100 tracking-tight">Insights</h1>
+              <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-2 max-w-lg leading-relaxed">
                  Monitor interaction layers, performance, and volume for your AI agents.
               </p>
            </div>
@@ -75,44 +75,44 @@ export default function InsightsPage() {
         
         {/* Micro Metrics */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-           <div className="bg-white p-5 rounded-2xl border border-gray-200/80 flex items-center justify-between shadow-sm">
+           <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shadow-sm">
               <div>
-                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Avg Latency</p>
-                 <p className="text-[15px] font-semibold text-gray-900 mt-1">~ 1.2s</p>
+                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Avg Latency</p>
+                 <p className="text-[15px] font-semibold text-gray-900 dark:text-zinc-100 mt-1">~ 1.2s</p>
               </div>
-              <Timer className="h-5 w-5 text-gray-300" />
+              <Timer className="h-5 w-5 text-gray-300 dark:text-zinc-600" />
            </div>
-           <div className="bg-white p-5 rounded-2xl border border-gray-200/80 flex items-center justify-between shadow-sm">
+           <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shadow-sm">
               <div>
-                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Resolution Rate</p>
-                 <p className="text-[15px] font-semibold text-gray-900 mt-1">{stats?.resolutionRate || 92}%</p>
+                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Resolution Rate</p>
+                 <p className="text-[15px] font-semibold text-gray-900 dark:text-zinc-100 mt-1">{stats?.resolutionRate || 92}%</p>
               </div>
-              <CheckCircle2 className="h-5 w-5 text-gray-300" />
+              <CheckCircle2 className="h-5 w-5 text-gray-300 dark:text-zinc-600" />
            </div>
-           <div className="bg-white p-5 rounded-2xl border border-gray-200/80 flex items-center justify-between shadow-sm">
+           <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-gray-200/80 dark:border-zinc-800 flex items-center justify-between shadow-sm">
               <div>
-                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">User Rating</p>
-                 <p className="text-[15px] font-semibold text-gray-900 mt-1">4.8 / 5.0</p>
+                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500">User Rating</p>
+                 <p className="text-[15px] font-semibold text-gray-900 dark:text-zinc-100 mt-1">4.8 / 5.0</p>
               </div>
-              <Star className="h-5 w-5 text-gray-300" />
+              <Star className="h-5 w-5 text-gray-300 dark:text-zinc-600" />
            </div>
         </div>
 
         {/* Main Chart */}
-        <Card className="rounded-3xl shadow-sm border-gray-200/80 overflow-hidden flex flex-col bg-white">
-          <CardHeader className="pb-6 p-6 border-b border-gray-50/50">
-            <CardTitle className="text-[15px] font-semibold flex items-center gap-2">
+        <Card className="rounded-3xl shadow-sm border-gray-200/80 dark:border-zinc-800 overflow-hidden flex flex-col bg-white dark:bg-zinc-900">
+          <CardHeader className="pb-6 p-6 border-b border-gray-50/50 dark:border-zinc-850">
+            <CardTitle className="text-[15px] font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-2">
               <PieChart className="h-4 w-4 text-orange-500" />
               Temporal Flow Pattern
             </CardTitle>
-            <p className="text-[13px] text-gray-500 mt-1">Interaction volume across a 7-day operational window.</p>
+            <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Interaction volume across a 7-day operational window.</p>
           </CardHeader>
           <CardContent className="h-[340px] p-6 flex-1">
             {creditsUsed === 0 ? (
-               <div className="h-full w-full flex flex-col items-center justify-center text-center border border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
-                  <MessageSquare className="h-6 w-6 text-gray-300 mb-3" />
-                  <h4 className="text-[14px] font-medium text-gray-900">Awaiting Data</h4>
-                  <p className="text-[13px] text-gray-500 mt-1">Deploy your AI to begin capturing interaction metrics.</p>
+               <div className="h-full w-full flex flex-col items-center justify-center text-center border border-dashed border-gray-200 dark:border-zinc-800 rounded-2xl bg-gray-50/50 dark:bg-zinc-950/40">
+                  <MessageSquare className="h-6 w-6 text-gray-300 dark:text-zinc-600 mb-3" />
+                  <h4 className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">Awaiting Data</h4>
+                  <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Deploy your AI to begin capturing interaction metrics.</p>
                </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -123,8 +123,8 @@ export default function InsightsPage() {
                       <stop offset="100%" stopColor="#f97316" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dy={10} />
-                  <YAxis stroke="#9ca3af" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dx={-5} />
+                  <XAxis dataKey="name" stroke="#6b7280" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dy={10} />
+                  <YAxis stroke="#6b7280" fontSize={11} fontWeight="500" tickLine={false} axisLine={false} dx={-5} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#fff', border: '1px solid #f3f4f6', borderRadius: '12px', fontSize: '12px', fontWeight: '500', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}
                     itemStyle={{ color: '#f97316' }}

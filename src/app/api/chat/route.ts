@@ -139,23 +139,18 @@ export async function POST(req: Request) {
 
     await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
 
-    // Atomic Deduct Credit
-    await Workspace.findOneAndUpdate(
-      { _id: workspace._id },
-      [
-        {
-          $set: {
-            "usage.creditsUsedThisMonth": {
-              $cond: {
-                if: { $lt: ["$usage.creditsUsedThisMonth", "$usage.monthlyCredits"] },
-                then: { $add: [{ $ifNull: ["$usage.creditsUsedThisMonth", 0] }, 1] },
-                else: { $ifNull: ["$usage.creditsUsedThisMonth", 0] }
-              }
-            }
-          }
-        }
-      ]
-    );
+    // Clean, highly-compatible robust atomic credit update
+    if (usedThisMonth < monthlyCredits) {
+      await Workspace.updateOne(
+        { _id: workspace._id },
+        { $inc: { "usage.creditsUsedThisMonth": 1 } }
+      );
+    } else if (addonCredits > 0) {
+      await Workspace.updateOne(
+        { _id: workspace._id },
+        { $inc: { "usage.addonCredits": -1 } }
+      );
+    }
 
     return NextResponse.json({ reply: aiReply, conversationId: convId });
 

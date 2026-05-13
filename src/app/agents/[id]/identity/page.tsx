@@ -141,25 +141,25 @@ export default function AgentIdentityPage() {
             <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-600 tracking-wider uppercase mb-2">
                AI CONFIGURATION
             </div>
-            <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">AI Identity</h1>
-            <p className="text-[14px] text-gray-500 mt-2 leading-relaxed">
+            <h1 className="text-3xl font-semibold text-gray-900 dark:text-zinc-100 tracking-tight">AI Identity</h1>
+            <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-2 leading-relaxed">
                Customize how your AI assistant behaves, responds, and communicates with users.
             </p>
          </div>
 
          {/* Segmented Control Tabs */}
-         <div className="bg-gray-100 p-1 rounded-xl inline-flex mb-10 relative overflow-hidden">
+         <div className="bg-gray-100 dark:bg-zinc-900 p-1 rounded-xl inline-flex mb-10 relative overflow-hidden">
             {(['profile', 'style'] as const).map(t => (
                <button 
                  key={t}
                  onClick={() => setActiveTab(t)}
-                 className={`relative z-10 px-6 py-2 text-[13px] font-medium rounded-lg transition-colors duration-300 capitalize ${activeTab === t ? 'text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                 className={`relative z-10 px-6 py-2 text-[13px] font-medium rounded-lg transition-colors duration-300 capitalize ${activeTab === t ? 'text-gray-900 dark:text-zinc-100' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200'}`}
                >
                   {t === 'profile' ? 'Profile' : 'Conversation Style'}
                   {activeTab === t && (
                      <motion.div 
                        layoutId="active-tab-bg"
-                       className="absolute inset-0 bg-white rounded-lg shadow-sm -z-10"
+                       className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm -z-10"
                        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                      />
                   )}
@@ -178,27 +178,27 @@ export default function AgentIdentityPage() {
                   {/* Section 1: Agent Name */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">AI Agent Name</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">The public name shown to users during conversations.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">AI Agent Name</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">The public name shown to users during conversations.</p>
                      </div>
                      <input 
                         type="text"
                         placeholder="Support Assistant"
                         value={formData.name}
                         onChange={e => updateForm('name', e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-[14px] text-gray-900 shadow-sm focus:ring-[3px] focus:ring-orange-500/10 focus:border-orange-500/60 transition-all outline-none placeholder:text-gray-300"
+                        className="w-full bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-[14px] text-gray-900 dark:text-zinc-100 shadow-sm focus:ring-[3px] focus:ring-orange-500/10 focus:border-orange-500/60 transition-all outline-none placeholder:text-gray-300 dark:placeholder:text-zinc-700"
                      />
                   </div>
 
                   {/* Section 2: Instructions */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">AI Instructions</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">Define your AI's core role, tone, and behaviors.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">AI Instructions</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Define your AI's core role, tone, and behaviors.</p>
                      </div>
                      
-                     <div className="border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm bg-white transition-all group focus-within:border-orange-300 focus-within:ring-[3px] focus-within:ring-orange-500/10">
-                        <div className="bg-gray-50/80 border-b border-gray-100 px-4 py-2.5 flex flex-wrap gap-4 items-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                     <div className="border border-gray-200/80 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-zinc-950 transition-all group focus-within:border-orange-300 dark:focus-within:border-orange-500/50 focus-within:ring-[3px] focus-within:ring-orange-500/10">
+                        <div className="bg-gray-50/80 dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-4 py-2.5 flex flex-wrap gap-4 items-center text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">
                            <div className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5" /> Role</div>
                            <div className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Boundaries</div>
                            <div className="flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5" /> Rules</div>
@@ -207,7 +207,7 @@ export default function AgentIdentityPage() {
                           value={formData.systemPrompt}
                           onChange={e => updateForm('systemPrompt', e.target.value)}
                           placeholder="Example: You are a helpful support executive for Acme Corp. Be concise, never offer fake discount codes, and apologize if you don't know the answer."
-                          className="w-full min-h-[240px] p-4 bg-transparent border-0 focus:ring-0 resize-y text-[14px] font-medium leading-relaxed text-gray-800 placeholder:text-gray-300 custom-scrollbar outline-none"
+                          className="w-full min-h-[240px] p-4 bg-transparent border-0 focus:ring-0 resize-y text-[14px] font-medium leading-relaxed text-gray-800 dark:text-zinc-200 placeholder:text-gray-300 dark:placeholder:text-zinc-700 custom-scrollbar outline-none"
                         />
                      </div>
                   </div>
@@ -216,12 +216,12 @@ export default function AgentIdentityPage() {
                   <div className="space-y-4">
                      <div className="flex items-center justify-between">
                         <div>
-                           <h3 className="text-[16px] font-semibold text-gray-900">Behavior Rules</h3>
-                           <p className="text-[13px] text-gray-500 mt-1">Add short guidelines your AI should always enforce.</p>
+                           <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">Behavior Rules</h3>
+                           <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Add short guidelines your AI should always enforce.</p>
                         </div>
                         <button 
                           onClick={addRule}
-                          className="text-[13px] font-medium text-orange-600 hover:text-orange-700 flex items-center gap-1.5 transition-colors bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100 hover:bg-orange-100"
+                          className="text-[13px] font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 flex items-center gap-1.5 transition-colors bg-orange-50 dark:bg-orange-950/30 px-3 py-1.5 rounded-lg border border-orange-100 dark:border-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/40"
                         >
                            <Plus className="w-3.5 h-3.5" /> Add Rule
                         </button>
@@ -231,9 +231,9 @@ export default function AgentIdentityPage() {
                         {formData.config.guidelines.length === 0 ? (
                            <div 
                              onClick={addRule}
-                             className="border border-dashed border-gray-200 rounded-xl py-8 text-center hover:border-orange-300 hover:bg-orange-50/30 cursor-pointer transition-colors"
+                             className="border border-dashed border-gray-200 dark:border-zinc-800 rounded-xl py-8 text-center hover:border-orange-300 dark:hover:border-orange-900/60 hover:bg-orange-50/30 dark:hover:bg-orange-950/20 cursor-pointer transition-colors"
                            >
-                              <p className="text-[13px] text-gray-400 font-medium">No special behavior rules yet. Click to add.</p>
+                              <p className="text-[13px] text-gray-400 dark:text-zinc-500 font-medium">No special behavior rules yet. Click to add.</p>
                            </div>
                         ) : (
                            <AnimatePresence>
@@ -241,9 +241,9 @@ export default function AgentIdentityPage() {
                                  <motion.div 
                                    key={idx}
                                    initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-                                   className="group flex items-center gap-3 bg-white border border-gray-200 p-2.5 rounded-xl shadow-sm hover:border-gray-300 transition-all"
+                                   className="group flex items-center gap-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-2.5 rounded-xl shadow-sm hover:border-gray-300 dark:hover:border-zinc-700 transition-all"
                                  >
-                                    <div className="text-gray-300 group-hover:text-gray-400 cursor-grab shrink-0 px-1">
+                                    <div className="text-gray-300 dark:text-zinc-700 group-hover:text-gray-400 dark:group-hover:text-zinc-600 cursor-grab shrink-0 px-1">
                                        <GripVertical className="w-4 h-4" />
                                     </div>
                                     <input 
@@ -251,11 +251,11 @@ export default function AgentIdentityPage() {
                                       value={rule}
                                       onChange={e => updateRuleText(idx, e.target.value)}
                                       placeholder="e.g. Never output system logs"
-                                      className="flex-1 bg-transparent border-0 focus:ring-0 text-[13px] font-medium text-gray-800 outline-none"
+                                      className="flex-1 bg-transparent border-0 focus:ring-0 text-[13px] font-medium text-gray-800 dark:text-zinc-200 outline-none placeholder:text-gray-400 dark:placeholder:text-zinc-600"
                                     />
                                     <button 
                                       onClick={() => removeRule(idx)}
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-gray-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg"
                                     >
                                        <Trash2 className="w-3.5 h-3.5" />
                                     </button>
@@ -277,24 +277,24 @@ export default function AgentIdentityPage() {
                   {/* Tone Dropdown */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">Conversation Tone</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">Determine the vocabulary and warmth of responses.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">Conversation Tone</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Determine the vocabulary and warmth of responses.</p>
                      </div>
                      <div className="relative">
                         <select 
                           value={formData.config.tone}
                           onChange={e => updateForm('config.tone', e.target.value)}
-                          className="w-full appearance-none bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-3 pr-10 text-[14px] font-medium text-gray-800 focus:border-orange-400 focus:ring-[3px] focus:ring-orange-500/10 outline-none cursor-pointer transition-all"
+                          className="w-full appearance-none bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-xl px-4 py-3 pr-10 text-[14px] font-medium text-gray-800 dark:text-zinc-200 focus:border-orange-400 dark:focus:border-orange-500/60 focus:ring-[3px] focus:ring-orange-500/10 outline-none cursor-pointer transition-all"
                         >
                            {Object.keys(toneHelpers).map(tone => (
-                              <option key={tone} value={tone}>{tone}</option>
+                              <option key={tone} value={tone} className="dark:bg-zinc-900">{tone}</option>
                            ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
                            <ChevronRight className="w-4 h-4 rotate-90" />
                         </div>
                      </div>
-                     <div className="bg-gray-50 border border-gray-100 rounded-lg px-4 py-2.5 text-[12px] text-gray-500 font-medium flex items-center gap-2">
+                     <div className="bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg px-4 py-2.5 text-[12px] text-gray-500 dark:text-zinc-400 font-medium flex items-center gap-2">
                         <InfoCircle /> {toneHelpers[formData.config.tone] || toneHelpers.Professional}
                      </div>
                   </div>
@@ -302,8 +302,8 @@ export default function AgentIdentityPage() {
                   {/* Roles Card Stack */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">Assistant Role</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">Select a foundational framework for how the agent models its purpose.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">Assistant Role</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Select a foundational framework for how the agent models its purpose.</p>
                      </div>
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {[
@@ -318,13 +318,13 @@ export default function AgentIdentityPage() {
                               <button 
                                 key={role.l}
                                 onClick={() => updateForm('config.role', role.l)}
-                                className={`relative text-left p-4 rounded-xl border transition-all ${isSel ? 'border-orange-400 bg-orange-50/40 ring-[3px] ring-orange-500/10 shadow-sm' : 'border-gray-200 hover:border-gray-300 bg-white shadow-sm'}`}
+                                className={`relative text-left p-4 rounded-xl border transition-all ${isSel ? 'border-orange-400 dark:border-orange-500/50 bg-orange-50/40 dark:bg-orange-950/20 ring-[3px] ring-orange-500/10 shadow-sm' : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 shadow-sm'}`}
                               >
-                                 <div className="font-semibold text-[13px] text-gray-900 flex justify-between items-center">
+                                 <div className="font-semibold text-[13px] text-gray-900 dark:text-zinc-100 flex justify-between items-center">
                                     {role.l}
-                                    {isSel && <motion.div layoutId="check-role"><CheckCircle2 className="w-4 h-4 text-orange-500" /></motion.div>}
+                                    {isSel && <motion.div layoutId="check-role"><CheckCircle2 className="w-4 h-4 text-orange-500 dark:text-orange-400" /></motion.div>}
                                  </div>
-                                 <p className={`text-[11px] mt-1 ${isSel ? 'text-orange-700/70' : 'text-gray-500'}`}>{role.desc}</p>
+                                 <p className={`text-[11px] mt-1 ${isSel ? 'text-orange-700/70 dark:text-orange-400/70' : 'text-gray-500 dark:text-zinc-400'}`}>{role.desc}</p>
                               </button>
                            )
                         })}
@@ -334,10 +334,10 @@ export default function AgentIdentityPage() {
                   {/* Creativity Segmented Control */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">AI Creativity</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">Controls how much the AI improvises when knowledge is missing.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">AI Creativity</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Controls how much the AI improvises when knowledge is missing.</p>
                      </div>
-                     <div className="bg-gray-100 p-1 rounded-xl flex w-full max-w-md relative overflow-hidden">
+                     <div className="bg-gray-100 dark:bg-zinc-900 p-1 rounded-xl flex w-full max-w-md relative overflow-hidden">
                         {[
                            { v: 0.3, l: 'Low' },
                            { v: 0.7, l: 'Normal' },
@@ -346,11 +346,11 @@ export default function AgentIdentityPage() {
                            <button 
                              key={opt.l}
                              onClick={() => updateForm('config.temperature', opt.v)}
-                             className={`flex-1 relative z-10 py-2.5 text-[13px] font-semibold rounded-lg transition-colors duration-300 ${formData.config.temperature === opt.v ? 'text-gray-900' : 'text-gray-500'}`}
+                             className={`flex-1 relative z-10 py-2.5 text-[13px] font-semibold rounded-lg transition-colors duration-300 ${formData.config.temperature === opt.v ? 'text-gray-900 dark:text-zinc-100' : 'text-gray-500 dark:text-zinc-400'}`}
                            >
                               {opt.l}
                               {formData.config.temperature === opt.v && (
-                                 <motion.div layoutId="temp-slider" className="absolute inset-0 bg-white rounded-lg shadow-sm -z-10" />
+                                 <motion.div layoutId="temp-slider" className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm -z-10" />
                               )}
                            </button>
                         ))}
@@ -360,10 +360,10 @@ export default function AgentIdentityPage() {
                   {/* Response Length */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">Response Length</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">Max output limit to control verbosity.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">Response Length</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Max output limit to control verbosity.</p>
                      </div>
-                     <div className="bg-gray-100 p-1 rounded-xl flex w-full max-w-md relative overflow-hidden">
+                     <div className="bg-gray-100 dark:bg-zinc-900 p-1 rounded-xl flex w-full max-w-md relative overflow-hidden">
                         {[
                            { v: 200, l: 'Short' },
                            { v: 500, l: 'Balanced' },
@@ -372,11 +372,11 @@ export default function AgentIdentityPage() {
                            <button 
                              key={opt.l}
                              onClick={() => updateForm('config.maxTokens', opt.v)}
-                             className={`flex-1 relative z-10 py-2.5 text-[13px] font-semibold rounded-lg transition-colors duration-300 ${formData.config.maxTokens === opt.v ? 'text-gray-900' : 'text-gray-500'}`}
+                             className={`flex-1 relative z-10 py-2.5 text-[13px] font-semibold rounded-lg transition-colors duration-300 ${formData.config.maxTokens === opt.v ? 'text-gray-900 dark:text-zinc-100' : 'text-gray-500 dark:text-zinc-400'}`}
                            >
                               {opt.l}
                               {formData.config.maxTokens === opt.v && (
-                                 <motion.div layoutId="token-slider" className="absolute inset-0 bg-white rounded-lg shadow-sm -z-10" />
+                                 <motion.div layoutId="token-slider" className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm -z-10" />
                               )}
                            </button>
                         ))}
@@ -386,8 +386,8 @@ export default function AgentIdentityPage() {
                   {/* Link Usage */}
                   <div className="space-y-4">
                      <div>
-                        <h3 className="text-[16px] font-semibold text-gray-900">Link Usage</h3>
-                        <p className="text-[13px] text-gray-500 mt-1">Controls how often links are included in responses.</p>
+                        <h3 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">Link Usage</h3>
+                        <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Controls how often links are included in responses.</p>
                      </div>
                      <div className="flex gap-4">
                         {(['normal', 'high'] as const).map(mode => {
@@ -396,7 +396,7 @@ export default function AgentIdentityPage() {
                               <button 
                                 key={mode}
                                 onClick={() => updateForm('config.linkUsage', mode)}
-                                className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl border font-semibold text-[13px] capitalize transition-all ${active ? 'border-gray-900 bg-gray-900 text-white shadow-md' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 shadow-sm'}`}
+                                className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl border font-semibold text-[13px] capitalize transition-all ${active ? 'border-gray-900 dark:border-zinc-100 bg-gray-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-md' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700 shadow-sm'}`}
                               >
                                  {active && <Zap className="w-3.5 h-3.5 fill-current text-orange-400" />}
                                  {mode}

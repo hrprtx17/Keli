@@ -56,10 +56,20 @@ function DeployPageContent() {
   
   if (isLoading) return <DashboardLayout><div className="p-12 flex justify-center"><div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div></DashboardLayout>;
 
+  const [origin, setOrigin] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
+  const actualOrigin = origin || 'http://localhost:3000';
+
   const scripts = {
-    widget: `<!-- AgentDesk Widget -->\n<script \n  src="https://agentdesk.ai/embed.js"\n  data-agent-id="${agentId}"\n  async defer\n></script>`,
-    frame: `<iframe \n  src="https://agentdesk.ai/chat/${agentId}"\n  width="100%" height="600px" \n  frameborder="0" \n  allow="microphone"\n></iframe>`,
-    sdk: `import { AgentChat } from '@agentdesk/sdk';\n\nexport const App = () => (\n  <AgentChat agentId="${agentId}" />\n);`
+    widget: `<!-- AgentDesk Widget -->\n<script \n  src="${actualOrigin}/widget/embed.js"\n  data-agent-id="${agentId}"\n  async defer\n></script>`,
+    frame: `<iframe \n  src="${actualOrigin}/widget/chat?agent=${agentId}"\n  width="100%" \n  height="600px" \n  frameborder="0" \n  style="border: none; border-radius: 16px; overflow: hidden;"\n  allow="microphone"\n></iframe>`,
+    sdk: `import { AgentChat } from '@agentdesk/sdk';\n\nexport const App = () => (\n  <AgentChat \n     agentId="${agentId}" \n     host="${actualOrigin}" \n  />\n);`
   };
 
   const methods = [
@@ -75,15 +85,15 @@ function DeployPageContent() {
          {/* 1. HEADER */}
          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-12">
             <div>
-               <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-600 tracking-wider uppercase mb-2">
+               <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-600 dark:text-orange-400 tracking-wider uppercase mb-2">
                   DEPLOYMENT
                </div>
-               <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Deploy Your AI Assistant</h1>
-               <p className="text-[14px] text-gray-500 mt-1.5">
+               <h1 className="text-3xl font-semibold text-gray-900 dark:text-zinc-100 tracking-tight">Deploy Your AI Assistant</h1>
+               <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-1.5">
                   Add your AI assistant to your website or application in minutes.
                </p>
             </div>
-            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full shrink-0">
+            <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-full shrink-0">
                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                <span className="text-[12px] font-semibold">Ready to Deploy</span>
             </div>
@@ -102,16 +112,16 @@ function DeployPageContent() {
                           key={m.id} 
                           onClick={() => setActiveMethod(m.id as any)}
                           className={`relative flex flex-col p-5 rounded-2xl border text-left transition-all ${
-                             isAct ? 'border-orange-500 bg-orange-50/30 shadow-sm ring-1 ring-orange-500' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                             isAct ? 'border-orange-500 dark:border-orange-500/50 bg-orange-50/30 dark:bg-orange-950/20 shadow-sm ring-1 ring-orange-500' : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 hover:shadow-sm'
                           }`}
                         >
-                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-colors ${isAct ? 'bg-orange-500 text-white' : 'bg-gray-50 text-gray-500'}`}>
+                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-colors ${isAct ? 'bg-orange-500 text-white' : 'bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400'}`}>
                               <m.icon className="w-5 h-5" />
                            </div>
-                           <div className="font-semibold text-[14px] text-gray-900 mb-1">{m.label}</div>
-                           <div className="text-[11px] text-gray-500 leading-relaxed">{m.desc}</div>
+                           <div className="font-semibold text-[14px] text-gray-900 dark:text-zinc-100 mb-1">{m.label}</div>
+                           <div className="text-[11px] text-gray-500 dark:text-zinc-400 leading-relaxed">{m.desc}</div>
                            {m.id === 'widget' && (
-                              <span className="absolute top-3 right-3 bg-white text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md border shadow-sm text-gray-600">Best</span>
+                              <span className="absolute top-3 right-3 bg-white dark:bg-zinc-800 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md border dark:border-zinc-700 shadow-sm text-gray-600 dark:text-zinc-300">Best</span>
                            )}
                         </button>
                      )
@@ -123,24 +133,24 @@ function DeployPageContent() {
                   <motion.div 
                     key={activeMethod}
                     initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-                    className="bg-white border border-gray-200 rounded-[24px] p-6 sm:p-8 shadow-sm"
+                    className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[24px] p-6 sm:p-8 shadow-sm"
                   >
                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <div>
-                           <h2 className="text-[16px] font-semibold text-gray-900 capitalize">
+                           <h2 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100 capitalize">
                               {methods.find(m => m.id === activeMethod)?.label} Installation
                            </h2>
-                           <p className="text-[13px] text-gray-500 mt-1">Works effortlessly across generic, WordPress, Shopify sites.</p>
+                           <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">Works effortlessly across generic, WordPress, Shopify sites.</p>
                         </div>
                      </div>
 
                      {/* Installation Steps visualization for primary methods */}
                      <div className="space-y-6">
-                        <div className="space-y-4 border-l-2 border-gray-100 ml-3 pl-6 relative">
+                        <div className="space-y-4 border-l-2 border-gray-100 dark:border-zinc-800 ml-3 pl-6 relative">
                            <div className="relative">
-                              <span className="absolute -left-[33px] top-0.5 w-[14px] h-[14px] bg-orange-500 rounded-full ring-4 ring-white" />
-                              <div className="text-[13px] font-semibold text-gray-900">Copy code snippet</div>
-                              <div className="text-[12px] text-gray-500 mt-0.5">Copy the autogenerated initialization string below.</div>
+                              <span className="absolute -left-[33px] top-0.5 w-[14px] h-[14px] bg-orange-500 rounded-full ring-4 ring-white dark:ring-zinc-900" />
+                              <div className="text-[13px] font-semibold text-gray-900 dark:text-zinc-100">Copy code snippet</div>
+                              <div className="text-[12px] text-gray-500 dark:text-zinc-400 mt-0.5">Copy the autogenerated initialization string below.</div>
                            </div>
                            <div className="relative py-4">
                               <div className="relative rounded-xl overflow-hidden bg-[#1e1e1e] shadow-lg group">
@@ -160,14 +170,14 @@ function DeployPageContent() {
                               </div>
                            </div>
                            <div className="relative">
-                              <span className="absolute -left-[33px] top-0.5 w-[14px] h-[14px] bg-gray-200 rounded-full ring-4 ring-white" />
-                              <div className="text-[13px] font-semibold text-gray-900">Paste before &lt;/body&gt;</div>
-                              <div className="text-[12px] text-gray-500 mt-0.5">Insert standard tag in your global template or site root.</div>
+                              <span className="absolute -left-[33px] top-0.5 w-[14px] h-[14px] bg-gray-200 dark:bg-zinc-800 rounded-full ring-4 ring-white dark:ring-zinc-900" />
+                              <div className="text-[13px] font-semibold text-gray-900 dark:text-zinc-100">Paste before &lt;/body&gt;</div>
+                              <div className="text-[12px] text-gray-500 dark:text-zinc-400 mt-0.5">Insert standard tag in your global template or site root.</div>
                            </div>
                            <div className="relative">
-                              <span className="absolute -left-[33px] top-0.5 w-[14px] h-[14px] bg-gray-200 rounded-full ring-4 ring-white" />
-                              <div className="text-[13px] font-semibold text-gray-900">Go live</div>
-                              <div className="text-[12px] text-gray-500 mt-0.5">Publish settings to deploy the dynamic AI immediately.</div>
+                              <span className="absolute -left-[33px] top-0.5 w-[14px] h-[14px] bg-gray-200 dark:bg-zinc-800 rounded-full ring-4 ring-white dark:ring-zinc-900" />
+                              <div className="text-[13px] font-semibold text-gray-900 dark:text-zinc-100">Go live</div>
+                              <div className="text-[12px] text-gray-500 dark:text-zinc-400 mt-0.5">Publish settings to deploy the dynamic AI immediately.</div>
                            </div>
                         </div>
                      </div>
@@ -179,11 +189,11 @@ function DeployPageContent() {
             {/* 4. SIDE PANEL - Security / Allowed Domains */}
             <div className="space-y-6">
                
-               <div className="bg-white border border-gray-200 rounded-[24px] p-6 shadow-sm">
-                  <h3 className="text-[15px] font-semibold text-gray-900 flex items-center gap-2 mb-1">
+               <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[24px] p-6 shadow-sm">
+                  <h3 className="text-[15px] font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-2 mb-1">
                      Allowed Domains
                   </h3>
-                  <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
+                  <p className="text-[12px] text-gray-500 dark:text-zinc-400 mb-5 leading-relaxed">
                      Restrict where your widget fires to prevent usage hijacking.
                   </p>
 
@@ -193,12 +203,12 @@ function DeployPageContent() {
                        placeholder="myapp.com"
                        value={newDomain}
                        onChange={e => setNewDomain(e.target.value)}
-                       className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-[13px] font-medium text-gray-800 focus:bg-white focus:border-orange-400 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none placeholder:text-gray-400"
+                       className="flex-1 min-w-0 bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-[13px] font-medium text-gray-800 dark:text-zinc-100 focus:bg-white dark:focus:bg-zinc-900 focus:border-orange-400 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none placeholder:text-gray-400"
                      />
                      <button 
                        type="submit"
                        disabled={!newDomain}
-                       className="bg-gray-900 text-white rounded-xl w-10 flex items-center justify-center hover:bg-black transition-all disabled:opacity-50 shadow-sm shrink-0"
+                       className="bg-gray-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl w-10 flex items-center justify-center hover:bg-black dark:hover:bg-white transition-all disabled:opacity-50 shadow-sm shrink-0"
                      >
                         <Plus className="w-4 h-4" />
                      </button>
@@ -206,21 +216,21 @@ function DeployPageContent() {
 
                   <div className="space-y-2">
                      {domains.map(d => (
-                        <div key={d} className="flex items-center justify-between bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl group transition-colors">
+                        <div key={d} className="flex items-center justify-between bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-850 px-3 py-2 rounded-xl group transition-colors">
                            <div className="flex items-center gap-2 min-w-0">
                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                              <span className="text-[12px] font-medium text-gray-700 truncate">{d}</span>
+                              <span className="text-[12px] font-medium text-gray-700 dark:text-zinc-300 truncate">{d}</span>
                            </div>
                            <button 
                              onClick={() => removeDomain(d)}
-                             className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all p-1"
+                             className="opacity-0 group-hover:opacity-100 text-gray-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 transition-all p-1"
                            >
                               <Trash2 className="w-3 h-3" />
                            </button>
                         </div>
                      ))}
                      {domains.length === 0 && (
-                        <div className="text-[12px] text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-xl">
+                        <div className="text-[12px] text-gray-400 dark:text-zinc-500 text-center py-4 border border-dashed border-gray-200 dark:border-zinc-800 rounded-xl">
                            Allow all domains (Unsafe)
                         </div>
                      )}
