@@ -74,18 +74,23 @@ export default function LandingPage() {
       <motion.nav 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled 
-            ? 'bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-md border-b border-zinc-200/50 dark:border-zinc-800/50 py-3 shadow-sm' 
-            : 'bg-transparent py-5'
-        }`}
+        className={`fixed z-50 transition-all duration-500 ease-in-out
+          md:top-0 md:inset-x-0 
+          top-3 inset-x-3 sm:top-4 sm:inset-x-6 rounded-[22px] sm:rounded-[26px] md:rounded-none
+          border border-zinc-200/40 dark:border-zinc-800/40 md:border-0
+          bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-xl md:backdrop-blur-none
+          ${scrolled 
+            ? 'shadow-[0_12px_40px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.4)] py-2 md:py-3 bg-white/80 dark:bg-[#09090b]/80 border-zinc-200/70 dark:border-zinc-800/70 md:border-b md:border-zinc-200/50 md:dark:border-zinc-800/50' 
+            : 'py-3 md:py-5 bg-white/50 dark:bg-[#09090b]/50 md:bg-transparent md:backdrop-blur-none md:border-0'
+          }
+        `}
       >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform transition group-hover:rotate-6">
-              <Bot className="w-5 h-5 text-white stroke-[2.5px]" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2.5 group">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 bg-gradient-to-br from-orange-500 to-amber-400 rounded-[10px] sm:rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform transition group-hover:rotate-6">
+              <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white stroke-[2.5px]" />
             </div>
-            <span className="font-black text-xl tracking-tighter">Agent Desk</span>
+            <span className="font-black text-[16px] sm:text-lg md:text-xl tracking-tighter text-zinc-900 dark:text-zinc-50">Agent Desk</span>
           </Link>
 
           {/* Desktop Links */}
@@ -99,12 +104,12 @@ export default function LandingPage() {
           </div>
 
           {/* Action Right */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 sm:gap-4">
             <button 
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+              className="p-1.5 sm:p-2 rounded-full border border-zinc-200/60 dark:border-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
             >
-              {mounted && theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {mounted && theme === 'dark' ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
             </button>
             <Link href="/login" className="hidden sm:block text-sm font-bold hover:text-orange-500 transition-colors">Login</Link>
             <Link href="/register" className="hidden sm:block">
@@ -116,8 +121,8 @@ export default function LandingPage() {
                 Try Now <ArrowRight className="w-4 h-4" />
               </motion.button>
             </Link>
-            <button className="md:hidden p-2 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <button className="md:hidden p-1.5 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -126,11 +131,11 @@ export default function LandingPage() {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="md:hidden absolute top-[calc(100%+12px)] inset-x-4 bg-white/90 dark:bg-[#0c0c0e]/90 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden z-50 shadow-2xl rounded-[28px] p-3"
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+              className="md:hidden absolute top-[calc(100%+8px)] inset-x-0 bg-white/95 dark:bg-[#0c0c0e]/95 backdrop-blur-2xl border border-zinc-200/70 dark:border-zinc-800/70 overflow-hidden z-50 shadow-2xl rounded-[22px] sm:rounded-[26px] p-2"
             >
               <div className="flex flex-col gap-1">
                 {[
@@ -143,21 +148,21 @@ export default function LandingPage() {
                     key={item.name} 
                     href={item.href} 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-base font-bold text-zinc-700 dark:text-zinc-300 hover:bg-orange-500/10 dark:hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 transition-all active:scale-[0.99]"
+                    className="flex items-center gap-3 px-3.5 py-3 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold text-zinc-700 dark:text-zinc-300 hover:bg-orange-500/10 dark:hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 transition-all active:scale-[0.99]"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
-                      <item.icon className="w-4 h-4 stroke-[2.5px]" />
+                    <div className="w-8 h-8 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+                      <item.icon className="w-3.5 h-3.5 stroke-[2.5px]" />
                     </div>
                     {item.name}
                   </a>
                 ))}
-                <div className="h-[1px] bg-zinc-200/50 dark:bg-zinc-800/50 my-2 mx-2" />
-                <div className="grid grid-cols-2 gap-3 p-1">
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-3.5 text-center rounded-2xl font-bold text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center">
+                <div className="h-[1px] bg-zinc-200/50 dark:bg-zinc-800/50 my-1.5 mx-2" />
+                <div className="grid grid-cols-2 gap-2 p-1">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-3 text-center rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center">
                     Login
                   </Link>
                   <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                    <button className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 hover:brightness-105 text-white rounded-2xl font-bold text-sm shadow-lg shadow-orange-600/20 active:scale-[0.98] transition-all flex items-center justify-center">
+                    <button className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-500 hover:brightness-105 text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-lg shadow-orange-600/20 active:scale-[0.98] transition-all flex items-center justify-center">
                       Try Now
                     </button>
                   </Link>
