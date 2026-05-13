@@ -107,7 +107,7 @@ export default function LandingPage() {
               {mounted && theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <Link href="/login" className="hidden sm:block text-sm font-bold hover:text-orange-500 transition-colors">Login</Link>
-            <Link href="/register">
+            <Link href="/register" className="hidden sm:block">
               <motion.button 
                 whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(249, 115, 22, 0.3)' }}
                 whileTap={{ scale: 0.95 }}
@@ -116,8 +116,8 @@ export default function LandingPage() {
                 Try Now <ArrowRight className="w-4 h-4" />
               </motion.button>
             </Link>
-            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X /> : <Menu />}
+            <button className="md:hidden p-2 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -126,29 +126,42 @@ export default function LandingPage() {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 overflow-hidden z-50 shadow-lg"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="md:hidden absolute top-[calc(100%+12px)] inset-x-4 bg-white/90 dark:bg-[#0c0c0e]/90 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 overflow-hidden z-50 shadow-2xl rounded-[28px] p-3"
             >
-              <div className="px-6 py-6 flex flex-col gap-5">
-                {['Features', 'How It Works', 'Pricing', 'Reviews'].map((item) => (
+              <div className="flex flex-col gap-1">
+                {[
+                  { name: 'Features', icon: Zap, href: '#features' },
+                  { name: 'How It Works', icon: Rocket, href: '#how-it-works' },
+                  { name: 'Pricing', icon: Check, href: '#pricing' },
+                  { name: 'Reviews', icon: Star, href: '#reviews' }
+                ].map((item) => (
                   <a 
-                    key={item} 
-                    href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} 
+                    key={item.name} 
+                    href={item.href} 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-base font-bold text-zinc-700 dark:text-zinc-300 hover:text-orange-500 py-2 transition-colors"
+                    className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-base font-bold text-zinc-700 dark:text-zinc-300 hover:bg-orange-500/10 dark:hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 transition-all active:scale-[0.99]"
                   >
-                    {item}
+                    <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
+                      <item.icon className="w-4 h-4 stroke-[2.5px]" />
+                    </div>
+                    {item.name}
                   </a>
                 ))}
-                <hr className="border-zinc-100 dark:border-zinc-800 my-2" />
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-base font-bold text-zinc-700 dark:text-zinc-300 py-2">Login</Link>
-                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <button className="w-full py-4 bg-orange-600 text-white rounded-xl font-bold text-base">
-                    Try Now
-                  </button>
-                </Link>
+                <div className="h-[1px] bg-zinc-200/50 dark:bg-zinc-800/50 my-2 mx-2" />
+                <div className="grid grid-cols-2 gap-3 p-1">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-3.5 text-center rounded-2xl font-bold text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center">
+                    Login
+                  </Link>
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full">
+                    <button className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-amber-500 hover:brightness-105 text-white rounded-2xl font-bold text-sm shadow-lg shadow-orange-600/20 active:scale-[0.98] transition-all flex items-center justify-center">
+                      Try Now
+                    </button>
+                  </Link>
+                </div>
               </div>
             </motion.div>
           )}

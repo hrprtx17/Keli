@@ -244,14 +244,14 @@ export default function AgentPlaygroundPage() {
           </div>
 
           {/* RIGHT PANEL - Live Preview (55% wide grid split) */}
-          <div className="lg:col-span-7 order-1 lg:order-2 flex items-center justify-center bg-[#fcfbfa] rounded-[32px] p-4 sm:p-8 md:p-12 border border-gray-200/50 shadow-[inset_0_2px_10px_rgba(0,0,0,0.01)] min-h-[650px]">
+          <div className="lg:col-span-7 order-1 lg:order-2 flex items-center justify-center bg-[#fcfbfa] rounded-[32px] p-3 sm:p-8 md:p-12 border border-gray-200/50 shadow-[inset_0_2px_10px_rgba(0,0,0,0.01)] min-h-[500px] sm:min-h-[650px]">
              
              {/* The Main Chat Box */}
              <motion.div 
                initial={{ opacity: 0, y: 20, scale: 0.98 }}
                animate={{ opacity: 1, y: 0, scale: 1 }}
                transition={{ type: "spring", stiffness: 260, damping: 20 }}
-               className="w-full max-w-[420px] h-[680px] bg-white rounded-[24px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col overflow-hidden relative"
+               className="w-full max-w-[420px] h-[520px] sm:h-[680px] bg-white rounded-[24px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.08)] border border-gray-200 flex flex-col overflow-hidden relative"
              >
                 {/* Preview Chat Header */}
                 <div 
