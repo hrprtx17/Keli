@@ -30,18 +30,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex bg-[#F8F8F8] text-[#1A1A1A] antialiased selection:bg-orange-100 selection:text-orange-700 overflow-hidden">
+    <div className="relative min-h-screen w-full flex bg-[#F8F8F8] dark:bg-zinc-950 text-[#1A1A1A] dark:text-zinc-100 antialiased selection:bg-orange-100 selection:text-orange-700 overflow-hidden">
       
       {/* Background Components */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div 
-          className="absolute inset-0 opacity-[0.03]" 
-          style={{ backgroundImage: `radial-gradient(#000 1px, transparent 1px)`, backgroundSize: '24px 24px' }} 
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]" 
+          style={{ backgroundImage: `radial-gradient(var(--foreground, #000) 1px, transparent 1px)`, backgroundSize: '24px 24px' }} 
         />
       </div>
 
       {/* Left Form Side */}
-      <div className="flex w-full md:w-[45%] lg:w-[40%] items-center justify-center p-6 sm:p-8 relative z-10 bg-white shadow-2xl shadow-black/[0.02] border-r border-gray-100">
+      <div className="flex w-full md:w-[45%] lg:w-[40%] items-center justify-center p-6 sm:p-8 relative z-10 bg-white dark:bg-zinc-900 shadow-2xl shadow-black/[0.02] border-r border-gray-100 dark:border-zinc-800">
         <div className="w-full max-w-md space-y-8">
           
           <Link href="/" className="inline-flex items-center gap-2.5 group">
@@ -50,12 +50,12 @@ export default function LoginPage() {
                  <div className="w-2.5 h-2.5 bg-white rounded-sm rotate-45 shadow-sm" />
                </div>
             </div>
-            <span className="font-semibold text-lg tracking-tight text-black">AgentDesk</span>
+            <span className="font-semibold text-lg tracking-tight text-black dark:text-zinc-100">AgentDesk</span>
           </Link>
 
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 leading-[1.1]">Welcome back</h1>
-            <p className="mt-2 text-sm font-medium text-gray-500">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-zinc-100 leading-[1.1]">Welcome back</h1>
+            <p className="mt-2 text-sm font-medium text-gray-500 dark:text-zinc-400">
               Sign in to manage your custom AI agents
             </p>
           </div>
@@ -63,7 +63,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500">Work Email</Label>
+                <Label htmlFor="email" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500 dark:text-zinc-400">Work Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -71,12 +71,12 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11 rounded-xl bg-gray-50/50 border-gray-200 px-4 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
+                  className="h-11 rounded-xl bg-gray-50/50 dark:bg-zinc-950/50 border-gray-200 dark:border-zinc-800 px-4 text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 dark:placeholder:text-zinc-600 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
                 />
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500">Password</Label>
+                  <Label htmlFor="password" className="text-[12px] font-semibold tracking-wide uppercase text-gray-500 dark:text-zinc-400">Password</Label>
                 </div>
                 <Input
                   id="password"
@@ -85,29 +85,29 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11 rounded-xl bg-gray-50/50 border-gray-200 px-4 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
+                  className="h-11 rounded-xl bg-gray-50/50 dark:bg-zinc-950/50 border-gray-200 dark:border-zinc-800 px-4 text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 dark:placeholder:text-zinc-600 focus:ring-[3px] focus:ring-orange-500/10 transition-all outline-none"
                 />
               </div>
             </div>
 
             <Button 
               type="submit" 
-              className="w-full h-11 rounded-xl bg-black text-white hover:bg-zinc-800 hover:shadow-md font-semibold text-[14px] transition-all duration-200 active:scale-[0.99]" 
+              className="w-full h-11 rounded-xl bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-white hover:shadow-md font-semibold text-[14px] transition-all duration-200 active:scale-[0.99]" 
               disabled={loading}
             >
               {loading ? 'Verifying credentials...' : 'Sign In'}
             </Button>
             
             <div className="relative my-4 flex items-center gap-4 text-xs text-gray-400 font-medium uppercase tracking-wider">
-              <div className="flex-1 border-t border-gray-100" />
+              <div className="flex-1 border-t border-gray-100 dark:border-zinc-800" />
               <span>Or</span>
-              <div className="flex-1 border-t border-gray-100" />
+              <div className="flex-1 border-t border-gray-100 dark:border-zinc-800" />
             </div>
 
             <Button
               type="button"
               variant="outline"
-              className="w-full h-11 rounded-xl border-gray-200 hover:bg-gray-50 flex items-center justify-center gap-2 text-[14px] font-semibold transition-all shadow-sm active:scale-[0.99]"
+              className="w-full h-11 rounded-xl border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center justify-center gap-2 text-[14px] font-semibold transition-all shadow-sm active:scale-[0.99] dark:text-zinc-200"
               onClick={() => signIn('google', { callbackUrl: '/agents' })}
             >
               <svg className="h-4 w-4" aria-hidden="true" focusable="false" viewBox="0 0 24 24">
@@ -120,7 +120,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="text-center text-[13px] font-medium text-gray-500">
+          <p className="text-center text-[13px] font-medium text-gray-500 dark:text-zinc-400">
             Don't have an account?{' '}
             <Link href="/register" className="text-orange-600 hover:text-orange-700 hover:underline transition-colors">
               Create one for free
@@ -132,10 +132,10 @@ export default function LoginPage() {
       {/* Right Display Side */}
       <div className="hidden md:flex md:flex-1 flex-col justify-center items-center p-12 text-center relative z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-transparent to-transparent opacity-60" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/[0.04] dark:bg-orange-500/[0.08] rounded-full blur-[120px]" />
         
         <div className="max-w-lg space-y-8 relative">
-          <div className="inline-flex items-center justify-center rounded-[24px] bg-white p-5 shadow-xl shadow-black/[0.02] border border-gray-100 mx-auto">
+          <div className="inline-flex items-center justify-center rounded-[24px] bg-white dark:bg-zinc-900 p-5 shadow-xl shadow-black/[0.02] border border-gray-100 dark:border-zinc-800 mx-auto">
             <div className="w-16 h-16 rounded-[18px] bg-black flex items-center justify-center text-white text-3xl shadow-lg shadow-orange-500/20 overflow-hidden">
                <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                  <div className="w-5 h-5 bg-white rounded rotate-45 shadow-sm" />
@@ -144,10 +144,10 @@ export default function LoginPage() {
           </div>
           
           <div className="space-y-4">
-            <h2 className="text-[32px] lg:text-[40px] font-bold tracking-tight text-gray-900 leading-[1.15]">
+            <h2 className="text-[32px] lg:text-[40px] font-bold tracking-tight text-gray-900 dark:text-zinc-100 leading-[1.15]">
               The AI support platform that works while you sleep.
             </h2>
-            <p className="text-[15px] font-medium text-gray-500 max-w-md mx-auto leading-relaxed">
+            <p className="text-[15px] font-medium text-gray-500 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
               Automate responses, index your knowledge base, and deploy enterprise chatbots in minutes.
             </p>
           </div>
@@ -158,7 +158,7 @@ export default function LoginPage() {
               { val: '< 1s', label: 'Inference Speed' },
               { val: '100%', label: 'Data Secure' }
             ].map(s => (
-              <div key={s.label} className="rounded-[16px] border border-gray-200/80 bg-white p-3.5 shadow-sm hover:shadow-md transition-shadow">
+              <div key={s.label} className="rounded-[16px] border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3.5 shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-[16px] font-bold text-orange-600 tracking-tight">{s.val}</div>
                 <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-1 leading-tight">{s.label}</div>
               </div>

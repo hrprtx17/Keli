@@ -118,51 +118,87 @@ export async function POST(req: Request) {
       content: m.content
     }));
 
-    let aiReply = 'I apologize, I am unable to respond at the moment.';
-    try {
-      const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-      const completion = await groq.chat.completions.create({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...formattedMessages,
-        ],
-        model: agent.model || 'llama-3.1-8b-instant',
-        temperature: agent.config?.temperature || 0.7,
-        max_tokens: agent.config?.maxTokens || 300,
-      });
-      aiReply = completion.choices[0]?.message?.content || aiReply;
-    } catch (e) {
-      console.error('Groq Error:', e);
+    let fullAiReply = '';
+    const encoder = new TextEncoder();
+    
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json({ error: 'Environment setup missing apiKey' }, { status: 500, headers: corsHeaders });
     }
 
-    await Message.create({
-      conversationId: convId,
-      agentId: agent._id,
-      role: 'assistant',
-      content: aiReply
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const chatStream = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...formattedMessages,
+      ],
+      model: agent.model || 'llama-3.1-8b-instant',
+      temperature: agent.config?.temperature || 0.7,
+      max_tokens: agent.config?.maxTokens || 500,
+      stream: true
     });
 
-    if (conv) {
-      await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
-    }
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          // Send immediate signal establishing conversation ID
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ conversationId: convId })}\n\n`));
+          
+          for await (const chunk of chatStream) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+              fullAiReply += content;
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: content })}\n\n`));
+            }
+          }
 
-    // Clean, highly-compatible robust atomic credit update
-    const WorkspaceModel = (await import('@/models/Workspace')).default;
-    if (usedThisMonth < monthlyCredits) {
-      await WorkspaceModel.updateOne(
-        { _id: workspace._id },
-        { $inc: { "usage.creditsUsedThisMonth": 1 } }
-      );
-    } else if (addonCredits > 0) {
-      await WorkspaceModel.updateOne(
-        { _id: workspace._id },
-        { $inc: { "usage.addonCredits": -1 } }
-      );
-    }
+          // Perform final DB insertions & credit reductions safely after stream consumption completes
+          await Message.create({
+            conversationId: convId,
+            agentId: agent._id,
+            role: 'assistant',
+            content: fullAiReply
+          });
 
-    return NextResponse.json({ reply: aiReply, conversationId: convId }, { headers: corsHeaders });
+          if (conv) {
+            await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
+          }
+
+          // Perform Credit Accounting
+          const WorkspaceModel = (await import('@/models/Workspace')).default;
+          if (usedThisMonth < monthlyCredits) {
+            await WorkspaceModel.updateOne(
+              { _id: workspace._id },
+              { $inc: { "usage.creditsUsedThisMonth": 1 } }
+            );
+          } else if (addonCredits > 0) {
+            await WorkspaceModel.updateOne(
+              { _id: workspace._id },
+              { $inc: { "usage.addonCredits": -1 } }
+            );
+          }
+
+          controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+          controller.close();
+        } catch (err) {
+          console.error('[Widget Stream Generator Failure]', err);
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream Interrupted' })}\n\n`));
+          controller.close();
+        }
+      }
+    });
+
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      }
+    });
+
   } catch (error: any) {
     console.error('Widget Chat Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: corsHeaders });
   }
 }
+

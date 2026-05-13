@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     if (!agent) return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
 
     return NextResponse.json({
+      agentName: agent.name || 'AI Assistant',
       welcomeMessage: agent.widgetConfig?.welcomeMessage || 'Hello! How can I help you today?',
       primaryColor: agent.widgetConfig?.primaryColor || '#F97316',
       showBranding: agent.widgetConfig?.showBranding !== false

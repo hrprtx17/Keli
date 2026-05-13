@@ -6,7 +6,7 @@ import { CalendarDays, ChevronDown, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, Tooltip } from 'recharts';
 
-const COLORS = ['#a78bfa', '#818cf8', '#60a5fa', '#34d399', '#fbbf24'];
+const COLORS = ['#f97316', '#f59e0b', '#fbbf24', '#fca5a5', '#e4e4e7'];
 
 export default function UsagePage() {
   const { data: workspace } = useQuery({
@@ -33,12 +33,15 @@ export default function UsagePage() {
   const historyData = analytics?.history || [{ name: 'No Activity', credits: 0 }];
   const pieData = analytics?.perAgent || [{ name: 'No Activity', value: 0 }];
 
-  // Get real timestamp labels for filtering box
-  const today = new Date();
-  const monthAgo = new Date();
-  monthAgo.setDate(today.getDate() - 30);
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const dateRangeStr = `${monthNames[monthAgo.getMonth()]} ${monthAgo.getDate().toString().padStart(2, '0')} - ${monthNames[today.getMonth()]} ${today.getDate().toString().padStart(2, '0')}, ${today.getFullYear()}`;
+  // Handle safe hydration date formatting
+  const [dateRangeStr, setDateRangeStr] = useState('Loading range...');
+  useEffect(() => {
+    const today = new Date();
+    const monthAgo = new Date();
+    monthAgo.setDate(today.getDate() - 30);
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    setDateRangeStr(`${monthNames[monthAgo.getMonth()]} ${monthAgo.getDate().toString().padStart(2, '0')} - ${monthNames[today.getMonth()]} ${today.getDate().toString().padStart(2, '0')}, ${today.getFullYear()}`);
+  }, []);
 
   return (
     <DashboardLayout>
@@ -48,10 +51,10 @@ export default function UsagePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Usage</h1>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50">
+            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all px-3 py-1.5">
               All agents <ChevronDown className="h-3.5 w-3.5 opacity-60" />
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-sm font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50">
+            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-xs sm:text-sm font-semibold text-zinc-700 dark:text-zinc-300 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all px-3 py-1.5">
               <CalendarDays className="h-3.5 w-3.5 opacity-60" />
               {dateRangeStr}
             </div>
@@ -66,7 +69,7 @@ export default function UsagePage() {
               <div className="relative w-7 h-7 mb-2">
                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                     <path className="text-zinc-100 dark:text-zinc-800" strokeDasharray="100, 100" stroke="currentColor" strokeWidth="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    <path className="text-blue-500" strokeDasharray={`${Math.min((usedCredits/totalCredits)*100, 100)}, 100`} strokeLinecap="round" stroke="currentColor" strokeWidth="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path className="text-orange-500" strokeDasharray={`${Math.min((usedCredits/totalCredits)*100, 100)}, 100`} strokeLinecap="round" stroke="currentColor" strokeWidth="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
                  </svg>
               </div>
               <div>
@@ -86,7 +89,7 @@ export default function UsagePage() {
               <div className="relative w-7 h-7 mb-2">
                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                     <path className="text-zinc-100 dark:text-zinc-800" strokeDasharray="100, 100" stroke="currentColor" strokeWidth="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                    <path className="text-blue-500" strokeDasharray={`${Math.min((usedAgentsCount/maxAgentsCount)*100, 100)}, 100`} strokeLinecap="round" stroke="currentColor" strokeWidth="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path className="text-orange-500" strokeDasharray={`${Math.min((usedAgentsCount/maxAgentsCount)*100, 100)}, 100`} strokeLinecap="round" stroke="currentColor" strokeWidth="3.5" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
                  </svg>
               </div>
               <div>
@@ -108,7 +111,7 @@ export default function UsagePage() {
           <CardContent className="px-6 pb-6 pt-2 h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
                <BarChart data={historyData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
-                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" />
+                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-zinc-100 dark:text-zinc-900" />
                  <XAxis 
                     dataKey="name" 
                     axisLine={false} 
@@ -122,8 +125,8 @@ export default function UsagePage() {
                     tickLine={false} 
                     tick={{ fontSize: 10, fill: '#a1a1aa' }}
                  />
-                 <Tooltip cursor={{fill: '#f8fafc'}} />
-                 <Bar dataKey="credits" fill="#2563eb" radius={[4, 4, 0, 0]} barSize={30} />
+                 <Tooltip cursor={{fill: 'currentColor', opacity: 0.03}} contentStyle={{ borderRadius: '8px', border: '1px solid #e4e4e7', fontSize: '11px' }} />
+                 <Bar dataKey="credits" fill="#f97316" radius={[4, 4, 0, 0]} barSize={30} />
                </BarChart>
             </ResponsiveContainer>
           </CardContent>

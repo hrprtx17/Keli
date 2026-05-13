@@ -125,7 +125,7 @@ export default function OnboardingPage() {
            setTrainingComplete(true);
            setCurrentStage('FINISHING');
         }
-     }, 20000); // Reduced cap for perceived speed while remaining robust
+     }, 8000); // Aggressive 8s cap to eliminate perceived "stuck" loading states completely
 
      try {
         const response = await fetch('/api/datasources/crawl', {
@@ -151,7 +151,7 @@ export default function OnboardingPage() {
                  const stg = packet.stage || '';
                  if (stg === 'Crawling' || stg === 'Extracting') setCurrentStage('READING');
                  if (stg === 'Chunking' || stg === 'Embedding') setCurrentStage('TRAINING');
-                 if (stg === 'Completed') {
+                 if (stg === 'Completed' || stg === 'Failed') {
                     setCurrentStage('FINISHING');
                     setTrainingComplete(true);
                     clearTimeout(timeout);
@@ -209,16 +209,16 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col bg-[#F8F8F8] text-[#1A1A1A] font-sans overflow-x-hidden selection:bg-orange-100 selection:text-orange-700">
+    <div className="relative min-h-screen w-full flex flex-col bg-[#F8F8F8] dark:bg-zinc-950 text-[#1A1A1A] dark:text-zinc-100 font-sans overflow-x-hidden selection:bg-orange-100 selection:text-orange-700">
       
       {/* PREMIUM BACKGROUND COMPONENTS */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div 
-          className="absolute inset-0 opacity-[0.04]" 
-          style={{ backgroundImage: `radial-gradient(#000 1px, transparent 1px)`, backgroundSize: '24px 24px' }} 
+          className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" 
+          style={{ backgroundImage: `radial-gradient(var(--foreground, #000) 1px, transparent 1px)`, backgroundSize: '24px 24px' }} 
         />
         <div className="absolute inset-0 opacity-[0.015] bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5F5F5] to-[#EBEBEB] opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F5F5F5] dark:via-zinc-900 to-[#EBEBEB] dark:to-black opacity-40" />
         <motion.div 
           animate={{ scale: [1, 1.05, 1], opacity: [0.4, 0.45, 0.4] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -227,21 +227,21 @@ export default function OnboardingPage() {
       </div>
 
       {/* 1. TOP NAVBAR */}
-      <nav className="sticky top-0 z-50 h-[64px] md:h-[72px] w-full flex items-center justify-between px-4 md:px-12 bg-white/70 backdrop-blur-lg border-b border-gray-200/50 transition-all">
+      <nav className="sticky top-0 z-50 h-[64px] md:h-[72px] w-full flex items-center justify-between px-4 md:px-12 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-lg border-b border-gray-200/50 dark:border-zinc-800/50 transition-all">
         <div className="flex items-center gap-3 group cursor-default">
           <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-black flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform">
              <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-600 opacity-90 flex items-center justify-center">
                <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-white rounded-sm rotate-45 shadow-sm" />
              </div>
           </div>
-          <span className="font-semibold text-lg md:text-xl tracking-tight text-black">AgentDesk</span>
+          <span className="font-semibold text-lg md:text-xl tracking-tight text-black dark:text-zinc-100">AgentDesk</span>
         </div>
         
-        <div className="flex items-center gap-4 md:gap-6 text-[13px] md:text-[14px] font-medium text-gray-500">
-          <Link href="#" className="hover:text-black flex items-center gap-1 transition-colors duration-200">
+        <div className="flex items-center gap-4 md:gap-6 text-[13px] md:text-[14px] font-medium text-gray-500 dark:text-zinc-400">
+          <Link href="#" className="hover:text-black dark:hover:text-zinc-100 flex items-center gap-1 transition-colors duration-200">
              <FileText className="w-3.5 h-3.5 md:w-4 md:h-4 opacity-70" /> <span className="hidden sm:inline">Docs</span>
           </Link>
-          <Link href="#" className="hover:text-black flex items-center gap-1 transition-colors duration-200">
+          <Link href="#" className="hover:text-black dark:hover:text-zinc-100 flex items-center gap-1 transition-colors duration-200">
              <HelpCircle className="w-3.5 h-3.5 md:w-4 md:h-4 opacity-70" /> <span className="hidden sm:inline">Help</span>
           </Link>
         </div>
@@ -260,22 +260,22 @@ export default function OnboardingPage() {
             >
               {/* Hero Section */}
               <motion.div variants={itemVariants} className="text-center max-w-[560px] mb-8 md:mb-12 flex flex-col items-center px-2">
-                <h1 className="text-[34px] sm:text-[44px] md:text-[52px] font-semibold leading-[1.1] tracking-[-0.04em] text-black mb-3 md:mb-4">
+                <h1 className="text-[34px] sm:text-[44px] md:text-[52px] font-semibold leading-[1.1] tracking-[-0.04em] text-black dark:text-zinc-100 mb-3 md:mb-4">
                   Welcome, {parsedGreeting}
                 </h1>
-                <p className="text-[15px] sm:text-[17px] font-medium text-gray-500 leading-relaxed max-w-[480px]">
+                <p className="text-[15px] sm:text-[17px] font-medium text-gray-500 dark:text-zinc-400 leading-relaxed max-w-[480px]">
                   Train your AI agent using your website. 
-                  <span className="block text-gray-400 font-normal text-[14px] sm:text-[15px] mt-1">Your AI can answer questions and learn from content.</span>
+                  <span className="block text-gray-400 dark:text-zinc-500 font-normal text-[14px] sm:text-[15px] mt-1">Your AI can answer questions and learn from content.</span>
                 </p>
               </motion.div>
 
               {/* Onboarding Card */}
-              <motion.div variants={itemVariants} className="w-full max-w-[460px] bg-white/82 backdrop-blur-xl border border-gray-200/70 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04),0_20px_60px_-15px_rgba(0,0,0,0.02)] flex flex-col gap-5 sm:gap-6 relative">
+              <motion.div variants={itemVariants} className="w-full max-w-[460px] bg-white/82 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200/70 dark:border-zinc-800/70 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04),0_20px_60px_-15px_rgba(0,0,0,0.02)] flex flex-col gap-5 sm:gap-6 relative">
                 
                 {/* Card Header */}
                 <motion.div variants={itemVariants}>
                    <div className="text-[10px] sm:text-[11px] font-medium tracking-[0.12em] text-orange-600 uppercase mb-1">Setup</div>
-                   <div className="text-[12px] sm:text-[13px] text-gray-500">Create your first AI assistant.</div>
+                   <div className="text-[12px] sm:text-[13px] text-gray-500 dark:text-zinc-400">Create your first AI assistant.</div>
                 </motion.div>
 
                 {/* Inputs */}
@@ -287,7 +287,7 @@ export default function OnboardingPage() {
                       value={agentName}
                       onChange={e => setAgentName(e.target.value)}
                       placeholder="Support Assistant"
-                      className="w-full h-[52px] sm:h-[56px] pl-11 sm:pl-12 pr-4 rounded-[14px] bg-[#FCFCFC] border border-gray-200 outline-none text-[15px] text-gray-900 placeholder:text-gray-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] transition-all focus:border-orange-300 focus:ring-[3px] ring-orange-500/10"
+                      className="w-full h-[52px] sm:h-[56px] pl-11 sm:pl-12 pr-4 rounded-[14px] bg-[#FCFCFC] dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 outline-none text-[15px] text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 dark:placeholder:text-zinc-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] transition-all focus:border-orange-300 focus:ring-[3px] ring-orange-500/10"
                       autoFocus
                     />
                   </motion.div>
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
                       value={website}
                       onChange={e => setWebsite(e.target.value)}
                       placeholder="yourcompany.com"
-                      className="w-full h-[52px] sm:h-[56px] pl-11 sm:pl-12 pr-4 rounded-[14px] bg-[#FCFCFC] border border-gray-200 outline-none text-[15px] text-gray-900 placeholder:text-gray-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] transition-all focus:border-orange-300 focus:ring-[3px] ring-orange-500/10"
+                      className="w-full h-[52px] sm:h-[56px] pl-11 sm:pl-12 pr-4 rounded-[14px] bg-[#FCFCFC] dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 outline-none text-[15px] text-gray-900 dark:text-zinc-100 placeholder:text-gray-400 dark:placeholder:text-zinc-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)] transition-all focus:border-orange-300 focus:ring-[3px] ring-orange-500/10"
                     />
                   </motion.div>
                 </div>
@@ -309,7 +309,7 @@ export default function OnboardingPage() {
                   whileTap={{ scale: 0.98 }}
                   onClick={beginDeployment}
                   disabled={!agentName || !website || loading}
-                  className="group relative w-full h-[50px] sm:h-[54px] bg-black text-white rounded-[16px] font-semibold text-[15px] flex items-center justify-center overflow-hidden transition-all duration-200 hover:-translate-y-[1px] hover:shadow-[0_8px_25px_-6px_rgba(249,115,22,0.25)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  className="group relative w-full h-[50px] sm:h-[54px] bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-[16px] font-semibold text-[15px] flex items-center justify-center overflow-hidden transition-all duration-200 hover:-translate-y-[1px] hover:shadow-[0_8px_25px_-6px_rgba(249,115,22,0.25)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
                 >
                   {loading ? (
                     <div className="flex items-center gap-2 opacity-90">
@@ -332,11 +332,11 @@ export default function OnboardingPage() {
               variants={containerVariants} initial="hidden" animate="visible" exit="exit"
               className="w-full max-w-[520px]"
             >
-              <motion.div variants={itemVariants} className="bg-white/82 backdrop-blur-xl border border-gray-200/70 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+              <motion.div variants={itemVariants} className="bg-white/82 dark:bg-zinc-900/80 backdrop-blur-xl border border-gray-200/70 dark:border-zinc-800/70 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
                 
                 {/* Top Section */}
-                <motion.div variants={itemVariants} className="flex items-center gap-3 sm:gap-4 pb-5 sm:pb-6 mb-5 sm:mb-6 border-b border-gray-100">
-                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
+                <motion.div variants={itemVariants} className="flex items-center gap-3 sm:gap-4 pb-5 sm:pb-6 mb-5 sm:mb-6 border-b border-gray-100 dark:border-zinc-800">
+                   <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden shadow-sm flex-shrink-0">
                       {website ? (
                          <img 
                            src={`https://www.google.com/s2/favicons?sz=64&domain=${website}`} 
@@ -347,8 +347,8 @@ export default function OnboardingPage() {
                       ) : <Globe className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400" />}
                    </div>
                    <div>
-                      <h2 className="text-[17px] sm:text-[19px] font-semibold text-black tracking-tight">Training your AI</h2>
-                      <p className="text-[12px] sm:text-[13px] text-gray-500 font-medium truncate max-w-[200px] sm:max-w-none">{trainingComplete ? 'Ready for interaction' : 'Preparing replies.'}</p>
+                      <h2 className="text-[17px] sm:text-[19px] font-semibold text-black dark:text-zinc-100 tracking-tight">Training your AI</h2>
+                      <p className="text-[12px] sm:text-[13px] text-gray-500 dark:text-zinc-400 font-medium truncate max-w-[200px] sm:max-w-none">{trainingComplete ? 'Ready for interaction' : 'Preparing replies.'}</p>
                    </div>
                 </motion.div>
 
@@ -368,7 +368,7 @@ export default function OnboardingPage() {
                              {item.status === 'active' && <Loader2 className="w-4 h-4 text-orange-500 animate-spin" />}
                              {item.status === 'pending' && <div className="w-2 h-2 rounded-full bg-gray-200" />}
                           </div>
-                          <span className={`text-[13px] sm:text-[14px] font-medium transition-colors duration-300 ${item.status === 'done' ? 'text-gray-800' : item.status === 'active' ? 'text-black' : 'text-gray-400'}`}>
+                          <span className={`text-[13px] sm:text-[14px] font-medium transition-colors duration-300 ${item.status === 'done' ? 'text-gray-800 dark:text-zinc-200' : item.status === 'active' ? 'text-black dark:text-zinc-100' : 'text-gray-400 dark:text-zinc-500'}`}>
                              {item.label}
                           </span>
                         </motion.div>
@@ -377,13 +377,13 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Live Activity Feed */}
-                <motion.div variants={itemVariants} className="mt-6 sm:mt-8 pt-4 border-t border-gray-50 overflow-hidden h-8 flex items-center">
+                <motion.div variants={itemVariants} className="mt-6 sm:mt-8 pt-4 border-t border-gray-50 dark:border-zinc-800 overflow-hidden h-8 flex items-center">
                    <AnimatePresence mode="wait">
                       <motion.div 
                         key={activeFeedIndex + (trainingComplete ? 'c' : 'a')}
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 0.7, y: 0 }} exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.35 }}
-                        className="text-[11px] sm:text-[12px] font-mono text-gray-600 flex items-center gap-2"
+                        className="text-[11px] sm:text-[12px] font-mono text-gray-600 dark:text-zinc-400 flex items-center gap-2"
                       >
                          <span className="w-1.5 h-1.5 rounded-full bg-orange-400 inline-block animate-pulse" />
                          {trainingComplete ? 'All operations finalized.' : FEED_MESSAGES[activeFeedIndex]}
@@ -398,7 +398,7 @@ export default function OnboardingPage() {
                            variants={itemVariants}
                            whileTap={{ scale: 0.98 }}
                            onClick={() => setStep(3)} 
-                           className="w-full h-[48px] sm:h-[52px] bg-black text-white rounded-[16px] font-semibold text-[15px] flex items-center justify-center gap-1 hover:-translate-y-[2px] hover:shadow-md transition-all duration-200"
+                           className="w-full h-[48px] sm:h-[52px] bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-[16px] font-semibold text-[15px] flex items-center justify-center gap-1 hover:-translate-y-[2px] hover:shadow-md transition-all duration-200"
                          >
                            Continue Setup <ArrowRight className="w-4 h-4 ml-1"/>
                          </motion.button>
@@ -416,27 +416,27 @@ export default function OnboardingPage() {
               variants={containerVariants} initial="hidden" animate="visible" exit="exit"
               className="w-full max-w-[520px]"
             >
-              <motion.div variants={itemVariants} className="bg-white border border-gray-200/70 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative">
+              <motion.div variants={itemVariants} className="bg-white dark:bg-zinc-900 border border-gray-200/70 dark:border-zinc-800/70 rounded-[24px] p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] relative">
                 
                 <motion.div variants={itemVariants} className="mb-5 sm:mb-6">
-                  <h2 className="text-[20px] sm:text-[22px] font-semibold text-black leading-tight">Your AI Agent is ready to preview!</h2>
-                  <p className="text-[13px] sm:text-[14px] text-gray-500 mt-1">Click Next to continue</p>
+                  <h2 className="text-[20px] sm:text-[22px] font-semibold text-black dark:text-zinc-100 leading-tight">Your AI Agent is ready to preview!</h2>
+                  <p className="text-[13px] sm:text-[14px] text-gray-500 dark:text-zinc-400 mt-1">Click Next to continue</p>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="flex items-center gap-2 text-[13px] sm:text-[14px] text-gray-500 font-medium mb-5 sm:mb-6">
+                <motion.div variants={itemVariants} className="flex items-center gap-2 text-[13px] sm:text-[14px] text-gray-500 dark:text-zinc-400 font-medium mb-5 sm:mb-6">
                   <Globe className="w-3.5 h-3.5 opacity-70" />
                   <span className="truncate">{agentName || 'AI Agent'} | Modern AI Support Platform</span>
                 </motion.div>
 
                 {/* Static Message Component */}
-                <motion.div variants={itemVariants} className="border border-gray-100 rounded-[16px] overflow-hidden mb-6 sm:mb-8 bg-white shadow-sm">
+                <motion.div variants={itemVariants} className="border border-gray-100 dark:border-zinc-800 rounded-[16px] overflow-hidden mb-6 sm:mb-8 bg-white dark:bg-zinc-950 shadow-sm">
                    <div className="bg-[#0C111D] px-3 sm:px-4 py-2 sm:py-2.5 flex items-center gap-2">
                       <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                          <div className="w-0 h-0 border-l-[2.5px] sm:border-l-[3px] border-l-transparent border-r-[2.5px] sm:border-r-[3px] border-r-transparent border-b-[4px] sm:border-b-[5px] border-b-[#0C111D]" />
                       </div>
                       <span className="text-white text-[11px] sm:text-[12px] font-semibold truncate">{agentName || 'Assistant'} Support</span>
                    </div>
-                   <div className="p-3 sm:p-4 text-[12px] sm:text-[13px] text-gray-800 leading-relaxed bg-[#FCFCFD]">
+                   <div className="p-3 sm:p-4 text-[12px] sm:text-[13px] text-gray-800 dark:text-zinc-300 leading-relaxed bg-[#FCFCFD] dark:bg-zinc-950">
                       Hi, I&apos;m the {agentName || 'Assistant'} assistant. Ask me about features, setup, or how we help resolve customer inquiries faster.
                    </div>
                 </motion.div>
@@ -451,7 +451,7 @@ export default function OnboardingPage() {
                    ].map((line, i) => {
                       const Icon = line.icon;
                       return (
-                        <motion.div variants={itemVariants} key={i} className="flex items-start sm:items-center gap-3 text-[13px] sm:text-[14px] text-gray-800 font-medium">
+                        <motion.div variants={itemVariants} key={i} className="flex items-start sm:items-center gap-3 text-[13px] sm:text-[14px] text-gray-800 dark:text-zinc-200 font-medium">
                           <div className="w-5 h-5 flex items-center justify-center text-green-600 flex-shrink-0 mt-0.5 sm:mt-0">
                              <Icon className="w-[16px] sm:w-[18px] h-[16px] sm:h-[18px]" />
                           </div>
@@ -465,7 +465,7 @@ export default function OnboardingPage() {
                    <motion.button 
                      whileTap={{ scale: 0.98 }}
                      onClick={() => setStep(4)}
-                     className="h-[40px] sm:h-[42px] px-6 sm:px-8 bg-black text-white font-semibold text-[13px] sm:text-[14px] rounded-full shadow-sm hover:opacity-90 transition-all flex items-center justify-center"
+                     className="h-[40px] sm:h-[42px] px-6 sm:px-8 bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-[13px] sm:text-[14px] rounded-full shadow-sm hover:opacity-90 transition-all flex items-center justify-center"
                    >
                       Next
                    </motion.button>
@@ -482,8 +482,8 @@ export default function OnboardingPage() {
               className="w-full max-w-[620px] text-center flex flex-col items-center"
             >
                <motion.div variants={itemVariants} className="mb-8 sm:mb-10">
-                  <h1 className="text-[26px] sm:text-[32px] font-semibold text-black tracking-tight leading-tight px-4">Where will you use it?</h1>
-                  <p className="text-gray-500 text-[14px] sm:text-[15px] font-medium mt-2 px-4">Select the channels where you want to deploy.</p>
+                  <h1 className="text-[26px] sm:text-[32px] font-semibold text-black dark:text-zinc-100 tracking-tight leading-tight px-4">Where will you use it?</h1>
+                  <p className="text-gray-500 dark:text-zinc-400 text-[14px] sm:text-[15px] font-medium mt-2 px-4">Select the channels where you want to deploy.</p>
                </motion.div>
 
                <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 px-2 sm:px-4 w-full max-w-[500px] sm:max-w-none">
@@ -499,11 +499,11 @@ export default function OnboardingPage() {
                           className={`relative p-3 sm:p-5 aspect-[4/3.2] rounded-[14px] sm:rounded-[18px] border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 group ${
                              isSel 
                               ? 'border-black bg-black shadow-md sm:scale-[1.02]' 
-                              : 'border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50'
+                              : 'border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-850'
                           }`}
                         >
                            <Icon className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${isSel ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}`} />
-                           <span className={`text-[12px] sm:text-[13px] font-semibold tracking-tight leading-tight ${isSel ? 'text-white' : 'text-gray-600'}`}>{pref.label}</span>
+                           <span className={`text-[12px] sm:text-[13px] font-semibold tracking-tight leading-tight ${isSel ? 'text-white' : 'text-gray-600 dark:text-zinc-300'}`}>{pref.label}</span>
                         </motion.div>
                      )
                   })}
@@ -513,14 +513,14 @@ export default function OnboardingPage() {
                   <motion.button 
                      whileTap={{ scale: 0.97 }}
                      onClick={finalize} 
-                     className="w-full sm:w-auto text-[13px] sm:text-[14px] font-semibold text-gray-400 hover:text-black px-6 py-3 order-2 sm:order-1 transition-colors"
+                     className="w-full sm:w-auto text-[13px] sm:text-[14px] font-semibold text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-zinc-200 px-6 py-3 order-2 sm:order-1 transition-colors"
                   >
                      Skip for now
                   </motion.button>
                   <motion.button 
                     whileTap={{ scale: 0.98 }}
                     onClick={finalize}
-                    className="w-[80%] sm:w-auto h-[48px] sm:h-[54px] px-8 sm:px-12 bg-black text-white font-semibold text-[14px] sm:text-[15px] rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:-translate-y-[1px] transition-all flex items-center justify-center gap-1 order-1 sm:order-2"
+                    className="w-[80%] sm:w-auto h-[48px] sm:h-[54px] px-8 sm:px-12 bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold text-[14px] sm:text-[15px] rounded-[16px] shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:-translate-y-[1px] transition-all flex items-center justify-center gap-1 order-1 sm:order-2"
                   >
                      Finish Setup
                   </motion.button>
@@ -539,8 +539,8 @@ export default function OnboardingPage() {
                    key={dot} 
                    className={`h-[5px] sm:h-[6px] rounded-full transition-all duration-300 ease-out ${
                      isActive 
-                       ? 'w-[14px] sm:w-[18px] bg-black' 
-                       : 'w-[5px] sm:w-[6px] bg-gray-300'
+                       ? 'w-[14px] sm:w-[18px] bg-black dark:bg-zinc-100' 
+                       : 'w-[5px] sm:w-[6px] bg-gray-300 dark:bg-zinc-700'
                    }`} 
                  />
               )
