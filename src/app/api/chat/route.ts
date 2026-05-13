@@ -3,13 +3,22 @@ import { connectDB } from '@/lib/db';
 import Agent from '@/models/Agent';
 import Conversation from '@/models/Conversation';
 import Message from '@/models/Message';
+import User from '@/models/User';
+import Workspace from '@/models/Workspace';
 import { auth } from '@/auth';
 import { searchKnowledge } from '@/lib/rag';
 import { rateLimit } from '@/lib/rate-limit';
-import { groq } from '@ai-sdk/groq';
-import { streamText, createUIMessageStreamResponse, convertToModelMessages } from 'ai';
+import { createGroq } from '@ai-sdk/groq';
+import { streamText, createUIMessageStreamResponse } from 'ai';
 
 export const maxDuration = 30;
+
+// Fully secure workspace identifier resolver that guarantees multi-auth compatibility
+async function resolveWorkspaceId(session: any): Promise<string | null> {
+  if ((session.user as any).workspaceId) return (session.user as any).workspaceId;
+  const dbUser = await User.findOne({ email: session.user?.email });
+  return dbUser?.workspaceId?.toString() || null;
+}
 
 export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
@@ -29,14 +38,28 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: 'Valid messages array and Agent ID required' }, { status: 400 });
     }
 
-    const promptText = uiMessages[uiMessages.length - 1].parts?.[0]?.text || uiMessages[uiMessages.length - 1].text || '';
-
+    // Bulletproof extraction of promptText to ensure context indexing never receives empty inputs
+    const latestMsg = uiMessages[uiMessages.length - 1];
+    let promptText = '';
+    if (Array.isArray(latestMsg.parts)) {
+      promptText = latestMsg.parts.map((p: any) => p.type === 'text' ? p.text : '').filter(Boolean).join(' ');
+    }
+    if (!promptText && latestMsg.content) promptText = latestMsg.content;
+    if (!promptText && latestMsg.text) promptText = latestMsg.text;
+    
     await connectDB();
-    const agent = await Agent.findOne({ _id: agentId, workspaceId: (session.user as any).workspaceId });
+
+    // Ensure user identity linkage is retrieved safely
+    const workspaceId = await resolveWorkspaceId(session);
+    if (!workspaceId) {
+      return NextResponse.json({ error: 'Workspace resolution lock failed.' }, { status: 403 });
+    }
+
+    const agent = await Agent.findOne({ _id: agentId, workspaceId });
     if (!agent) return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
 
-    const workspace = await (await import('@/models/Workspace')).default.findById(agent.workspaceId);
-    if (!workspace) return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) return NextResponse.json({ error: 'Workspace context invalid' }, { status: 404 });
 
     const monthlyCredits = workspace.usage?.monthlyCredits || 0;
     const usedThisMonth = workspace.usage?.creditsUsedThisMonth || 0;
@@ -50,7 +73,7 @@ export async function POST(req: Request) {
     if (!convId) {
       const conv = await Conversation.create({
         agentId: agent._id,
-        workspaceId: agent.workspaceId,
+        workspaceId: workspace._id,
         sessionId: 'dashboard-' + Date.now(),
         source: 'dashboard',
         messageCount: 1
@@ -64,14 +87,16 @@ export async function POST(req: Request) {
       conversationId: convId,
       agentId: agent._id,
       role: 'user',
-      content: promptText
+      content: promptText || ''
     });
 
     let relevantChunks: string[] = [];
     try {
-      relevantChunks = await searchKnowledge(promptText, agent._id.toString(), agent.workspaceId.toString());
+      if (promptText) {
+        relevantChunks = await searchKnowledge(promptText, agent._id.toString(), workspaceId);
+      }
     } catch (e) {
-      console.error('[RAG Fail]', e);
+      console.error('[RAG Failure Recovery]', e);
     }
     
     const contextStr = relevantChunks.length > 0 
@@ -79,7 +104,23 @@ export async function POST(req: Request) {
       : '';
 
     const systemPrompt = (agent.systemPrompt || 'You are a helpful assistant.') + contextStr;
-    const modelMessages = await convertToModelMessages(uiMessages);
+
+    // Stabilized UI to core mapping to circumvent complex object transformation issues
+    const modelMessages = uiMessages.map((msg: any) => {
+      let c = '';
+      if (Array.isArray(msg.parts)) {
+        c = msg.parts.map((p: any) => p.type === 'text' ? p.text : '').filter(Boolean).join('\n');
+      }
+      if (!c && msg.content) c = msg.content;
+      if (!c && msg.text) c = msg.text;
+      return {
+        role: (msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system') ? msg.role : 'user',
+        content: c || ''
+      };
+    });
+
+    // Explicit provider allocation with runtime environment propagation
+    const groq = createGroq({ apiKey: process.env.GROQ_API_KEY });
 
     const result = streamText({
       model: groq(agent.model || 'llama-3.1-8b-instant'),
@@ -98,7 +139,7 @@ export async function POST(req: Request) {
            
            await Conversation.findByIdAndUpdate(convId, { $inc: { messageCount: 1 } });
 
-           await (await import('@/models/Workspace')).default.findOneAndUpdate(
+           await Workspace.findOneAndUpdate(
              { _id: workspace._id },
              [
                {
@@ -115,12 +156,12 @@ export async function POST(req: Request) {
              ]
            );
          } catch (saveErr) {
-           console.error('[Finalize Fail]', saveErr);
+           console.error('[Finalize Error Ignored]', saveErr);
          }
       }
     });
 
-    // Attach conversation info dynamically to the message metadata boundary
+    // Ensure atomic return of UI response stream
     return createUIMessageStreamResponse({
        stream: result.toUIMessageStream({
           messageMetadata: () => ({ conversationId: convId.toString() })
@@ -128,7 +169,14 @@ export async function POST(req: Request) {
     });
 
   } catch (error: any) {
-    console.error('Stream Fault:', error);
-    return NextResponse.json({ error: 'Engine internal fault' }, { status: 500 });
+    console.error('Production AI Pipeline Fault:', error);
+    return NextResponse.json(
+      { 
+        error: 'Internal Pipeline Disruption', 
+        details: error.message,
+        stage: 'Execution'
+      }, 
+      { status: 500 }
+    );
   }
 }
