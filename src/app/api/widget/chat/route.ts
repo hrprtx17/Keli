@@ -48,6 +48,9 @@ export async function POST(req: Request) {
     if (!agent) {
       return NextResponse.json({ error: 'Agent not found' }, { status: 404, headers: corsHeaders });
     }
+    if (!agent.isActive) {
+      return NextResponse.json({ error: 'Agent not active' }, { status: 403, headers: corsHeaders });
+    }
 
     const workspace = await (await import('@/models/Workspace')).default.findById(agent.workspaceId);
     if (!workspace) return NextResponse.json({ error: 'Workspace not found' }, { status: 404, headers: corsHeaders });

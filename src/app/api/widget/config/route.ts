@@ -12,6 +12,7 @@ export async function GET(req: Request) {
     await connectDB();
     const agent = await Agent.findById(agentId);
     if (!agent) return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
+    if (!agent.isActive) return NextResponse.json({ error: 'Agent not active' }, { status: 403 });
 
     return NextResponse.json({
       agentName: agent.name || 'AI Assistant',

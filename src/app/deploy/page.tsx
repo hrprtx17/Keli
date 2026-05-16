@@ -149,7 +149,7 @@ function DeployPageContent() {
   const actualOrigin = origin || 'https://agentdesk.vercel.app';
 
   const scripts = {
-    widget: `<!-- AgentDesk AI Assistant Widget -->\n<script\n  src="${actualOrigin}/widget.js"\n  data-agent-id="${agentId}"\n  async\n></script>`,
+    widget: `<!-- AgentDesk AI Assistant Widget -->\n<script\n  src="${actualOrigin}/agentdesk.js"\n  data-agent-id="${agentId}"\n  async\n></script>`,
     frame: `<iframe \n  src="${actualOrigin}/widget/chat?agent=${agentId}"\n  width="100%" \n  height="600px" \n  frameborder="0" \n  style="border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden;"\n  allow="microphone; clipboard-write"\n></iframe>`,
     sdk: `import { AgentWidget } from '@agentdesk/react';\n\nexport default function App() {\n  return (\n    <AgentWidget \n      agentId="${agentId}" \n      themeColor="${primaryColor}" \n    />\n  );\n}`
   };
@@ -174,10 +174,45 @@ function DeployPageContent() {
                </div>
                <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-zinc-100 tracking-tight flex items-center gap-2">
                  Go Live: {agent?.name || 'Assistant'}
+                 {agent?.isActive ? (
+                   <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider">
+                     <div className="w-1 h-1 rounded-full bg-emerald-500" /> Live
+                   </span>
+                 ) : (
+                   <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-500/10 text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
+                     <div className="w-1 h-1 rounded-full bg-zinc-500" /> Offline
+                   </span>
+                 )}
                </h1>
                <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-1">
                   Acquire the embed script and deploy to any tech stack instantly.
                </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={async () => {
+                  const next = !agent?.isActive;
+                  try {
+                    await fetch(`/api/agents/${agentId}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ isActive: next })
+                    });
+                    queryClient.invalidateQueries({ queryKey: ['agent', agentId] });
+                    toast.success(next ? 'Agent is now LIVE' : 'Agent taken offline');
+                  } catch (e) {
+                    toast.error('Status update failed');
+                  }
+                }}
+                className={`h-10 px-6 rounded-xl font-bold text-[13px] transition-all shadow-sm ${
+                  agent?.isActive 
+                  ? 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200' 
+                  : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                }`}
+              >
+                {agent?.isActive ? 'Take Offline' : 'Go Live Now'}
+              </button>
             </div>
 
             {/* Sub-Navigation Tabs */}
