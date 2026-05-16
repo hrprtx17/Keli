@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "dependencies": {
     "@ai-sdk/groq": "^3.0.39",
     "@ai-sdk/react": "^3.0.179",

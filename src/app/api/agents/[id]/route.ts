@@ -44,6 +44,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
   if (body.systemPrompt) updateData.systemPrompt = body.systemPrompt;
   if (body.widgetConfig) updateData.widgetConfig = body.widgetConfig;
   if (body.config) updateData.config = body.config;
+  if (body.isActive !== undefined) updateData.isActive = body.isActive;
 
   const updatedAgent = await Agent.findOneAndUpdate(
     { _id: id, workspaceId },
