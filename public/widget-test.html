@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f9fafb;
+            color: #111827;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        h1 { font-size: 36px; margin-bottom: 16px; }
+        p { font-size: 18px; color: #4b5563; }
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Widget Test Page</h1>
+        <p>If the configuration is correct, you should see an orange chat button in the bottom-right corner of this page.</p>
+        <p style="margin-top: 20px; font-size: 14px; color: #9ca3af;">This page is served from the public folder and embeds the widget via the absolute Netlify URL.</p>
+    </div>
+
+    <!-- AgentDesk Widget -->
+    <script 
+        src="https://agentdeskk.netlify.app/widget.js" 
+        data-agent-id="6a01a86ac0f6bfe1402360f5"
+        async>
+    </script>
+</body>
+</html>
