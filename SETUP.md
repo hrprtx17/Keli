@@ -45,6 +45,11 @@ You must retrieve and populate these explicit variable keys inside your `.env.lo
 
 ---
 
+## 1. Prerequisites
+- **Node.js**: `v20.9.0` or higher is **required** (Check with `node -v`).
+- **Database**: MongoDB Atlas cluster with Vector Search enabled.
+- **AI Keys**: Groq and HuggingFace API keys.
+
 ## 2. Runtime Initialization Procedures
 
 Once `.env.local` is hydrated, follow these execution mandates:
