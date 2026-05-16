@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 // --- COMPONENT: TYPING EFFECT LOOP ---
-const TYPING_WORDS = ['online', 'replying', 'learning', 'helping', 'converting', 'supporting'];
+const TYPING_WORDS = ["Ready", "Online", "Watching", "Learning", "Working"];
 
 function TypingText() {
   const [index, setIndex] = useState(0);
@@ -30,15 +30,22 @@ function TypingText() {
     }
     const timeout = setTimeout(() => {
       setSubIndex((prev) => prev + (reverse ? -1 : 1));
-    }, reverse ? 60 : 100);
+    }, reverse ? 40 : 60);
 
     return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse]);
+
+  useEffect(() => {
+    if (subIndex === TYPING_WORDS[index].length && !reverse) {
+      const timer = setTimeout(() => setReverse(true), 1800);
+      return () => clearTimeout(timer);
+    }
   }, [subIndex, index, reverse]);
 
   return (
     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400 inline-block min-w-[150px]">
       {TYPING_WORDS[index].substring(0, subIndex)}
-      <span className="text-orange-400 animate-pulse">|</span>
+      <span className="text-orange-400 animate-[blink_1s_infinite]">|</span>
     </span>
   );
 }
@@ -148,7 +155,7 @@ export default function LandingPage() {
                     key={item.name} 
                     href={item.href} 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-3.5 py-3 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold text-zinc-700 dark:text-zinc-300 hover:bg-orange-500/10 dark:hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 transition-all active:scale-[0.99]"
+                    className="flex items-center gap-3 px-3.5 py-3 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold text-zinc-700 dark:text-zinc-300 hover:bg-orange-500/10 dark:hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400 transition-all active:scale-[0.99] min-h-[44px]"
                   >
                     <div className="w-8 h-8 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-500 dark:text-zinc-400">
                       <item.icon className="w-3.5 h-3.5 stroke-[2.5px]" />
@@ -158,11 +165,11 @@ export default function LandingPage() {
                 ))}
                 <div className="h-[1px] bg-zinc-200/50 dark:bg-zinc-800/50 my-1.5 mx-2" />
                 <div className="grid grid-cols-2 gap-2 p-1">
-                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-3 text-center rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center">
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full py-3 text-center rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center min-h-[44px]">
                     Login
                   </Link>
                   <Link href="/register" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                    <button className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-500 hover:brightness-105 text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-lg shadow-orange-600/20 active:scale-[0.98] transition-all flex items-center justify-center">
+                    <button className="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-500 hover:brightness-105 text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-lg shadow-orange-600/20 active:scale-[0.98] transition-all flex items-center justify-center min-h-[44px]">
                       Try Now
                     </button>
                   </Link>
@@ -295,7 +302,7 @@ export default function LandingPage() {
             <h2 className="text-sm font-black uppercase text-orange-500 tracking-widest mb-3">Superpowers</h2>
             <h3 className="text-3xl md:text-5xl font-black tracking-tight">Everything you need to automate</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: Bot, t: 'AI Customer Support', d: 'Leverage bleeding-edge language models for human-like accuracy.' },
               { icon: FileText, t: 'Smart Knowledge Base', d: 'Instantly hydrate AI using existing docs, URLs, and TXT files.' },
@@ -437,7 +444,7 @@ export default function LandingPage() {
                                  transition={{ duration: 0.2 }}
                                  className="inline-block"
                               >
-                                 {priceAnnual ? '313' : '29'}
+                                 {priceAnnual ? '312' : '29'}
                               </motion.span>
                            </AnimatePresence>
                         </span>
@@ -457,6 +464,11 @@ export default function LandingPage() {
                            <span className="line-through opacity-60">Was $348</span>
                            <span className="bg-orange-500/10 text-[10px] px-2 py-0.5 rounded border border-orange-500/20">10% OFF</span>
                         </motion.div>
+                     )}
+                     {priceAnnual && (
+                        <div className="text-orange-500/70 text-[10px] font-bold mt-1">
+                           Billed $312/year
+                        </div>
                      )}
                   </div>
                   
@@ -481,7 +493,7 @@ export default function LandingPage() {
                      ))}
                   </ul>
                   
-                  <Link href="/plans" className="relative z-10">
+                  <Link href="/#pricing" className="relative z-10">
                      <button className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 text-white font-bold text-base shadow-xl shadow-orange-600/20 hover:shadow-orange-500/40 hover:brightness-110 transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]">
                         Upgrade Now <ArrowRight className="w-5 h-5" />
                      </button>
@@ -499,7 +511,7 @@ export default function LandingPage() {
          
          {/* Carousel Marquee effect wrapper */}
          <div className="flex gap-6 overflow-x-hidden relative group">
-            <div className="flex gap-6 animate-marquee-infinite whitespace-nowrap py-4 flex-nowrap">
+            <div className="flex gap-6 animate-marquee whitespace-nowrap py-4 flex-nowrap">
                {[
                  { n: 'Sarah J.', r: 'CTO @ Fintech', q: "Agent Desk slashed our support queue in hours. Pure wizardry." },
                  { n: 'Alex K.', r: 'Founder @ SaaSify', q: "Best integration I've ever written. Hand-offs are instant." },
@@ -571,15 +583,38 @@ export default function LandingPage() {
                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Injecting autonomous atomic intelligence into scaling workflows worldwide.</p>
             </div>
             {[
-              { t: 'Product', links: ['Features', 'Pricing', 'Widget', 'Integrations'] },
-              { t: 'Company', links: ['About', 'Careers', 'Blog', 'Media Kit'] },
-              { t: 'Support', links: ['Documentation', 'API Access', 'Guides', 'Status'] },
+              { t: 'Product', links: [
+                { n: 'Features', h: '#features' },
+                { n: 'Pricing', h: '#pricing' },
+                { n: 'Widget', h: '/dashboard/deploy' },
+                { n: 'Integrations', h: '#' }
+              ] },
+              { t: 'Company', links: [
+                { n: 'About', h: '#' },
+                { n: 'Careers', h: '#' },
+                { n: 'Blog', h: '#' },
+                { n: 'Media Kit', h: '#' }
+              ] },
+              { t: 'Support', links: [
+                { n: 'Documentation', h: '#' },
+                { n: 'API Access', h: '#' },
+                { n: 'Guides', h: '#' },
+                { n: 'Status', h: '#' }
+              ] },
             ].map((group, i) => (
               <div key={i}>
                  <h5 className="font-bold text-sm mb-6 text-zinc-900 dark:text-white">{group.t}</h5>
                  <ul className="space-y-4">
                     {group.links.map(l => (
-                      <li key={l}><a href="#" className="text-sm font-medium text-zinc-500 hover:text-orange-500 transition-colors">{l}</a></li>
+                      <li key={l.n}>
+                        <a 
+                          href={l.h} 
+                          title={l.h === '#' ? 'Coming soon' : ''}
+                          className="text-sm font-medium text-zinc-500 hover:text-orange-500 transition-colors"
+                        >
+                          {l.n}
+                        </a>
+                      </li>
                     ))}
                  </ul>
               </div>
@@ -588,25 +623,29 @@ export default function LandingPage() {
          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-800/50 text-xs font-bold text-zinc-400 uppercase tracking-wider">
             <p>© 2026 AgentDesk Inc. All rights reserved.</p>
             <div className="flex gap-6">
-               <a href="#">Privacy</a>
-               <a href="#">Terms</a>
-               <a href="#">GDPR</a>
+               <a href="#" title="Coming soon">Privacy</a>
+               <a href="#" title="Coming soon">Terms</a>
+               <a href="#" title="Coming soon">GDPR</a>
             </div>
          </div>
       </footer>
 
       {/* Define simple infinite marquee animation custom style */}
       <style jsx global>{`
-         @keyframes marquee-infinite {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
+         @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
          }
-         .animate-marquee-infinite {
+         .animate-marquee {
             display: flex;
             width: max-content;
-            animation: marquee-infinite 40s linear infinite;
+            animation: marquee 30s linear infinite;
          }
-         .animate-marquee-infinite:hover {
+         @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+         }
+         .animate-marquee:hover {
             animation-play-state: paused;
          }
          @keyframes bounce-slow {

@@ -126,11 +126,26 @@
 @layer base {
   * {
     @apply border-border outline-ring/50 tracking-tight transition-colors duration-200 ease-in-out;
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased text-[15px] sm:text-[16px] leading-relaxed;
+    overflow-x: hidden;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-semibold tracking-tight text-zinc-900 dark:text-zinc-100;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
   }
 }
