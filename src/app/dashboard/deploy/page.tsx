@@ -95,7 +95,7 @@ export default function DeployPage() {
   }
 
   const embedCode = `<script 
-  src="https://agentdeskk.netlify.app/widget.js" 
+  src="https://agentdeskk.netlify.app/agentdesk.js" 
   data-agent-id="${agent?._id || '[AGENT_ID]'}">
 </script>`
 

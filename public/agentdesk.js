@@ -349,12 +349,14 @@
   }
 
   function init() {
+    console.log('[AgentDesk] Initializing widget for agent:', agentId);
     fetch(DOMAIN + '/api/agents/public/' + agentId)
       .then(function(res) {
         if (!res.ok) throw new Error('Agent not found: ' + res.status);
         return res.json();
       })
       .then(function(info) {
+        console.log('[AgentDesk] Agent info loaded:', info.name);
         if (!info.isActive) {
           console.log('[AgentDesk] Agent is not active');
           return;
