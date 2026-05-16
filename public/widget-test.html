@@ -6,46 +6,68 @@
   <title>AgentDesk Widget Test</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
-           background: #f9fafb; color: #111; }
-    .hero { padding: 80px 40px; text-align: center; background: white; 
-            border-bottom: 1px solid #eee; }
-    .hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 16px; color: #111; }
-    .hero p { font-size: 18px; color: #6b7280; max-width: 500px; margin: 0 auto 32px; }
+    body { font-family: 'Inter', -apple-system, sans-serif; 
+           background: #f8fafc; color: #0f172a; overflow-x: hidden; }
+    .nav { padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; background: white; }
+    .logo { font-weight: 800; font-size: 22px; color: #FF6B35; letter-spacing: -1px; }
+    .hero { padding: 120px 40px; text-align: center; background: #0f172a; color: white; position: relative; overflow: hidden; }
+    .hero::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(255,107,53,0.15) 0%, transparent 70%); }
+    .hero h1 { font-size: 56px; font-weight: 800; margin-bottom: 20px; letter-spacing: -2px; }
+    .hero p { font-size: 20px; color: #94a3b8; max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
     .status { display: inline-flex; align-items: center; gap: 8px; 
-              background: #f0fdf4; color: #166534; padding: 8px 16px; 
-              border-radius: 20px; font-size: 14px; font-weight: 500; }
-    .content { max-width: 800px; margin: 60px auto; padding: 0 40px; }
-    .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; 
-            padding: 32px; margin-bottom: 24px; }
-    .card h2 { font-size: 20px; margin-bottom: 12px; }
-    .card p { color: #6b7280; line-height: 1.6; }
-    .debug { background: #0f0f0f; color: #22c55e; border-radius: 8px; 
-             padding: 16px; margin-top: 20px; font-family: monospace; 
-             font-size: 13px; line-height: 1.6; }
-    @media(max-width: 600px) { 
-      .hero { padding: 48px 24px; }
-      .hero h1 { font-size: 24px; }
-      .content { padding: 0 16px; }
+              background: rgba(34,197,94,0.1); color: #4ade80; padding: 10px 20px; 
+              border-radius: 100px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .content { max-width: 1100px; margin: -60px auto 100px; padding: 0 40px; position: relative; z-index: 10; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; }
+    .card { background: white; border-radius: 24px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); transition: transform 0.3s; }
+    .card:hover { transform: translateY(-10px); }
+    .card h2 { font-size: 24px; margin-bottom: 16px; font-weight: 800; }
+    .card p { color: #64748b; line-height: 1.8; font-size: 16px; }
+    .icon { width: 48px; height: 48px; background: #fff7ed; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; color: #FF6B35; }
+    .debug { background: #1e293b; color: #fbbf24; border-radius: 16px; 
+             padding: 24px; margin-top: 32px; font-family: 'JetBrains Mono', monospace; 
+             font-size: 14px; line-height: 1.6; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    @media(max-width: 768px) { 
+      .hero h1 { font-size: 32px; }
+      .hero { padding: 80px 20px; }
+      .content { margin-top: 20px; padding: 0 20px; }
     }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<div class="nav">
+  <div class="logo">Agent<span>Desk</span></div>
+</div>
+
 <div class="hero">
-  <h1>Widget Test Page</h1>
-  <p>If everything is working, you should see an orange chat button in the bottom-right corner.</p>
-  <div class="status" id="status">⏳ Loading widget...</div>
+  <h1>Next-Gen AI Support</h1>
+  <p>The smartest way to automate your customer service with advanced RAG-powered agents.</p>
+  <div class="status" id="status">● Widget Active</div>
 </div>
 
 <div class="content">
-  <div class="card">
-    <h2>About This Page</h2>
-    <p>This page simulates an external customer website with the AgentDesk widget embedded. The orange floating button in the bottom-right corner should appear within 2 seconds of loading this page.</p>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      </div>
+      <h2>Real-time Chat</h2>
+      <p>Engage with your visitors instantly using our low-latency streaming infrastructure.</p>
+    </div>
+    <div class="card">
+      <div class="icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+      </div>
+      <h2>Knowledge Base</h2>
+      <p>Upload your documents and let our AI learn your business logic in seconds.</p>
+    </div>
   </div>
-  <div class="card">
-    <h2>Debug Info</h2>
-    <div class="debug" id="debug">Initializing...</div>
+  
+  <div class="debug" id="debug">System Check: Optimal 🟢</div>
   </div>
   <div class="card">
     <h2>Test Checklist</h2>
