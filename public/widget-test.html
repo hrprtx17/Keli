@@ -1,46 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Widget Test Page</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background-color: #f9fafb;
-            color: #111827;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-        }
-        h1 { font-size: 36px; margin-bottom: 16px; }
-        p { font-size: 18px; color: #4b5563; }
-        .card {
-            background: white;
-            padding: 32px;
-            border-radius: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentDesk Widget Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+           background: #f9fafb; color: #111; }
+    .hero { padding: 80px 40px; text-align: center; background: white; 
+            border-bottom: 1px solid #eee; }
+    .hero h1 { font-size: 36px; font-weight: 700; margin-bottom: 16px; color: #111; }
+    .hero p { font-size: 18px; color: #6b7280; max-width: 500px; margin: 0 auto 32px; }
+    .status { display: inline-flex; align-items: center; gap: 8px; 
+              background: #f0fdf4; color: #166534; padding: 8px 16px; 
+              border-radius: 20px; font-size: 14px; font-weight: 500; }
+    .content { max-width: 800px; margin: 60px auto; padding: 0 40px; }
+    .card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; 
+            padding: 32px; margin-bottom: 24px; }
+    .card h2 { font-size: 20px; margin-bottom: 12px; }
+    .card p { color: #6b7280; line-height: 1.6; }
+    .debug { background: #0f0f0f; color: #22c55e; border-radius: 8px; 
+             padding: 16px; margin-top: 20px; font-family: monospace; 
+             font-size: 13px; line-height: 1.6; }
+    @media(max-width: 600px) { 
+      .hero { padding: 48px 24px; }
+      .hero h1 { font-size: 24px; }
+      .content { padding: 0 16px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Widget Test Page</h1>
-        <p>If the configuration is correct, you should see an orange chat button in the bottom-right corner of this page.</p>
-        <p style="margin-top: 20px; font-size: 14px; color: #9ca3af;">This page is served from the public folder and embeds the widget via the absolute Netlify URL.</p>
-    </div>
 
-    <!-- AgentDesk Widget -->
-    <script 
-        src="https://agentdeskk.netlify.app/widget.js" 
-        data-agent-id="6a01a86ac0f6bfe1402360f5"
-        async>
-    </script>
+<div class="hero">
+  <h1>Widget Test Page</h1>
+  <p>If everything is working, you should see an orange chat button in the bottom-right corner.</p>
+  <div class="status" id="status">⏳ Loading widget...</div>
+</div>
+
+<div class="content">
+  <div class="card">
+    <h2>About This Page</h2>
+    <p>This page simulates an external customer website with the AgentDesk widget embedded. The orange floating button in the bottom-right corner should appear within 2 seconds of loading this page.</p>
+  </div>
+  <div class="card">
+    <h2>Debug Info</h2>
+    <div class="debug" id="debug">Initializing...</div>
+  </div>
+  <div class="card">
+    <h2>Test Checklist</h2>
+    <p>✓ Orange launcher button appears (bottom-right)<br>
+       ✓ Clicking it opens a chat panel<br>
+       ✓ Welcome message appears<br>
+       ✓ Can type and send a message<br>
+       ✓ AI responds with streamed text<br>
+       ✓ Close button works</p>
+  </div>
+</div>
+
+<script>
+  var log = document.getElementById('debug');
+  var status = document.getElementById('status');
+  var lines = [];
+  
+  function addLog(msg, type) {
+    var color = type === 'error' ? '#ef4444' : type === 'success' ? '#22c55e' : '#94a3b8';
+    lines.push('<span style="color:' + color + '">[' + new Date().toLocaleTimeString() + '] ' + msg + '</span>');
+    log.innerHTML = lines.join('<br>');
+  }
+  
+  addLog('Page loaded. Looking for widget...', 'info');
+  
+  // Check if widget loaded after 3 seconds
+  setTimeout(function() {
+    var launcher = document.getElementById('agd-launcher');
+    if (launcher) {
+      addLog('✓ Widget launcher found in DOM!', 'success');
+      status.innerHTML = '✅ Widget loaded successfully';
+      status.style.background = '#f0fdf4';
+      status.style.color = '#166534';
+    } else {
+      addLog('✗ Widget launcher NOT found - check console for errors', 'error');
+      status.innerHTML = '❌ Widget failed to load - open DevTools Console';
+      status.style.background = '#fef2f2';
+      status.style.color = '#991b1b';
+    }
+  }, 3000);
+  
+  window.addEventListener('error', function(e) {
+    addLog('JS Error: ' + e.message + ' (line ' + e.lineno + ')', 'error');
+  });
+</script>
+
+<!-- REPLACE THIS AGENT ID WITH A REAL ONE FROM YOUR DASHBOARD -->
+<script 
+  src="https://agentdeskk.netlify.app/widget.js" 
+  data-agent-id="6a01a2cd3f47c7ecf616439f">
+</script>
+
 </body>
 </html>

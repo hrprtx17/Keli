@@ -2,22 +2,56 @@
   command = "npm run build"
   publish = ".next"
 
-[functions]
-  included_files = ["models/**"]
+[build.environment]
+  NODE_VERSION = "18"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Serve widget.js with correct headers - MUST be before catch-all
 [[headers]]
   for = "/widget.js"
   [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
     Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET"
-    Content-Type = "application/javascript"
+    Cache-Control = "public, max-age=300"
 
 [[headers]]
-  for = "/api/*"
+  for = "/widget-test.html"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+
+# API routes get CORS headers
+[[headers]]
+  for = "/api/widget-chat"
   [headers.values]
     Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Methods = "POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
+
+[[headers]]
+  for = "/api/agents/public/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+# Protect against clickjacking on app pages but NOT widget
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Widget.js must NOT be caught by SPA redirect
+[[redirects]]
+  from = "/widget.js"
+  to = "/widget.js"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/widget-test.html"
+  to = "/widget-test.html"
+  status = 200
+  force = true
