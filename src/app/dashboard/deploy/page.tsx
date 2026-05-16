@@ -8,12 +8,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { Check, Copy, ExternalLink, Globe, Layout, MessageSquare, Terminal, Monitor, Smartphone, Loader2 } from 'lucide-react'
 
 export default function DeployPage() {
   const { data: session, status } = useSession()
-  const { toast } = useToast()
   const [agent, setAgent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
@@ -60,13 +59,12 @@ export default function DeployPage() {
       })
       if (res.ok) {
         setAgent({ ...agent, isActive: checked })
-        toast({
-          title: checked ? "Agent Deployed" : "Agent Taken Offline",
+        toast.success(checked ? "Agent Deployed" : "Agent Taken Offline", {
           description: checked ? "Your widget is now live." : "Your widget is now offline.",
         })
       }
     } catch (err) {
-      toast({ title: "Error", description: "Failed to update status.", variant: "destructive" })
+      toast.error("Error", { description: "Failed to update status." })
     }
   }
 
@@ -86,11 +84,11 @@ export default function DeployPage() {
         })
       })
       if (res.ok) {
-        toast({ title: "Settings Saved", description: "Widget updated." })
+        toast.success("Settings Saved", { description: "Widget updated." })
         fetchAgent()
       }
     } catch (err) {
-      toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" })
+      toast.error("Error", { description: "Failed to save settings." })
     }
   }
 
@@ -102,7 +100,7 @@ export default function DeployPage() {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(embedCode)
     setCopied(true)
-    toast({ title: "Copied!", description: "Embed code copied." })
+    toast.success("Copied!", { description: "Embed code copied." })
     setTimeout(() => setCopied(false), 2000)
   }
 
