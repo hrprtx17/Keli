@@ -50,19 +50,30 @@ function SettingsPageContent() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
+    notificationEmail: '',
   });
 
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     if (workspace) {
-      setFormData({
+      setFormData(prev => ({
+        ...prev,
         name: workspace.name || '',
         slug: workspace.slug || '',
-      });
+      }));
       setHasChanges(false);
     }
   }, [workspace]);
+
+  useEffect(() => {
+    if (agent) {
+      setFormData(prev => ({
+        ...prev,
+        notificationEmail: agent.notificationEmail || '',
+      }));
+    }
+  }, [agent]);
 
   const handleChange = (key: string, val: string) => {
      setFormData(p => ({ ...p, [key]: val }));
@@ -78,6 +89,17 @@ function SettingsPageContent() {
         body: JSON.stringify({ name: formData.name })
       });
       if (!res.ok) throw new Error('Save failed');
+
+      if (agentId) {
+        const resAgent = await fetch(`/api/agents/${agentId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notificationEmail: formData.notificationEmail })
+        });
+        if (!resAgent.ok) throw new Error('Agent save failed');
+        queryClient.invalidateQueries({ queryKey: ['agent', agentId] });
+      }
+
       toast.success('Workspace preferences synced successfully.');
       queryClient.invalidateQueries({ queryKey: ['workspace'] });
       setHasChanges(false);
@@ -167,6 +189,41 @@ function SettingsPageContent() {
                   </div>
                </div>
             </motion.div>
+
+            {/* Card 1.5: Ticket Notification (only if agentId present) */}
+            {agentId && (
+               <motion.div 
+                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.02 }}
+                 className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[24px] shadow-sm overflow-hidden"
+               >
+                  <div className="p-6 sm:p-8">
+                     <h2 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100 mb-2 flex items-center gap-2">
+                        <Bot className="w-4 h-4 text-orange-500" />
+                        Agent Support Escalation ({agent?.name})
+                     </h2>
+                     <p className="text-[13px] text-gray-500 dark:text-zinc-400 mb-6">
+                        Configure where visitor escalation support tickets are sent.
+                     </p>
+                     
+                     <div className="space-y-6">
+                        <div>
+                           <label className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 block mb-2">Ticket notification email</label>
+                           <input 
+                             type="email"
+                             value={formData.notificationEmail}
+                             onChange={e => handleChange('notificationEmail', e.target.value)}
+                             placeholder="support@yourcompany.com"
+                             className="w-full bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 px-4 py-2.5 rounded-xl text-[14px] text-gray-900 dark:text-zinc-100 focus:border-orange-400 focus:ring-[3px] focus:ring-orange-500/10 outline-none transition-all shadow-sm placeholder:text-gray-300 dark:placeholder:text-zinc-700"
+                           />
+                           <div className="mt-3 flex items-start gap-2.5 text-gray-500 dark:text-zinc-500 px-1">
+                              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 text-gray-400 dark:text-zinc-600" />
+                              <p className="text-[12px] leading-relaxed">Where we send alerts when a visitor creates a support ticket. Free tier emails are delivered immediately via Resend.</p>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </motion.div>
+            )}
 
             {/* Card 2: Appearance & Theme */}
             {mounted && (

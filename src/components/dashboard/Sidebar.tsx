@@ -23,7 +23,26 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [openTicketsCount, setOpenTicketsCount] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchOpenCount = async () => {
+      try {
+        const res = await fetch('/api/tickets?status=open');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data.total === 'number') {
+          setOpenTicketsCount(data.total);
+        }
+      } catch (err) {
+        console.error('Failed to fetch open tickets count', err);
+      }
+    };
+    fetchOpenCount();
+    const interval = setInterval(fetchOpenCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -100,7 +119,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       <Link
         href={finalHref}
         onClick={onNavClick}
-        className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all ${
+        className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all ${
           isActive
             ? 'bg-gray-100/80 dark:bg-zinc-900 text-black dark:text-zinc-100 font-semibold border border-transparent dark:border-zinc-800/40'
             : 'text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-900/50'
@@ -108,6 +127,19 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       >
         {Icon && <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-orange-500' : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-600 dark:group-hover:text-zinc-300 transition-colors'}`} />}
         <span className="flex-1 truncate">{children}</span>
+        {children === 'Inbox' && openTicketsCount > 0 && (
+          <span 
+            className="absolute top-1/2 -translate-y-1/2 right-3 flex items-center justify-center rounded-full font-bold text-white bg-[#FF6B35]"
+            style={{
+              width: '18px',
+              height: '18px',
+              fontSize: '10px',
+              lineHeight: '1',
+            }}
+          >
+            {openTicketsCount >= 10 ? '9+' : openTicketsCount}
+          </span>
+        )}
       </Link>
     );
   };
@@ -211,7 +243,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       <nav className="flex-1 overflow-y-auto px-4 py-2 custom-scrollbar">
         <NavSection title="Main">
           <NavLink href={`/agents/${activeAgentId || ''}`} icon={PlayCircle} exact>AI Preview</NavLink>
-          <NavLink href="/conversations" icon={Inbox}>Inbox</NavLink>
+          <NavLink href="/dashboard/inbox" icon={Inbox}>Inbox</NavLink>
           <NavLink href="/dashboard" icon={PieChart}>Insights</NavLink>
         </NavSection>
 

@@ -6,6 +6,7 @@ export interface IAgent {
   description?: string
   avatar?: string
   systemPrompt?: string
+  notificationEmail?: string
   model: string
   config: {
     temperature: number
@@ -37,6 +38,7 @@ const AgentSchema = new Schema<IAgent>({
   description: { type: String },
   avatar: { type: String },
   systemPrompt: { type: String },
+  notificationEmail: { type: String },
   model: { type: String, default: 'llama-3.1-8b-instant' },
   config: {
     temperature: { type: Number, default: 0.7 },
