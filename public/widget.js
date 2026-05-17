@@ -165,6 +165,12 @@
         }\
         #agd-send:hover{opacity:0.85;}\
         #agd-send:disabled{opacity:0.5;cursor:not-allowed;}\
+        #agd-ticket-btn{\
+          width:38px;height:38px;border-radius:50%;background:#F3F4F6;\
+          border:none;cursor:pointer;display:flex;align-items:center;\
+          justify-content:center;flex-shrink:0;transition:background 0.15s;\
+        }\
+        #agd-ticket-btn:hover{background:#E5E7EB;}\
         #agd-powered{\
           text-align:center;font-size:10px;color:#bbb;padding:5px;\
           font-family:-apple-system,BlinkMacSystemFont,sans-serif;flex-shrink:0;\
@@ -180,15 +186,15 @@
         }
       }
     }
-
+ 
     // Build widget HTML and inject into body (Timing safe — called when document.body exists)
     function buildWidget() {
       if (el('agd-launcher')) return; // already built
-
+ 
       var color = (agentData && agentData.themeColor) || '#FF6B35';
       var name = (agentData && agentData.name) || 'Support';
       var letter = name.charAt(0).toUpperCase();
-
+ 
       // Launcher
       var launcher = document.createElement('button');
       if (launcher) {
@@ -197,7 +203,7 @@
         launcher.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
         launcher.onclick = togglePanel;
       }
-
+ 
       // Panel
       var panel = document.createElement('div');
       if (panel) {
@@ -220,6 +226,9 @@
           '</div>',
           '<div id="agd-bar">',
             '<input id="agd-input" type="text" placeholder="Type a message..." autocomplete="off"/>',
+            '<button id="agd-ticket-btn" title="Create Support Ticket">',
+              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>',
+            '</button>',
             '<button id="agd-send" aria-label="Send">',
               '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
             '</button>',
@@ -227,20 +236,22 @@
           '<div id="agd-powered">Powered by AgentDesk</div>',
         ].join('');
       }
-
+ 
       if (document.body) {
         if (launcher) document.body.appendChild(launcher);
         if (panel) document.body.appendChild(panel);
       }
-
+ 
       // Wire up events AFTER elements are in DOM
       var closeBtn = el('agd-close-btn');
       var humanBtn = el('agd-human-btn');
+      var ticketBtn = el('agd-ticket-btn');
       var sendBtn  = el('agd-send');
       var input    = el('agd-input');
-
+ 
       if (closeBtn) closeBtn.onclick = togglePanel;
       if (humanBtn) humanBtn.onclick = showTicketForm;
+      if (ticketBtn) ticketBtn.onclick = showTicketForm;
       if (sendBtn)  sendBtn.onclick  = handleSend;
       if (input) {
         input.onkeydown = function(e) {
