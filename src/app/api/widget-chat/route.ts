@@ -1,11 +1,30 @@
 import { NextRequest } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
+import { checkRateLimit } from '@/lib/ratelimit'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+function sanitizeMessage(msg: string): string {
+  const injectionPatterns = [
+    /ignore\s+(all\s+)?(previous|above|prior)\s+instructions?/gi,
+    /you\s+are\s+now\s+(a\s+)?/gi,
+    /act\s+as\s+(if\s+you\s+are|a)\s+/gi,
+    /forget\s+(everything|all|your)\s+/gi,
+    /system\s*:\s*/gi,
+    /\[INST\]/gi,
+    /<\|im_start\|>/gi,
+  ]
+  
+  let cleaned = msg
+  for (const pattern of injectionPatterns) {
+    cleaned = cleaned.replace(pattern, '[removed]')
+  }
+  return cleaned.slice(0, 2000)
 }
 
 export async function OPTIONS() {
@@ -14,31 +33,70 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const ip = request.headers.get('x-forwarded-for') || 
+               request.headers.get('x-real-ip') || 
+               'unknown'
+
+    // Rate Limiting
+    if (!checkRateLimit(ip, 20, 60000)) {
+      return Response.json(
+        { error: 'Too many requests. Please wait.' },
+        { status: 429, headers: { ...CORS_HEADERS, 'Retry-After': '60' } }
+      )
+    }
+
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return Response.json(
+        { error: 'Malformed JSON body' },
+        { status: 400, headers: CORS_HEADERS }
+      )
+    }
+
     const { agentId, message, sessionId, history = [] } = body
     
-    // Validate
-    if (!agentId || !message || typeof message !== 'string') {
+    // Validate inputs
+    if (!agentId || typeof agentId !== 'string' || !/^[a-f\d]{24}$/i.test(agentId)) {
       return Response.json(
-        { error: 'Missing agentId or message' },
+        { error: 'Invalid or missing agentId' },
         { status: 400, headers: CORS_HEADERS }
       )
     }
-    if (message.length > 2000) {
+
+    if (!message || typeof message !== 'string') {
       return Response.json(
-        { error: 'Message too long' },
+        { error: 'Invalid or missing message' },
         { status: 400, headers: CORS_HEADERS }
       )
     }
+
+    const trimmedMsg = message.trim()
+    if (trimmedMsg.length === 0) {
+      return Response.json(
+        { error: 'Message cannot be empty' },
+        { status: 400, headers: CORS_HEADERS }
+      )
+    }
+
+    if (trimmedMsg.length > 2000) {
+      return Response.json(
+        { error: 'Message exceeds maximum length' },
+        { status: 400, headers: CORS_HEADERS }
+      )
+    }
+
+    const safeMessage = sanitizeMessage(trimmedMsg)
     
-    // Load agent
+    // Load agent from DB
     const db = await connectDB()
     let agent
     try {
       agent = await db.collection('agents').findOne({ _id: new ObjectId(agentId) })
     } catch {
       return Response.json(
-        { error: 'Invalid agent ID' },
+        { error: 'Invalid agent ID format' },
         { status: 400, headers: CORS_HEADERS }
       )
     }
@@ -49,6 +107,7 @@ export async function POST(request: NextRequest) {
         { status: 404, headers: CORS_HEADERS }
       )
     }
+
     if (!agent.isActive) {
       return Response.json(
         { error: 'Agent not active' },
@@ -56,11 +115,11 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // RAG: get embedding with 6s timeout
+    // RAG: Fetch embeddings with strict 5s timeout fallback
     let context = ''
     try {
       const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 6000)
+      const timeout = setTimeout(() => controller.abort(), 5000)
       
       const embRes = await fetch(
         'https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2',
@@ -70,7 +129,7 @@ export async function POST(request: NextRequest) {
             'Authorization': `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ inputs: message }),
+          body: JSON.stringify({ inputs: safeMessage }),
           signal: controller.signal,
         }
       )
@@ -79,7 +138,6 @@ export async function POST(request: NextRequest) {
       if (embRes.ok) {
         const embedding = await embRes.json()
         if (Array.isArray(embedding) && embedding.length > 0) {
-          // Correct collection name and field mappings
           const chunks = await db.collection('knowledgechunks').aggregate([
             {
               $vectorSearch: {
@@ -100,11 +158,10 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (e: any) {
-      // RAG failed - answer without context (Groq still responds)
       console.log('[AgentDesk] RAG skipped:', e.message)
     }
     
-    // System prompt
+    // Construct System Prompt
     const systemPrompt = `You are ${agent.name || 'an AI assistant'}, a helpful support assistant.
 
 ${agent.systemPrompt || ''}
@@ -118,7 +175,7 @@ Important rules:
 - Be warm, professional, and friendly
 - Do not mention that you are using a knowledge base or that you are an AI unless asked`
     
-    // Call Groq streaming
+    // Call Groq AI streaming API
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -136,7 +193,7 @@ Important rules:
             role: h.role,
             content: h.content,
           })),
-          { role: 'user', content: message },
+          { role: 'user', content: safeMessage },
         ],
       }),
     })
@@ -150,7 +207,7 @@ Important rules:
       )
     }
     
-    // Stream SSE back to widget
+    // Pipe Groq's SSE stream back to client
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
       async start(controller) {
@@ -170,7 +227,7 @@ Important rules:
             for (const line of lines) {
               const trimmed = line.trim()
               if (!trimmed.startsWith('data: ')) continue
-              const raw = trimmed.slice(6)
+              const raw = trimmed.slice(6).trim()
               if (raw === '[DONE]') {
                 controller.enqueue(encoder.encode('data: {"done":true}\n\n'))
                 continue
@@ -190,11 +247,11 @@ Important rules:
           controller.close()
         }
         
-        // Log conversation async (never await this)
+        // Log conversation record in background
         db.collection('conversations').insertOne({
           agentId,
           sessionId: sessionId || 'unknown',
-          userMessage: message,
+          userMessage: safeMessage,
           agentName: agent.name,
           timestamp: new Date(),
         }).catch(() => {})

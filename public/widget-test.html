@@ -82,7 +82,7 @@
 
 <script>
   var log = document.getElementById('debug');
-  var status = document.getElementById('status');
+  var statusEl = document.getElementById('status');
   var lines = [];
   
   function addLog(msg, type) {
@@ -98,14 +98,22 @@
     var launcher = document.getElementById('agd-launcher');
     if (launcher) {
       addLog('✓ Widget launcher found in DOM!', 'success');
-      status.innerHTML = '✅ Widget loaded successfully';
-      status.style.background = '#f0fdf4';
-      status.style.color = '#166534';
+      if (statusEl) {
+        statusEl.innerHTML = '✅ Widget loaded successfully';
+        if (statusEl.style) {
+          statusEl.style.background = '#f0fdf4';
+          statusEl.style.color = '#166534';
+        }
+      }
     } else {
       addLog('✗ Widget launcher NOT found - check console for errors', 'error');
-      status.innerHTML = '❌ Widget failed to load - open DevTools Console';
-      status.style.background = '#fef2f2';
-      status.style.color = '#991b1b';
+      if (statusEl) {
+        statusEl.innerHTML = '❌ Widget failed to load - open DevTools Console';
+        if (statusEl.style) {
+          statusEl.style.background = '#fef2f2';
+          statusEl.style.color = '#991b1b';
+        }
+      }
     }
   }, 3000);
   

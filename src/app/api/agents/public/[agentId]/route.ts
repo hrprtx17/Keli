@@ -19,9 +19,10 @@ export async function GET(
   try {
     const { agentId } = await params
     
-    if (!agentId || agentId.length < 10) {
+    // Validate agent ID format strictly
+    if (!agentId || typeof agentId !== 'string' || !/^[a-f\d]{24}$/i.test(agentId)) {
       return Response.json(
-        { error: 'Invalid agent ID' },
+        { error: 'Invalid or missing agent ID' },
         { status: 400, headers: CORS_HEADERS }
       )
     }
@@ -53,6 +54,7 @@ export async function GET(
       )
     }
     
+    // Protect private parameters (FIX 16) - return strictly only the required public fields
     return Response.json({
       name: agent.name || 'AI Assistant',
       welcomeMessage: agent.welcomeMessage || 'Hi! 👋 How can I help you today?',
