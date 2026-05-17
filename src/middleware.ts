@@ -29,6 +29,7 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|widget\\.js|agentdesk\\.js|widget-test\\.html|api/widget-chat|api/agents/public).*)',
+    '/((?!_next/static|_next/image|favicon.ico|widget\\.js|agentdesk\\.js|widget-test\\.html|api/widget-chat|api/agents/public|api/tickets).*)',
   ],
 }
+

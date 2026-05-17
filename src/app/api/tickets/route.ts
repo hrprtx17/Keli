@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET handler (for dashboard inbox)
+// GET handler (for dashboard inbox and tickets page)
 export async function GET(request: NextRequest) {
   // Auth required for this endpoint
   const session = await auth()
@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
   
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status') || 'all'
-  const page = parseInt(searchParams.get('page') || '1')
+  const pageParam = searchParams.get('page')
   const limit = 20
   
   const db = await connectDB()
@@ -206,6 +206,21 @@ export async function GET(request: NextRequest) {
   }
   
   try {
+    if (pageParam === null) {
+      // Non-paginated request (original /tickets page)
+      const tickets = await db.collection('tickets')
+        .find(query)
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .toArray()
+        
+      return Response.json(tickets.map(t => ({
+        ...t,
+        _id: t._id.toString()
+      })))
+    }
+
+    const page = parseInt(pageParam || '1')
     const [tickets, total] = await Promise.all([
       db.collection('tickets')
         .find(query)
@@ -230,3 +245,4 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Failed to retrieve tickets' }, { status: 500 })
   }
 }
+
