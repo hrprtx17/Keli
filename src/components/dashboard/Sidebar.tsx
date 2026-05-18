@@ -75,13 +75,13 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   // Ensure there's always an active agent if agents exist, otherwise force onboarding
   useEffect(() => {
     if (agents) {
-      if (agents.length > 0 && !activeAgentId && pathname !== '/onboarding') {
-        router.replace(`/agents/${agents[0]._id}`);
-      } else if (agents.length === 0 && pathname !== '/onboarding') {
+      if (agents.length === 0 && pathname !== '/onboarding') {
         router.replace('/onboarding');
+      } else if (agents.length > 0 && pathname === '/agents') {
+        router.replace(`/agents/${agents[0]._id}`);
       }
     }
-  }, [agents, activeAgentId, pathname, router]);
+  }, [agents, pathname, router]);
 
   const activeAgent = agents?.find((a: any) => a._id === activeAgentId) || agents?.[0];
 
@@ -251,7 +251,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
         <NavSection title="AI Agent">
           <NavLink href={`/agents/${activeAgentId || ''}/identity`} icon={Fingerprint} exact>Identity</NavLink>
           <NavLink href="/knowledge" icon={Database}>Training Data</NavLink>
-          <NavLink href="/deploy" icon={Rocket}>Deploy</NavLink>
+          <NavLink href="/dashboard/deploy" icon={Rocket}>Deploy</NavLink>
           <NavLink href="#" icon={Network} isLocked>Integrations</NavLink>
         </NavSection>
 

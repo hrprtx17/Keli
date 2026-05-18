@@ -14,10 +14,10 @@ export async function OPTIONS() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { agentId: string } }
+  context: { params: Promise<{ agentId: string }> }
 ) {
   try {
-    const { agentId } = await params
+    const { agentId } = await context.params
     
     // Validate agent ID format strictly
     if (!agentId || typeof agentId !== 'string' || !/^[a-f\d]{24}$/i.test(agentId)) {

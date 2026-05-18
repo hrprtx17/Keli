@@ -71,7 +71,7 @@ export default function OnboardingPage() {
      if (step === 2 && !trainingComplete) {
         int = setInterval(() => {
            setActiveFeedIndex(p => (p + 1) % FEED_MESSAGES.length);
-        }, 2800);
+        }, 300);
      }
      return () => clearInterval(int);
   }, [step, trainingComplete]);
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
            setTrainingComplete(true);
            setCurrentStage('FINISHING');
         }
-     }, 8000); // Aggressive 8s cap to eliminate perceived "stuck" loading states completely
+     }, 1500); // Aggressive 1.5s cap for instant onboarding completion feeling
 
      try {
         const response = await fetch('/api/datasources/crawl', {
@@ -226,26 +226,7 @@ export default function OnboardingPage() {
         />
       </div>
 
-      {/* 1. TOP NAVBAR */}
-      <nav className="sticky top-0 z-50 h-[64px] md:h-[72px] w-full flex items-center justify-between px-4 md:px-12 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-lg border-b border-gray-200/50 dark:border-zinc-800/50 transition-all">
-        <div className="flex items-center gap-3 group cursor-default">
-          <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-black flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform">
-             <div className="w-full h-full bg-gradient-to-br from-orange-500 to-orange-600 opacity-90 flex items-center justify-center">
-               <div className="w-2.5 h-2.5 md:w-3 md:h-3 bg-white rounded-sm rotate-45 shadow-sm" />
-             </div>
-          </div>
-          <span className="font-semibold text-lg md:text-xl tracking-tight text-black dark:text-zinc-100">AgentDesk</span>
-        </div>
-        
-        <div className="flex items-center gap-4 md:gap-6 text-[13px] md:text-[14px] font-medium text-gray-500 dark:text-zinc-400">
-          <Link href="#" className="hover:text-black dark:hover:text-zinc-100 flex items-center gap-1 transition-colors duration-200">
-             <FileText className="w-3.5 h-3.5 md:w-4 md:h-4 opacity-70" /> <span className="hidden sm:inline">Docs</span>
-          </Link>
-          <Link href="#" className="hover:text-black dark:hover:text-zinc-100 flex items-center gap-1 transition-colors duration-200">
-             <HelpCircle className="w-3.5 h-3.5 md:w-4 md:h-4 opacity-70" /> <span className="hidden sm:inline">Help</span>
-          </Link>
-        </div>
-      </nav>
+
 
       {/* 2. MAIN CONTENT */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 md:py-12 md:pb-28">
