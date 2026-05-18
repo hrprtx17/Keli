@@ -218,7 +218,7 @@ export default function BillingPage() {
                     <Button 
                       variant="outline" 
                       className="w-full mt-8 border-zinc-700 bg-transparent text-zinc-100 hover:bg-zinc-800 rounded-xl h-11 text-xs font-bold shadow-none"
-                      onClick={() => window.location.href = '/plans'}
+                      onClick={() => window.location.href = '/dashboard/upgrade'}
                     >
                        {isPremium ? 'Modify Payment Engine' : 'Attach Vault Instance'}
                     </Button>
@@ -235,7 +235,7 @@ export default function BillingPage() {
                        </div>
                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     </div>
-                    <Button className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border shadow-none text-xs font-bold rounded-xl" onClick={() => window.location.href = '/plans'}>
+                    <Button className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border shadow-none text-xs font-bold rounded-xl" onClick={() => window.location.href = '/dashboard/upgrade'}>
                        Launch Tier Matrix
                     </Button>
                  </div>

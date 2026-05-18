@@ -146,7 +146,7 @@ function DeployPageContent() {
   if (!agentId) return <DashboardLayout><div className="p-12 text-center text-gray-500 font-medium">Please select an agent from the sidebar context.</div></DashboardLayout>;
   if (isLoading) return <DashboardLayout><div className="p-12 flex justify-center"><div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" /></div></DashboardLayout>;
 
-  const actualOrigin = origin || 'https://agentdesk.vercel.app';
+  const actualOrigin = origin || 'http://localhost:3000';
 
   const scripts = {
     widget: `<!-- AgentDesk AI Assistant Widget -->\n<script\n  src="${actualOrigin}/agentdesk.js"\n  data-agent-id="${agentId}"\n  async\n></script>`,

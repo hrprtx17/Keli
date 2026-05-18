@@ -173,7 +173,7 @@ function SettingsPageContent() {
                      <div>
                         <label className="text-[13px] font-medium text-gray-600 dark:text-zinc-400 block mb-2">Workspace ID (Permanent)</label>
                         <div className="flex items-center bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 group cursor-not-allowed">
-                           <span className="text-[14px] font-mono text-gray-400 dark:text-zinc-600 select-none">agentdesk.ai/ws/</span>
+                           <span className="text-[14px] font-mono text-gray-400 dark:text-zinc-600 select-none">/ws/</span>
                            <input 
                              disabled
                              type="text"

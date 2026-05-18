@@ -31,7 +31,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Desktop sidebar (hidden on mobile) */}
       <div className="hidden lg:flex lg:flex-shrink-0">
-        <Suspense fallback={<div className="w-[260px] bg-[#FAFAFA] dark:bg-zinc-950" />}>
+        <Suspense fallback={<div className="w-[240px] bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl" />}>
           <Sidebar />
         </Suspense>
       </div>
@@ -46,7 +46,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Mobile sidebar sliding drawer */}
       <div className={`fixed inset-y-0 left-0 z-50 flex transition duration-300 transform lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Suspense fallback={<div className="w-[260px] bg-[#FAFAFA] dark:bg-zinc-950" />}>
+        <Suspense fallback={<div className="w-[240px] bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl" />}>
           <Sidebar onNavClick={() => setSidebarOpen(false)} />
         </Suspense>
       </div>

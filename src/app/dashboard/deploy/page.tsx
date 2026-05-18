@@ -14,6 +14,7 @@ import {
   Check, Copy, ExternalLink, Globe, Layout, MessageSquare, 
   Terminal, Monitor, Smartphone, Loader2, Lock, Save, RefreshCw 
 } from 'lucide-react'
+import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 
 export default function DeployPage() {
   const { data: session, status } = useSession()
@@ -24,11 +25,18 @@ export default function DeployPage() {
   const [testUrl, setTestUrl] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isStatusSaving, setIsStatusSaving] = useState(false)
+  const [siteUrl, setSiteUrl] = useState('http://localhost:3000')
   const [settings, setSettings] = useState({
     primaryColor: '#FF6B35',
     welcomeMessage: '',
     showBranding: true
   })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSiteUrl(window.location.origin)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -131,7 +139,7 @@ export default function DeployPage() {
     }
   }
 
-  const embedCode = `<!-- AgentDesk Widget -->\n<script\n  src="https://agentdeskk.netlify.app/widget.js"\n  data-agent-id="${agent?._id || '[REAL_AGENT_ID]'}">\n</script>`
+  const embedCode = `<!-- AgentDesk Widget -->\n<script\n  src="${siteUrl}/widget.js"\n  data-agent-id="${agent?._id || '[REAL_AGENT_ID]'}">\n</script>`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(embedCode)
@@ -146,27 +154,21 @@ export default function DeployPage() {
     window.open(url, '_blank')
   }
 
-  if (status === 'loading' || loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-10 h-10 text-[#FF6B35] animate-spin" />
-        <p className="text-zinc-500 font-medium">Synchronizing deployment variables...</p>
-      </div>
-    )
-  }
-
-  if (!agent) {
-    return (
-      <div className="p-8 text-center text-zinc-500 font-medium border border-zinc-200 rounded-2xl max-w-md mx-auto mt-20">
-        Failed to load agent data. Please refresh.
-      </div>
-    )
-  }
-
   const isPremium = workspace?.plan === 'premium'
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl animate-in fade-in duration-500 relative z-10 pb-32">
+    <DashboardLayout>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <Loader2 className="w-8 h-8 text-[#FF6B35] animate-spin" />
+          <p className="text-zinc-500 text-xs font-semibold">Synchronizing deployment variables...</p>
+        </div>
+      ) : !agent ? (
+        <div className="p-8 text-center text-zinc-500 text-xs font-semibold border border-zinc-200/50 rounded-2xl max-w-md mx-auto mt-20 bg-white">
+          Failed to load agent data. Please refresh.
+        </div>
+      ) : (
+        <div className="container mx-auto py-8 px-4 max-w-7xl animate-in fade-in duration-500 relative z-10 pb-32">
       
       {/* PAGE HEADER */}
       <div className="mb-8">
@@ -238,7 +240,7 @@ export default function DeployPage() {
                 <pre className="bg-[#0D0D0D] text-zinc-300 p-5 rounded-xl font-mono text-[13px] overflow-x-auto border border-zinc-800 leading-relaxed">
                   <span className="text-[#8B8B8B]">&lt;!-- AgentDesk Widget --&gt;</span>{'\n'}
                   <span className="text-[#EC592D]">&lt;script</span>{'\n'}
-                  <span className="text-[#9CDCFE]">  src</span><span className="text-zinc-400">=</span><span className="text-[#CE9178]">&quot;https://agentdeskk.netlify.app/widget.js&quot;</span>{'\n'}
+                  <span className="text-[#9CDCFE]">  src</span><span className="text-zinc-400">=</span><span className="text-[#CE9178]">&quot;{siteUrl}/widget.js&quot;</span>{'\n'}
                   <span className="text-[#9CDCFE]">  data-agent-id</span><span className="text-zinc-400">=</span><span className="text-[#CE9178]">&quot;{agent?._id || '[REAL_AGENT_ID]'}&quot;</span>{'\n'}
                   <span className="text-[#EC592D]">&gt;&lt;/script&gt;</span>
                 </pre>
@@ -411,7 +413,7 @@ export default function DeployPage() {
               </div>
               <div className="pt-2">
                 <a 
-                  href="https://agentdeskk.netlify.app/widget-test.html" 
+                  href="http://localhost:3000/widget-test.html" 
                   target="_blank" 
                   className="text-xs text-[#FF6B35] hover:underline font-bold inline-flex items-center gap-1.5"
                 >
@@ -566,5 +568,7 @@ export default function DeployPage() {
       </div>
 
     </div>
+      )}
+    </DashboardLayout>
   )
 }

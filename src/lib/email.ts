@@ -26,7 +26,7 @@ export async function sendTicketEmail(params: EmailTicketParams) {
     return
   }
   
-  const dashboardUrl = `${process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'https://agentdeskk.netlify.app'}/dashboard/inbox?ticket=${ticketId}`
+  const dashboardUrl = `${process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'http://localhost:3000'}/dashboard/inbox?ticket=${ticketId}`
   
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -76,6 +76,7 @@ export async function sendTicketEmail(params: EmailTicketParams) {
     </div>
   `
   
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -83,9 +84,117 @@ export async function sendTicketEmail(params: EmailTicketParams) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: 'AgentDesk Notifications <notifications@agentdeskk.netlify.app>',
+      from: `AgentDesk Notifications <${fromEmail}>`,
       to: [to],
       subject: `[New Ticket] ${subject} — from ${visitorName}`,
+      html
+    })
+  })
+  
+  if (!response.ok) {
+    const err = await response.text()
+    throw new Error(`Resend API error: ${err}`)
+  }
+  
+  return response.json()
+}
+
+interface EmailHumanParams {
+  to: string
+  agentName: string
+  visitorName: string
+  visitorEmail: string
+  message: string
+  conversationId?: string
+}
+
+export async function sendHumanNotificationEmail(params: EmailHumanParams) {
+  const {
+    to, agentName, visitorName, visitorEmail,
+    message, conversationId
+  } = params
+  
+  if (!to) {
+    console.log('[AgentDesk] No notification email configured for this agent')
+    return
+  }
+  
+  if (!process.env.RESEND_API_KEY) {
+    console.log('[AgentDesk] Human Alert Email skipped (no RESEND_API_KEY):', {
+      to, visitorEmail
+    })
+    return
+  }
+  
+  const dashboardUrl = `${process.env.NEXTAUTH_URL || process.env.AUTH_URL || 'http://localhost:3000'}/dashboard/inbox?conversation=${conversationId}`
+  
+  const html = `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+                max-width:600px;margin:0 auto;padding:24px;color:#111;">
+      <div style="background:#F97316;padding:20px 24px;border-radius:12px 12px 0 0;">
+        <h1 style="color:white;margin:0;font-size:20px;">Human Support Request</h1>
+        <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px;">
+          ${agentName} — AgentDesk
+        </p>
+      </div>
+      <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;
+                  border:1px solid #e5e7eb;border-top:none;">
+        <p style="font-size:15px;line-height:1.6;font-weight:500;margin:0 0 16px;">
+          A visitor is requesting a live human agent to take over the conversation.
+        </p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;width:120px;">Name</td>
+            <td style="padding:8px 0;font-weight:500;">${visitorName}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Email</td>
+            <td style="padding:8px 0;font-weight:500;"><a href="mailto:${visitorEmail}" style="color:#F97316;text-decoration:none;">${visitorEmail}</a></td>
+          </tr>
+          ${conversationId ? `
+          <tr>
+            <td style="padding:8px 0;color:#6b7280;">Conversation ID</td>
+            <td style="padding:8px 0;font-family:monospace;font-size:12px;">${conversationId}</td>
+          </tr>
+          ` : ''}
+        </table>
+        
+        <div style="margin-top:16px;padding:16px;background:white;
+                    border-radius:8px;border:1px solid #e5e7eb;">
+          <p style="margin:0 0 6px;font-size:12px;font-weight:500;color:#6b7280;
+                    text-transform:uppercase;letter-spacing:0.05em;">Message / Inquiry</p>
+          <p style="margin:0;font-size:14px;line-height:1.6;">${message || 'No additional message was provided.'}</p>
+        </div>
+        
+        ${conversationId ? `
+        <a href="${dashboardUrl}"
+           style="display:inline-block;margin-top:20px;background:#F97316;
+                  color:white;text-decoration:none;padding:12px 24px;
+                  border-radius:8px;font-weight:500;font-size:14px;
+                  box-shadow: 0 4px 12px rgba(249,115,22,0.25);">
+          Open Chat Inbox →
+        </a>
+        ` : ''}
+        
+        <p style="margin-top:24px;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:12px;">
+          This notification was sent by AgentDesk. 
+          Please contact the customer directly at <a href="mailto:${visitorEmail}" style="color:#9ca3af;">${visitorEmail}</a>.
+        </p>
+      </div>
+    </div>
+  `
+  
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: `AgentDesk Live Alert <${fromEmail}>`,
+      to: [to],
+      subject: `[Live Support Request] from ${visitorName}`,
       html
     })
   })

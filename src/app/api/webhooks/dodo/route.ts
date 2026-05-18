@@ -6,6 +6,13 @@ import DodoPayments from 'dodopayments';
 import SecurityLog from '@/models/SecurityLog';
 
 export async function POST(req: Request) {
+  try {
+    await connectDB();
+  } catch (dbErr) {
+    console.error('Database connection failed in webhook:', dbErr);
+    return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
+  }
+
   const payloadText = await req.text();
   const signature = req.headers.get('webhook-signature') || req.headers.get('dodo-signature');
   
@@ -35,7 +42,6 @@ export async function POST(req: Request) {
   }
 
   try {
-    await connectDB();
 
     // Check if this is a payment success event
     if (event.type === 'payment.succeeded' || event.type === 'payment_intent.succeeded') {
