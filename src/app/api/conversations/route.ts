@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import { connectDB } from '@/lib/db';
 import Conversation from '@/models/Conversation';
+import Message from '@/models/Message';
 import User from '@/models/User';
 
 async function getWorkspaceId(session: any) {
@@ -10,10 +11,19 @@ async function getWorkspaceId(session: any) {
   return dbUser?.workspaceId?.toString() || null;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   await connectDB();
+
+  const { searchParams } = new URL(req.url);
+  const conversationId = searchParams.get('conversationId');
+
+  if (conversationId) {
+    const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
+    return NextResponse.json(messages);
+  }
+
   const workspaceId = await getWorkspaceId(session);
   if (!workspaceId) return NextResponse.json([]);
   const conversations = await Conversation.find({ workspaceId }).sort({ createdAt: -1 }).limit(50);

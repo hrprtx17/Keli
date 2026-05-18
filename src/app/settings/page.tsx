@@ -310,7 +310,7 @@ function SettingsPageContent() {
                      </div>
                      <div className="flex gap-2">
                         <button 
-                          onClick={() => { setFormData({ name: workspace.name, slug: workspace.slug }); setHasChanges(false); }}
+                          onClick={() => { setFormData({ name: workspace.name || '', slug: workspace.slug || '', notificationEmail: agent?.notificationEmail || '' }); setHasChanges(false); }}
                           className="text-[12px] font-medium text-gray-400 hover:text-white px-3 py-1.5 transition-colors"
                         >
                            Revert

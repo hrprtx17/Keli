@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 import { 
   Inbox, 
   Search, 
   Clock, 
-  User, 
+  UserCircle, 
   Mail, 
   Bot, 
   Copy, 
@@ -16,154 +18,284 @@ import {
   AlertCircle,
   FileText,
   Bookmark,
-  CheckCircle,
   Play,
-  XCircle,
-  Save,
-  RotateCw
+  RotateCw,
+  Send,
+  Sparkles,
+  Layers,
+  HelpCircle,
+  MonitorPlay,
+  ArrowRight,
+  ExternalLink,
+  Laptop
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { motion, AnimatePresence } from 'framer-motion'
 
-interface Ticket {
+interface Conversation {
   _id: string
   agentId: string
-  agentName: string
+  workspaceId: string
   sessionId: string
-  visitorName: string
-  visitorEmail: string
-  subject: string
-  description: string
-  conversationHistory: Array<{ role: string, content: string }>
-  status: 'open' | 'in_progress' | 'resolved' | 'closed'
-  priority: 'low' | 'medium' | 'high'
-  ownerId: string
+  customerEmail?: string
+  customerName?: string
+  source: 'widget' | 'dashboard' | 'api'
+  status: 'open' | 'resolved'
+  messageCount: number
   createdAt: string
   updatedAt: string
-  resolvedAt?: string
-  agentNotes?: string
 }
 
-export default function InboxPage() {
-  const [tickets, setTickets] = useState<Ticket[]>([])
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [activeTab, setActiveTab] = useState<'all' | 'open' | 'in_progress' | 'resolved' | 'closed'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [notesText, setNotesText] = useState('')
-  const [copiedId, setCopiedId] = useState(false)
-  const [showMobileDetail, setShowMobileDetail] = useState(false)
+interface Message {
+  _id: string
+  conversationId: string
+  agentId: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  createdAt: string
+}
 
-  // Fetch Tickets
-  const fetchTickets = async (silent = false) => {
-    if (!silent) setIsLoading(true)
+interface Agent {
+  _id: string
+  name: string
+  model?: string
+  welcomeMessage?: string
+}
+
+export default function InboxDashboardPage() {
+  const { data: session, status: sessionStatus } = useSession()
+  const router = useRouter()
+
+  // Layout View Mode: 'inbox' (customer chats) or 'playground' (AI preview sandbox)
+  const [viewMode, setViewMode] = useState<'inbox' | 'playground'>('inbox')
+
+  // Inbox State
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [activeFilter, setActiveFilter] = useState<'all' | 'widget' | 'preview'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoadingList, setIsLoadingList] = useState(true)
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [showMobileDetail, setShowMobileDetail] = useState(false)
+  const [viewedSessionIds, setViewedSessionIds] = useState<Set<string>>(new Set())
+
+  // AI Preview Sandbox State
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null)
+  const [sandboxMessages, setSandboxMessages] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([])
+  const [sandboxInput, setSandboxInput] = useState('')
+  const [isSandboxSending, setIsSandboxSending] = useState(false)
+  const [sandboxConvId, setSandboxConvId] = useState<string | null>(null)
+
+  const messageEndRef = useRef<HTMLDivElement>(null)
+  const sandboxEndRef = useRef<HTMLDivElement>(null)
+
+  // Redirect if unauthenticated
+  useEffect(() => {
+    if (sessionStatus === 'unauthenticated') {
+      router.replace('/login')
+    }
+  }, [sessionStatus, router])
+
+  // Load viewed conversations from localStorage on mount
+  useEffect(() => {
     try {
-      const statusParam = activeTab === 'all' ? 'all' : activeTab
-      const res = await fetch(`/api/tickets?status=${statusParam}&page=${page}`)
-      if (!res.ok) throw new Error('Failed to fetch')
+      const stored = localStorage.getItem('agentdesk_viewed_sessions')
+      if (stored) {
+        setViewedSessionIds(new Set(JSON.parse(stored)))
+      }
+    } catch (e) {}
+  }, [])
+
+  // Auto-scroll messages
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  useEffect(() => {
+    sandboxEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [sandboxMessages])
+
+  // Fetch all conversations
+  const fetchConversations = async (silent = false) => {
+    if (!silent) setIsLoadingList(true)
+    try {
+      const res = await fetch('/api/conversations')
+      if (!res.ok) throw new Error('Failed to retrieve conversations')
       const data = await res.json()
-      
-      setTickets(data.tickets || [])
-      setTotal(data.total || 0)
-      setTotalPages(data.totalPages || 1)
-      
-      // Update selected ticket ref to stay fresh
-      if (selectedTicket) {
-        const updated = (data.tickets as Ticket[]).find(t => t._id === selectedTicket._id)
-        if (updated) {
-          setSelectedTicket(updated)
-          setNotesText(updated.agentNotes || '')
-        }
+      setConversations(data || [])
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to sync conversations list')
+    } finally {
+      if (!silent) setIsLoadingList(false)
+    }
+  }
+
+  // Fetch agents for Sandbox Preview
+  const fetchAgents = async () => {
+    try {
+      const res = await fetch('/api/agents')
+      if (!res.ok) return
+      const data = await res.json()
+      setAgents(data || [])
+      if (data && data.length > 0) {
+        setSelectedAgent(data[0])
+        resetSandboxChat(data[0])
       }
     } catch (err) {
       console.error(err)
-      toast.error('Failed to reload tickets')
-    } finally {
-      if (!silent) setIsLoading(false)
     }
   }
 
-  // Initial and reactive fetch
   useEffect(() => {
-    fetchTickets()
-  }, [activeTab, page])
+    if (session) {
+      fetchConversations()
+      fetchAgents()
+    }
+  }, [session])
 
-  // Polling every 60 seconds
+  // Poll conversations every 30 seconds
   useEffect(() => {
+    if (!session) return
     const interval = setInterval(() => {
-      fetchTickets(true)
-    }, 60000)
+      fetchConversations(true)
+    }, 30000)
     return () => clearInterval(interval)
-  }, [activeTab, page, selectedTicket])
+  }, [session])
 
-  // Reset selected ticket notes when selection changes
+  // Mark session as viewed when clicked
+  const handleSelectConversation = (conv: Conversation) => {
+    setSelectedConversation(conv)
+    setShowMobileDetail(true)
+    
+    setViewedSessionIds(prev => {
+      const next = new Set(prev)
+      if (!next.has(conv._id)) {
+        next.add(conv._id)
+        try {
+          localStorage.setItem('agentdesk_viewed_sessions', JSON.stringify(Array.from(next)))
+        } catch (e) {}
+      }
+      return next
+    })
+  }
+
+  // Load message logs for selected conversation
   useEffect(() => {
-    if (selectedTicket) {
-      setNotesText(selectedTicket.agentNotes || '')
-    }
-  }, [selectedTicket])
+    if (!selectedConversation) return
 
-  // Filter local tickets based on search query
-  const filteredTickets = tickets.filter(ticket => {
-    const query = searchQuery.toLowerCase()
-    return (
-      ticket.visitorName.toLowerCase().includes(query) ||
-      ticket.visitorEmail.toLowerCase().includes(query) ||
-      ticket.subject.toLowerCase().includes(query) ||
-      ticket.description.toLowerCase().includes(query)
-    )
-  })
-
-  // Handle patch updates (optimistic update)
-  const updateTicket = async (ticketId: string, updates: Partial<Ticket>) => {
-    setIsUpdating(true)
-    
-    // Optimistic Update
-    const prevTickets = [...tickets]
-    const prevSelected = selectedTicket ? { ...selectedTicket } : null
-    
-    setTickets(prev => prev.map(t => t._id === ticketId ? { ...t, ...updates } as Ticket : t))
-    if (selectedTicket && selectedTicket._id === ticketId) {
-      setSelectedTicket(prev => prev ? { ...prev, ...updates } as Ticket : null)
+    const loadMessages = async () => {
+      setIsLoadingMessages(true)
+      try {
+        const res = await fetch(`/api/conversations?conversationId=${selectedConversation._id}`)
+        if (!res.ok) throw new Error('Failed to load message history')
+        const data = await res.json()
+        setMessages(data || [])
+      } catch (err) {
+        console.error(err)
+        toast.error('Failed to load message transcript')
+      } finally {
+        setIsLoadingMessages(false)
+      }
     }
+
+    loadMessages()
+  }, [selectedConversation])
+
+  // Copy helper
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedField(text)
+    toast.success(`${label} copied to clipboard`)
+    setTimeout(() => setCopiedField(null), 2000)
+  }
+
+  // Local client side filtering & search
+  const filteredConversations = useMemo(() => {
+    let list = [...conversations]
+
+    // Active tab filters
+    if (activeFilter === 'widget') {
+      list = list.filter(c => c.source === 'widget')
+    } else if (activeFilter === 'preview') {
+      list = list.filter(c => c.source !== 'widget')
+    }
+
+    // Search query filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim()
+      list = list.filter(c => 
+        c.sessionId.toLowerCase().includes(q) ||
+        (c.customerName || '').toLowerCase().includes(q) ||
+        (c.customerEmail || '').toLowerCase().includes(q) ||
+        c._id.toLowerCase().includes(q)
+      )
+    }
+
+    return list
+  }, [conversations, activeFilter, searchQuery])
+
+  // AI Sandbox Chat Simulator handler
+  const resetSandboxChat = (agent: Agent) => {
+    setSandboxMessages([
+      { role: 'assistant', content: agent.welcomeMessage || `Hi! I'm ${agent.name}. How can I assist you today?` }
+    ])
+    setSandboxInput('')
+    setSandboxConvId(null)
+  }
+
+  const handleSendSandboxMessage = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!sandboxInput.trim() || !selectedAgent || isSandboxSending) return
+
+    const promptText = sandboxInput.trim()
+    setSandboxInput('')
+    
+    // Add user message immediately
+    const nextMessages = [...sandboxMessages, { role: 'user' as const, content: promptText }]
+    setSandboxMessages(nextMessages)
+    setIsSandboxSending(true)
 
     try {
-      const res = await fetch(`/api/tickets/${ticketId}`, {
-        method: 'PATCH',
+      const payload: any = {
+        messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
+        agentId: selectedAgent._id
+      }
+      if (sandboxConvId) {
+        payload.conversationId = sandboxConvId
+      }
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
+        body: JSON.stringify(payload)
       })
-      if (!res.ok) throw new Error('Failed to update ticket')
-      toast.success('Ticket updated successfully')
-    } catch (err) {
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'AI request failed')
+      }
+
+      const data = await res.json()
+      setSandboxMessages(prev => [...prev, { role: 'assistant', content: data.reply || 'Sorry, no response returned.' }])
+      if (data.conversationId) {
+        setSandboxConvId(data.conversationId)
+      }
+    } catch (err: any) {
       console.error(err)
-      toast.error('Could not save changes. Reverting...')
-      setTickets(prevTickets)
-      setSelectedTicket(prevSelected)
+      toast.error(err.message || 'AI engine error. Please check your system credits.')
+      setSandboxMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Service error: Please confirm your Groq API keys and credit usage.' }])
     } finally {
-      setIsUpdating(false)
+      setIsSandboxSending(false)
     }
   }
 
-  // Handle Save Notes
-  const saveNotes = () => {
-    if (!selectedTicket) return
-    updateTicket(selectedTicket._id, { agentNotes: notesText })
-  }
-
-  // Copy Ticket ID helper
-  const copyId = (id: string) => {
-    navigator.clipboard.writeText(id)
-    setCopiedId(true)
-    toast.success('Ticket ID copied to clipboard')
-    setTimeout(() => setCopiedId(false), 2000)
-  }
-
-  // Time format helper
+  // Relative time helper
   const timeAgo = (dateStr: string) => {
+    if (!dateStr) return ''
     const now = new Date()
     const then = new Date(dateStr)
     const diffMs = now.getTime() - then.getTime()
@@ -173,432 +305,514 @@ export default function InboxPage() {
     const diffDays = Math.floor(diffHr / 24)
 
     if (diffSec < 60) return 'just now'
-    if (diffMin < 60) return `${diffMin}m ago`
-    if (diffHr < 24) return `${diffHr}h ago`
+    if (diffMin < 60) return `${diffMin}m`
+    if (diffHr < 24) return `${diffHr}h`
     if (diffDays === 1) return 'yesterday'
-    return `${diffDays}d ago`
+    return `${diffDays}d`
   }
 
-  // Status badge styling
-  const getStatusBadge = (status: Ticket['status']) => {
-    switch (status) {
-      case 'open':
-        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-50 dark:bg-orange-950/30 text-orange-600 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30"><span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" /> Open</span>
-      case 'in_progress':
-        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/30"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> In Progress</span>
-      case 'resolved':
-        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-900/30"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Resolved</span>
-      case 'closed':
-        return <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-150 dark:border-zinc-700"><span className="w-1.5 h-1.5 rounded-full bg-gray-500" /> Closed</span>
-    }
+  if (sessionStatus === 'loading') {
+    return (
+      <DashboardLayout>
+        <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
+          <RotateCw className="w-8 h-8 animate-spin text-[#FF6B35]" />
+        </div>
+      </DashboardLayout>
+    )
   }
 
-  // Priority badge styling
-  const getPriorityBadge = (priority: Ticket['priority']) => {
-    switch (priority) {
-      case 'high':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-150 dark:bg-red-950/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/50">High</span>
-      case 'medium':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30">Medium</span>
-      case 'low':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-zinc-800 text-slate-650 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700">Low</span>
-    }
-  }
+  if (!session) return null
 
   return (
     <DashboardLayout>
-      <div className="h-[calc(100vh-80px)] flex flex-col md:flex-row bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-900 rounded-[32px] overflow-hidden shadow-xl">
+      <div className="flex flex-col h-[calc(100vh-100px)] max-w-7xl mx-auto space-y-4 antialiased">
         
-        {/* LEFT PANEL: Ticket List */}
-        <div className={`w-full md:w-[380px] flex-shrink-0 flex flex-col border-r border-gray-200 dark:border-zinc-900 ${showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
-          {/* Header */}
-          <div className="p-6 border-b border-gray-100 dark:border-zinc-900 bg-[#FAFAFA]/50 dark:bg-zinc-950/50 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-bold text-gray-900 dark:text-zinc-500 tracking-tight">Inbox</h1>
-                {total > 0 && (
-                  <span className="bg-orange-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                    {total}
-                  </span>
-                )}
-              </div>
-              <button 
-                onClick={() => fetchTickets(false)} 
-                className="p-2 text-gray-400 hover:text-orange-500 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-lg transition-all"
-                title="Refresh Tickets"
-              >
-                <RotateCw className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex bg-gray-100 dark:bg-zinc-900 p-0.5 rounded-xl text-[12px] font-medium overflow-x-auto scrollbar-none">
-              {(['all', 'open', 'in_progress', 'resolved'] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => { setActiveTab(tab); setPage(1); }}
-                  className={`flex-1 py-1.5 px-3 rounded-lg capitalize whitespace-nowrap transition-all ${
-                    activeTab === tab 
-                      ? 'bg-white dark:bg-zinc-800 text-orange-600 dark:text-orange-400 shadow-sm font-semibold' 
-                      : 'text-gray-500 hover:text-gray-900 dark:hover:text-zinc-200'
-                  }`}
-                >
-                  {tab === 'in_progress' ? 'In Progress' : tab}
-                </button>
-              ))}
-            </div>
-
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search visitor, email, subject..."
-                className="w-full pl-9 pr-4 py-2 text-[13px] bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 rounded-xl outline-none focus:border-orange-500 dark:focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all text-gray-800 dark:text-zinc-200 placeholder:text-gray-400"
-              />
-            </div>
+        {/* HEADER TOOLBAR & TAB PICKER */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 flex-shrink-0">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-150 tracking-tight flex items-center gap-2">
+              <Inbox className="w-6 h-6 text-[#FF6B35]" />
+              Inbox
+            </h1>
+            <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-0.5">
+              Review visitor interactions, widget chats, and simulate agent behavior.
+            </p>
           </div>
 
-          {/* Ticket Row List */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-gray-100 dark:divide-zinc-900">
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className="p-5 animate-pulse space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="h-4 bg-gray-150 dark:bg-zinc-800 rounded w-1/2" />
-                    <div className="h-3 bg-gray-150 dark:bg-zinc-800 rounded w-1/4" />
-                  </div>
-                  <div className="h-3.5 bg-gray-150 dark:bg-zinc-800 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 dark:bg-zinc-850 rounded w-5/6" />
-                </div>
-              ))
-            ) : filteredTickets.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-8 py-20 text-center text-gray-400 dark:text-zinc-600">
-                <div className="w-14 h-14 bg-gray-50 dark:bg-zinc-900 rounded-2xl flex items-center justify-center mb-4 text-gray-300 dark:text-zinc-700">
-                  <Inbox className="w-7 h-7" />
-                </div>
-                <h3 className="text-[14px] font-semibold text-gray-900 dark:text-zinc-300">No tickets yet</h3>
-                <p className="text-[12px] text-gray-500 dark:text-zinc-500 mt-1 max-w-[240px]">
-                  When visitors request human support via the chat widget, new tickets will appear here.
-                </p>
-              </div>
-            ) : (
-              filteredTickets.map(ticket => {
-                const isSelected = selectedTicket?._id === ticket._id
-                return (
-                  <div
-                    key={ticket._id}
-                    onClick={() => {
-                      setSelectedTicket(ticket)
-                      setShowMobileDetail(true)
-                    }}
-                    className={`p-5 cursor-pointer text-left transition-all border-l-3 ${
-                      isSelected
-                        ? 'bg-orange-50/20 dark:bg-orange-950/10 border-orange-500'
-                        : 'border-transparent hover:bg-gray-50/50 dark:hover:bg-zinc-900/30'
-                    }`}
+          {/* Switch Mode Tab Selector */}
+          <div className="flex bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-1 rounded-xl gap-1">
+            <button
+              onClick={() => setViewMode('inbox')}
+              className={`flex items-center gap-2 py-1.5 px-4 rounded-lg text-xs font-bold transition-all ${
+                viewMode === 'inbox'
+                  ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-zinc-350'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              Live Widget Chats
+            </button>
+            
+            <button
+              onClick={() => setViewMode('playground')}
+              className={`flex items-center gap-2 py-1.5 px-4 rounded-lg text-xs font-bold transition-all ${
+                viewMode === 'playground'
+                  ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-zinc-350'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#FF6B35]" />
+              AI Preview Sandbox
+            </button>
+          </div>
+        </div>
+
+        {/* MAIN DISPLAY VIEW */}
+        {viewMode === 'inbox' ? (
+          /* ========================================================================= */
+          /*                       MODE 1: LIVE CHATS VIEW                             */
+          /* ========================================================================= */
+          <div className="flex-1 flex gap-5 overflow-hidden">
+            
+            {/* LEFT SIDEBAR: ALL SESSIONS LIST */}
+            <div className={`w-full md:w-[320px] lg:w-[380px] shrink-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-xs ${selectedConversation && showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
+              
+              {/* Header inside sidebar */}
+              <div className="p-4 border-b border-gray-100 dark:border-zinc-800 space-y-3 flex-shrink-0 bg-gray-50/30 dark:bg-zinc-950/20">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">
+                    Conversations
+                  </span>
+                  <button
+                    onClick={() => fetchConversations(false)}
+                    className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-450 hover:text-[#FF6B35] rounded-md transition-colors"
+                    title="Reload conversations"
                   >
-                    <div className="flex items-start justify-between gap-2 mb-1.5">
-                      <div className="font-bold text-[14px] text-gray-900 dark:text-zinc-200 truncate flex-1">
-                        {ticket.visitorName}
+                    <RotateCw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Sub-Filters: All | User Widget | AI Preview */}
+                <div className="flex bg-gray-100 dark:bg-zinc-950 p-0.5 rounded-lg text-[11px] font-semibold gap-0.5">
+                  {[
+                    { id: 'all', label: 'All' },
+                    { id: 'widget', label: 'Widget' },
+                    { id: 'preview', label: 'Playground' }
+                  ].map(filter => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setActiveFilter(filter.id as any)}
+                      className={`flex-1 py-1 rounded-md text-center transition-all ${
+                        activeFilter === filter.id
+                          ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 shadow-2xs'
+                          : 'text-gray-500 hover:text-gray-900 dark:hover:text-zinc-400'
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search by session or customer info..."
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-zinc-900 border border-gray-255 dark:border-zinc-800 rounded-lg outline-hidden focus:border-[#FF6B35] transition-all text-gray-800 dark:text-zinc-200 placeholder:text-gray-450"
+                  />
+                </div>
+              </div>
+
+              {/* Scrollable List */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-gray-100 dark:divide-zinc-800">
+                {isLoadingList ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="p-4 flex flex-col gap-2 animate-pulse border-b border-gray-100 dark:border-zinc-800">
+                      <div className="flex justify-between items-center">
+                        <div className="h-4 bg-gray-150 dark:bg-zinc-850 rounded w-1/3" />
+                        <div className="h-3 bg-gray-150 dark:bg-zinc-850 rounded w-10" />
                       </div>
-                      <span className="text-[11px] text-gray-400 dark:text-zinc-500 font-medium shrink-0">
-                        {timeAgo(ticket.createdAt)}
+                      <div className="h-3.5 bg-gray-150 dark:bg-zinc-850 rounded w-2/3" />
+                      <div className="h-3 bg-gray-100 dark:bg-zinc-850 rounded w-1/2" />
+                    </div>
+                  ))
+                ) : filteredConversations.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 py-20 text-center">
+                    <div className="w-12 h-12 bg-gray-50 dark:bg-zinc-950 rounded-2xl flex items-center justify-center mb-3 border border-gray-100 dark:border-zinc-850 text-gray-300">
+                      <Inbox className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-xs font-bold text-gray-700 dark:text-zinc-350">No chat sessions</h3>
+                    <p className="text-[10.5px] text-gray-400 dark:text-zinc-500 mt-1 max-w-[200px] leading-relaxed">
+                      Widget interactions and test playground logs will appear here
+                    </p>
+                  </div>
+                ) : (
+                  filteredConversations.map((conv: Conversation) => {
+                    const isSelected = selectedConversation?._id === conv._id
+                    const isUnread = !viewedSessionIds.has(conv._id)
+                    
+                    return (
+                      <div
+                        key={conv._id}
+                        onClick={() => handleSelectConversation(conv)}
+                        className={`relative p-4 cursor-pointer text-left transition-all border-b border-gray-100 dark:border-zinc-800/80 ${
+                          isSelected
+                            ? 'bg-[#FFF5F0] dark:bg-orange-950/10'
+                            : 'hover:bg-gray-50/50 dark:hover:bg-zinc-900/30'
+                        }`}
+                      >
+                        {/* Status side bar indicator */}
+                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${
+                          isSelected ? 'bg-[#FF6B35]' : 'bg-transparent'
+                        }`} />
+
+                        {/* Unread Indicator Dot */}
+                        {isUnread && (
+                          <span className="absolute top-4 right-4 w-2 h-2 bg-[#FF6B35] rounded-full shrink-0" />
+                        )}
+
+                        <div className="flex justify-between items-start gap-2 mb-1">
+                          <span className="font-mono text-xs font-bold text-gray-900 dark:text-zinc-200">
+                            {conv.sessionId?.slice(-8) || conv._id?.slice(-8)}
+                          </span>
+                          <span className="text-[10px] text-gray-400 dark:text-zinc-500">
+                            {timeAgo(conv.createdAt)}
+                          </span>
+                        </div>
+
+                        <div className="text-xs font-medium text-gray-550 dark:text-zinc-400 truncate mb-2">
+                          {conv.customerEmail || conv.customerName || 'Anonymous Visitor'}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-1.5">
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${
+                            conv.source === 'widget'
+                              ? 'bg-orange-50 text-orange-600 border-orange-100 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/30'
+                              : 'bg-zinc-100 text-zinc-650 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-350 dark:border-zinc-700'
+                          }`}>
+                            {conv.source || 'widget'}
+                          </span>
+                          
+                          <span className="text-[10px] text-gray-400 dark:text-zinc-500">
+                            {conv.messageCount || 0} messages
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+
+            </div>
+
+            {/* RIGHT WORKSPACE: ACTIVE CONVERSATION DETAILS & TRANSCRIPT */}
+            <div className={`flex-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-xs ${!selectedConversation || !showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
+              {selectedConversation ? (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  
+                  {/* Top Header Card */}
+                  <div className="p-4 border-b border-gray-150 dark:border-zinc-800 bg-gray-50/20 dark:bg-zinc-950/20 flex items-center justify-between gap-4 flex-shrink-0">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setShowMobileDetail(false)}
+                        className="p-1 border border-gray-250 dark:border-zinc-800 rounded-md md:hidden text-gray-500 hover:bg-gray-50 dark:hover:bg-zinc-800"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="min-w-0 text-left">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-gray-900 dark:text-zinc-100 font-mono">
+                            Session: {selectedConversation.sessionId}
+                          </h3>
+                          <button
+                            onClick={() => handleCopy(selectedConversation.sessionId, 'Session ID')}
+                            className="text-gray-400 hover:text-gray-900 dark:hover:text-zinc-200 p-0.5"
+                          >
+                            {copiedField === selectedConversation.sessionId ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400 dark:text-zinc-500 font-medium">
+                          <span>Source: <strong className="capitalize">{selectedConversation.source}</strong></span>
+                          <span>•</span>
+                          <span>Created {new Date(selectedConversation.createdAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-green-600 dark:text-green-400">
+                        {selectedConversation.status || 'open'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Transcript Scroll Area */}
+                  <div className="flex-1 overflow-y-auto custom-scrollbar p-4 bg-gray-50/25 dark:bg-zinc-950/5 flex flex-col space-y-4">
+                    {isLoadingMessages ? (
+                      <div className="flex-1 flex flex-col items-center justify-center">
+                        <RotateCw className="w-6 h-6 animate-spin text-[#FF6B35]" />
+                        <span className="text-xs text-gray-400 mt-2 font-medium">Loading session transcript...</span>
+                      </div>
+                    ) : messages.length === 0 ? (
+                      <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-gray-400">
+                        <MessageSquare className="w-8 h-8 mb-2 opacity-50" />
+                        <h4 className="text-xs font-bold">No recorded messages</h4>
+                        <p className="text-[10.5px] mt-1">This chat session has not recorded any text exchange yet.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 flex-1">
+                        {messages.map((msg, index) => {
+                          const isUser = msg.role === 'user'
+                          return (
+                            <div
+                              key={msg._id || index}
+                              className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
+                            >
+                              <span className="text-[9px] text-gray-400 dark:text-zinc-500 uppercase tracking-widest font-bold mb-1">
+                                {isUser ? 'Visitor' : 'AI Agent'}
+                              </span>
+                              <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed max-w-[80%] break-words shadow-2xs ${
+                                isUser
+                                  ? 'bg-[#FF6B35] text-white rounded-tr-none'
+                                  : 'bg-white dark:bg-zinc-800 border border-gray-150 dark:border-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none'
+                              }`}>
+                                {msg.content}
+                              </div>
+                              <span className="text-[9px] text-gray-400 mt-1 font-medium">
+                                {timeAgo(msg.createdAt)}
+                              </span>
+                            </div>
+                          )
+                        })}
+                        <div ref={messageEndRef} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Metadata and Stats card footer */}
+                  <div className="p-4 border-t border-gray-150 dark:border-zinc-800 bg-white dark:bg-zinc-900 grid grid-cols-2 md:grid-cols-4 gap-3 text-left text-xs font-medium">
+                    <div className="bg-gray-50/50 dark:bg-zinc-950/40 p-2.5 rounded-lg border border-gray-150 dark:border-zinc-800/80 shadow-3xs">
+                      <span className="text-[9px] text-gray-400 uppercase font-bold tracking-wider block">Customer Name</span>
+                      <span className="text-gray-800 dark:text-zinc-200 mt-1 block truncate">
+                        {selectedConversation.customerName || 'Anonymous'}
                       </span>
                     </div>
 
-                    <div className="text-[12px] text-gray-500 dark:text-zinc-400 truncate mb-2">
-                      {ticket.visitorEmail}
-                    </div>
-
-                    <div className="text-[13px] font-medium text-gray-800 dark:text-zinc-300 truncate mb-3">
-                      {ticket.subject}
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${
-                          ticket.status === 'open' ? 'bg-orange-500' :
-                          ticket.status === 'in_progress' ? 'bg-blue-500' :
-                          ticket.status === 'resolved' ? 'bg-green-500' : 'bg-gray-500'
-                        }`} />
-                        <span className="text-[11px] font-semibold text-gray-600 dark:text-zinc-400 capitalize">
-                          {ticket.status.replace('_', ' ')}
+                    <div className="bg-gray-50/50 dark:bg-zinc-950/40 p-2.5 rounded-lg border border-gray-150 dark:border-zinc-800/80 shadow-3xs flex items-center justify-between">
+                      <div className="min-w-0">
+                        <span className="text-[9px] text-gray-400 uppercase font-bold tracking-wider block">Customer Email</span>
+                        <span className="text-gray-800 dark:text-zinc-200 mt-1 block truncate">
+                          {selectedConversation.customerEmail || 'none'}
                         </span>
                       </div>
-                      {ticket.agentName && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-150 dark:border-zinc-700/60 max-w-[120px] truncate">
-                          🤖 {ticket.agentName}
-                        </span>
+                      {selectedConversation.customerEmail && (
+                        <button
+                          onClick={() => handleCopy(selectedConversation.customerEmail!, 'Email')}
+                          className="text-gray-400 hover:text-gray-900 p-0.5"
+                        >
+                          {copiedField === selectedConversation.customerEmail ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
                       )}
                     </div>
-                  </div>
-                )
-              })
-            )}
-          </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="p-4 border-t border-gray-100 dark:border-zinc-900 bg-[#FAFAFA]/30 dark:bg-zinc-950/20 flex items-center justify-between">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage(p => Math.max(p - 1, 1))}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800 text-[12px] font-semibold disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-zinc-900"
-              >
-                Previous
-              </button>
-              <span className="text-[12px] text-gray-500">
-                Page {page} of {totalPages}
-              </span>
-              <button
-                disabled={page === totalPages}
-                onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800 text-[12px] font-semibold disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-zinc-900"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
+                    <div className="bg-gray-50/50 dark:bg-zinc-950/40 p-2.5 rounded-lg border border-gray-150 dark:border-zinc-800/80 shadow-3xs">
+                      <span className="text-[9px] text-gray-400 uppercase font-bold tracking-wider block">AI Model Assigned</span>
+                      <span className="text-gray-800 dark:text-zinc-200 mt-1 block truncate flex items-center gap-1">
+                        <Bot className="w-3.5 h-3.5 text-[#FF6B35]" />
+                        Llama 3.1
+                      </span>
+                    </div>
 
-        {/* RIGHT PANEL: Ticket Details */}
-        <div className={`flex-1 flex flex-col min-w-0 bg-[#FCFCFD] dark:bg-zinc-950/30 ${showMobileDetail ? 'flex' : 'hidden md:flex'}`}>
-          {selectedTicket ? (
-            <div className="flex-1 flex flex-col h-full overflow-hidden">
-              
-              {/* DETAIL TOP BAR */}
-              <div className="p-6 border-b border-gray-200 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setShowMobileDetail(false)}
-                    className="p-1.5 border border-gray-200 dark:border-zinc-800 rounded-lg md:hidden text-gray-500 hover:bg-gray-50 dark:hover:bg-zinc-900"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <div className="min-w-0 text-left">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-zinc-100 truncate">
-                      {selectedTicket.visitorName}
-                    </h2>
-                    <p className="text-xs text-gray-500 dark:text-zinc-400 truncate flex items-center gap-1.5 mt-0.5">
-                      <Mail className="w-3.5 h-3.5" />
-                      {selectedTicket.visitorEmail}
-                    </p>
+                    <div className="bg-gray-50/50 dark:bg-zinc-950/40 p-2.5 rounded-lg border border-gray-150 dark:border-zinc-800/80 shadow-3xs">
+                      <span className="text-[9px] text-gray-400 uppercase font-bold tracking-wider block">Platform Context</span>
+                      <span className="text-gray-800 dark:text-zinc-200 mt-1 block truncate capitalize">
+                        {selectedConversation.source || 'web widget'}
+                      </span>
+                    </div>
                   </div>
+
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2.5">
-                  {/* Priority display */}
-                  {getPriorityBadge(selectedTicket.priority)}
-
-                  {/* Status Dropdown selector */}
-                  <div className="relative">
-                    <select
-                      value={selectedTicket.status}
-                      disabled={isUpdating}
-                      onChange={e => updateTicket(selectedTicket._id, { status: e.target.value as any })}
-                      className="bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 rounded-xl px-3 py-1.5 text-xs font-semibold text-gray-700 dark:text-zinc-300 outline-none focus:border-orange-500 transition-all cursor-pointer"
-                    >
-                      <option value="open">Open</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="resolved">Resolved</option>
-                      <option value="closed">Closed</option>
-                    </select>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                  <div className="w-16 h-16 bg-gray-50 dark:bg-zinc-950 border border-gray-150 dark:border-zinc-850 text-gray-450 rounded-full flex items-center justify-center mb-3 shadow-3xs">
+                    <MessageSquare className="w-7 h-7" />
                   </div>
-
-                  {/* Quick action: Mark Resolved if open */}
-                  {(selectedTicket.status === 'open' || selectedTicket.status === 'in_progress') && (
-                    <button
-                      onClick={() => updateTicket(selectedTicket._id, { status: 'resolved' })}
-                      className="px-3.5 py-1.5 rounded-xl bg-green-600 hover:bg-green-700 text-white text-xs font-semibold transition-all flex items-center gap-1 shadow-sm"
-                    >
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      Mark Resolved
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* CONSOLE SPLIT: Detail Body */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
-                
-                {/* Subject Header */}
-                <div className="bg-white dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-150 dark:border-zinc-900/60 shadow-sm text-left">
-                  <span className="text-[10px] font-bold tracking-wider text-orange-600 dark:text-orange-400 uppercase">
-                    TICKET SUBJECT
-                  </span>
-                  <h3 className="text-base font-bold text-gray-900 dark:text-zinc-150 mt-1">
-                    {selectedTicket.subject}
-                  </h3>
-                </div>
-
-                {/* Description Highlight */}
-                <div className="bg-orange-50/10 dark:bg-orange-950/5 border border-orange-100 dark:border-orange-900/10 rounded-2xl p-5 text-left">
-                  <div className="flex items-center gap-2 mb-2 text-xs font-bold text-orange-650 dark:text-orange-400 uppercase tracking-wide">
-                    <FileText className="w-4 h-4 shrink-0" />
-                    Visitor's Problem Description
-                  </div>
-                  <p className="text-[14px] text-gray-800 dark:text-zinc-250 leading-relaxed font-medium">
-                    {selectedTicket.description}
+                  <h3 className="text-sm font-bold text-gray-800 dark:text-zinc-200">Inspect Conversational Sessions</h3>
+                  <p className="text-xs text-gray-400 dark:text-zinc-500 mt-1 max-w-[240px] leading-relaxed">
+                    Select a conversation on the left to read customer questions and AI replies in real-time.
                   </p>
                 </div>
+              )}
+            </div>
 
-                {/* Conversation History Stream */}
-                {selectedTicket.conversationHistory && selectedTicket.conversationHistory.length > 0 && (
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500 text-left">
-                      Chat Context Transcript ({selectedTicket.conversationHistory.length} messages)
-                    </h4>
-                    
-                    <div className="border border-gray-150 dark:border-zinc-900 rounded-2xl bg-white dark:bg-zinc-900 p-5 space-y-4 max-h-[360px] overflow-y-auto custom-scrollbar">
-                      {selectedTicket.conversationHistory.map((msg, index) => {
-                        const isUser = msg.role === 'user'
-                        return (
-                          <div 
-                            key={index} 
-                            className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
-                          >
-                            <div className="text-[10px] text-gray-400 dark:text-zinc-500 font-semibold mb-1 uppercase tracking-wider">
-                              {isUser ? 'Visitor' : `AI Agent (${selectedTicket.agentName})`}
-                            </div>
-                            <div className={`px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed max-w-[85%] break-words shadow-sm ${
-                              isUser 
-                                ? 'bg-orange-500 text-white font-medium rounded-tr-none' 
-                                : 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none border border-gray-150 dark:border-zinc-800'
-                            }`}>
-                              {msg.content}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
+          </div>
+        ) : (
+          /* ========================================================================= */
+          /*                    MODE 2: AI PLAYGROUND SANDBOX                          */
+          /* ========================================================================= */
+          <div className="flex-1 flex gap-5 overflow-hidden">
+            
+            {/* LEFT SELECTOR: CHOOSE AI AGENT TO PREVIEW */}
+            <div className="w-full md:w-[300px] lg:w-[340px] shrink-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl flex flex-col overflow-hidden shadow-xs">
+              
+              <div className="p-4 border-b border-gray-100 dark:border-zinc-800 flex-shrink-0 bg-gray-50/30 dark:bg-zinc-950/20 text-left">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#FF6B35] block mb-1">
+                  Agent Preview Configuration
+                </span>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-zinc-200">
+                  Select AI Agent to Test
+                </h3>
+              </div>
+
+              {/* Agents list select */}
+              <div className="flex-1 p-3 overflow-y-auto custom-scrollbar space-y-2">
+                {agents.length === 0 ? (
+                  <div className="py-12 text-center text-xs text-gray-400">
+                    No agents found. Create one first!
                   </div>
+                ) : (
+                  agents.map(agent => {
+                    const isSelected = selectedAgent?._id === agent._id
+                    return (
+                      <div
+                        key={agent._id}
+                        onClick={() => {
+                          setSelectedAgent(agent)
+                          resetSandboxChat(agent)
+                        }}
+                        className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-[#FFF5F0] border-[#FF6B35] dark:bg-orange-950/10 dark:border-orange-500/80 shadow-2xs'
+                            : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 hover:bg-gray-50/50 dark:hover:bg-zinc-900/30'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <Bot className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[#FF6B35]' : 'text-gray-400'}`} />
+                          <span className="font-bold text-xs text-gray-800 dark:text-zinc-200 truncate flex-1">
+                            {agent.name}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-gray-400 dark:text-zinc-500 truncate">
+                          Engine: {agent.model || 'Llama 3.1 8B'}
+                        </p>
+                      </div>
+                    )
+                  })
                 )}
+              </div>
 
-                {/* Ticket Metadata Info */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/50 dark:bg-zinc-900/30 p-5 rounded-2xl border border-gray-200 dark:border-zinc-900/60 text-left">
-                  <div className="space-y-3.5">
-                    <div>
-                      <div className="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Ticket ID</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="font-mono text-xs font-semibold text-gray-800 dark:text-zinc-300">
-                          {selectedTicket._id}
-                        </span>
-                        <button
-                          onClick={() => copyId(selectedTicket._id)}
-                          className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded text-gray-400 hover:text-gray-900"
-                        >
-                          {copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                    </div>
+              {/* Informative info footer */}
+              <div className="p-3 bg-gray-50 dark:bg-zinc-950/30 border-t border-gray-100 dark:border-zinc-800 text-[11px] text-gray-400 text-left leading-relaxed flex gap-2">
+                <HelpCircle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                <span>
+                  The sandbox lets you converse instantly with your trained agent. This simulates the exact live widget behavior.
+                </span>
+              </div>
 
-                    <div>
-                      <div className="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Created Date</div>
-                      <div className="text-xs font-semibold text-gray-700 dark:text-zinc-300 mt-1 flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-gray-400" />
-                        {new Date(selectedTicket.createdAt).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'short' })}
-                      </div>
-                    </div>
-                  </div>
+            </div>
 
-                  <div className="space-y-3.5">
-                    <div>
-                      <div className="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Assigned Agent</div>
-                      <div className="text-xs font-semibold text-gray-700 dark:text-zinc-300 mt-1 flex items-center gap-1.5">
-                        <Bot className="w-4 h-4 text-orange-500" />
-                        {selectedTicket.agentName} (ID: {selectedTicket.agentId})
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Session Identifier</div>
-                      <div className="text-xs font-mono text-gray-500 dark:text-zinc-400 mt-1 truncate">
-                        {selectedTicket.sessionId}
-                      </div>
-                    </div>
-                  </div>
+            {/* RIGHT SIDEBAR: SANDBOX SIMULATOR GRAPHICS */}
+            <div className="flex-1 bg-[#FAFAFA] dark:bg-zinc-950/10 border border-gray-200 dark:border-zinc-800 rounded-2xl flex items-center justify-center p-4">
+              
+              {/* WIDGET PHONE SIMULATOR SHELL */}
+              <div className="w-full max-w-[380px] h-[520px] bg-white dark:bg-zinc-900 border-4 border-gray-800 dark:border-zinc-800 rounded-[32px] flex flex-col shadow-2xl overflow-hidden relative">
+                
+                {/* Simulator speaker camera header notch */}
+                <div className="w-32 h-4 bg-gray-800 dark:bg-zinc-800 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl z-50 flex items-center justify-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-650" />
+                  <span className="w-8 h-1 bg-zinc-650 rounded-full" />
                 </div>
 
-                {/* NOTES SECTION */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-450 dark:text-zinc-400 uppercase tracking-wider">
-                      <Bookmark className="w-4 h-4 text-orange-500 shrink-0" />
-                      Internal Agent Notes
+                {/* Simulated Widget Top Header */}
+                <div className="bg-gradient-to-r from-[#FF6B35] to-[#FF8C64] p-4 pt-6 text-white text-left flex items-center justify-between shadow-sm">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 bg-white/20 backdrop-blur-xs rounded-full flex items-center justify-center shadow-2xs shrink-0">
+                      <Bot className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-[10px] font-semibold text-gray-400 italic">
-                      Private — only visible to you
-                    </span>
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-bold truncate leading-tight">
+                        {selectedAgent?.name || 'Support Agent'}
+                      </h4>
+                      <span className="text-[9px] text-orange-100 font-medium flex items-center gap-1 mt-0.5">
+                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full shrink-0 animate-ping" />
+                        AI Online
+                      </span>
+                    </div>
                   </div>
                   
-                  <div className="space-y-2 text-right">
-                    <textarea
-                      rows={3}
-                      value={notesText}
-                      onChange={e => setNotesText(e.target.value)}
-                      placeholder="Write private details, logs, reminders, or resolution progress here..."
-                      className="w-full p-4 text-[13.5px] bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 rounded-2xl outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all text-gray-800 dark:text-zinc-200 placeholder:text-gray-400 resize-none shadow-sm"
-                    />
-                    <button
-                      onClick={saveNotes}
-                      disabled={isUpdating}
-                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center gap-1.5 ml-auto"
-                    >
-                      <Save className="w-3.5 h-3.5" />
-                      Save Internal Notes
-                    </button>
-                  </div>
+                  <button 
+                    onClick={() => {
+                      if (selectedAgent) resetSandboxChat(selectedAgent)
+                    }} 
+                    className="p-1 hover:bg-white/10 rounded-md text-white"
+                    title="Reset Simulator Chat"
+                  >
+                    <RotateCw className="w-3.5 h-3.5" />
+                  </button>
                 </div>
 
-                {/* STATUS ACTIONS ROW */}
-                <div className="border-t border-gray-150 dark:border-zinc-900 pt-6">
-                  <div className="text-[11px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-3 text-left">
-                    Workflow Actions
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <button
-                      onClick={() => updateTicket(selectedTicket._id, { status: 'in_progress' })}
-                      className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/20 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-semibold border border-blue-150 dark:border-blue-900/30 transition-all flex items-center gap-1.5"
-                    >
-                      <Play className="w-3 h-3 fill-current" />
-                      Mark In Progress
-                    </button>
-
-                    <button
-                      onClick={() => updateTicket(selectedTicket._id, { status: 'resolved' })}
-                      className="px-4 py-2 rounded-xl bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-semibold border border-green-150 dark:border-green-900/30 transition-all flex items-center gap-1.5"
-                    >
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      Mark Resolved
-                    </button>
-
-                    <button
-                      onClick={() => updateTicket(selectedTicket._id, { status: 'closed' })}
-                      className="px-4 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-zinc-900 dark:hover:bg-zinc-800/80 text-gray-650 dark:text-zinc-350 text-xs font-semibold border border-gray-150 dark:border-zinc-800 transition-all flex items-center gap-1.5"
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                      Close Ticket
-                    </button>
-                  </div>
+                {/* Simulated Chat Feed viewport */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3 bg-[#FCFCFD] dark:bg-zinc-950/20 flex flex-col">
+                  {sandboxMessages.map((msg, index) => {
+                    const isUser = msg.role === 'user'
+                    return (
+                      <div
+                        key={index}
+                        className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
+                      >
+                        <div className={`px-3.5 py-2.5 rounded-xl text-xs max-w-[85%] break-words leading-relaxed shadow-3xs ${
+                          isUser
+                            ? 'bg-[#FF6B35] text-white rounded-tr-none'
+                            : 'bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none'
+                        }`}>
+                          {msg.content}
+                        </div>
+                      </div>
+                    )
+                  })}
+                  
+                  {isSandboxSending && (
+                    <div className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                      <Bot className="w-3.5 h-3.5 text-[#FF6B35] animate-bounce shrink-0" />
+                      <span>Agent is searching knowledge & replying...</span>
+                    </div>
+                  )}
+                  <div ref={sandboxEndRef} />
                 </div>
 
+                {/* Simulated Input Bar Footer */}
+                <form 
+                  onSubmit={handleSendSandboxMessage}
+                  className="p-2.5 bg-white dark:bg-zinc-900 border-t border-gray-150 dark:border-zinc-800 flex items-center gap-2"
+                >
+                  <input
+                    type="text"
+                    value={sandboxInput}
+                    onChange={e => setSandboxInput(e.target.value)}
+                    placeholder="Type message to test AI..."
+                    disabled={isSandboxSending}
+                    className="flex-1 px-3 py-1.5 text-xs bg-gray-50 dark:bg-zinc-950 border border-gray-255 dark:border-zinc-800 rounded-xl outline-hidden focus:border-[#FF6B35] transition-all text-gray-850 dark:text-zinc-250 placeholder:text-gray-450"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!sandboxInput.trim() || isSandboxSending}
+                    className="w-7 h-7 bg-[#FF6B35] hover:bg-[#FF6B35]/95 disabled:bg-gray-200 dark:disabled:bg-zinc-800 text-white rounded-full flex items-center justify-center shrink-0 shadow-2xs hover:shadow transition-all"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+
               </div>
+
             </div>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-650 p-6 text-center">
-              <div className="w-16 h-16 bg-gray-50 dark:bg-zinc-900 rounded-3xl flex items-center justify-center mb-4 text-gray-300 dark:text-zinc-700 shadow-sm border border-gray-100 dark:border-zinc-900">
-                <MessageSquare className="w-7 h-7" />
-              </div>
-              <h3 className="text-[15px] font-semibold text-gray-900 dark:text-zinc-400">No ticket selected</h3>
-              <p className="text-[13px] text-gray-500 dark:text-zinc-550 mt-1 max-w-[280px]">
-                Click on a ticket from the left panel to inspect visitor details, AI conversations, and internal notes.
-              </p>
-            </div>
-          )}
-        </div>
+
+          </div>
+        )}
 
       </div>
     </DashboardLayout>

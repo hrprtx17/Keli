@@ -6,7 +6,7 @@ import {
   MessageSquare, Settings, LogOut, ChevronDown, Zap, 
   BarChart3, Database, Rocket, Bot, Plus, Search, Check,
   UserCircle, CreditCard, PieChart, Inbox, PlayCircle, Fingerprint, Network,
-  Sun, Moon
+  Sun, Moon, Ticket
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useRef, useEffect } from 'react';
@@ -127,7 +127,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       >
         {Icon && <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-orange-500' : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-600 dark:group-hover:text-zinc-300 transition-colors'}`} />}
         <span className="flex-1 truncate">{children}</span>
-        {children === 'Inbox' && openTicketsCount > 0 && (
+        {(children === 'Inbox' || children === 'Tickets') && openTicketsCount > 0 && (
           <span 
             className="absolute top-1/2 -translate-y-1/2 right-3 flex items-center justify-center rounded-full font-bold text-white bg-[#FF6B35]"
             style={{
@@ -244,6 +244,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
         <NavSection title="Main">
           <NavLink href={`/agents/${activeAgentId || ''}`} icon={PlayCircle} exact>AI Preview</NavLink>
           <NavLink href="/dashboard/inbox" icon={Inbox}>Inbox</NavLink>
+          <NavLink href="/dashboard/tickets" icon={Ticket}>Tickets</NavLink>
           <NavLink href="/dashboard" icon={PieChart}>Insights</NavLink>
         </NavSection>
 
