@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         let rawText = '';
 
         if (file.type === 'application/pdf' || nameLower.endsWith('.pdf')) {
-          const pdf = require('pdf-parse');
+          const pdf = await import('pdf-parse').then(m => m.default || m);
           const result = await pdf(buffer);
           rawText = result.text;
         } else if (nameLower.endsWith('.docx')) {

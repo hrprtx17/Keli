@@ -1,4 +1,5 @@
 'use client';
+import { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,10 +45,15 @@ export default function InsightsPage() {
   const totalCredits = (workspace?.usage?.monthlyCredits || 500) + (workspace?.usage?.addonCredits || 0);
   const creditPct = Math.min(Math.round((creditsUsed / Math.max(totalCredits, 1)) * 100), 100);
 
-  const activityData = weekDays.map((name) => ({ 
-    name, 
-    conversations: creditsUsed > 0 ? Math.floor(Math.random() * 10) : 0 
-  }));
+  const activityData = useMemo(() => {
+    const dayValues: Record<string, number> = {
+      Mon: 3, Tue: 5, Wed: 2, Thu: 8, Fri: 4, Sat: 7, Sun: 6
+    };
+    return weekDays.map((name) => ({ 
+      name, 
+      conversations: creditsUsed > 0 ? (dayValues[name] || 0) : 0 
+    }));
+  }, [creditsUsed]);
 
   return (
     <DashboardLayout>

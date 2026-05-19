@@ -38,13 +38,6 @@ export default function DeployPage() {
     }
   }, [])
 
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchAgent()
-      fetchWorkspace()
-    }
-  }, [status])
-
   const fetchWorkspace = async () => {
     try {
       const res = await fetch('/api/workspace')
@@ -78,6 +71,13 @@ export default function DeployPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchAgent()
+      fetchWorkspace()
+    }
+  }, [status])
 
   const handleToggleDeploy = async (checked: boolean) => {
     if (!agent) return

@@ -13,6 +13,80 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
+interface NavLinkProps {
+  href: string;
+  icon?: any;
+  children: React.ReactNode;
+  exact?: boolean;
+  isLocked?: boolean;
+  pathname: string;
+  activeAgentId?: string;
+  onNavClick?: () => void;
+  openTicketsCount: number;
+}
+
+function NavLink({ href, icon: Icon, children, exact = false, isLocked = false, pathname, activeAgentId, onNavClick, openTicketsCount }: NavLinkProps) {
+  const isActive = exact ? pathname === href : (pathname === href || pathname.startsWith(href));
+  
+  const finalHref = (activeAgentId && !href.startsWith('/agents') && href !== '#' && !href.includes('?')) 
+    ? `${href}?agentId=${activeAgentId}` 
+    : href;
+
+  if (isLocked) {
+    return (
+      <div className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-[13px] font-medium text-gray-400 dark:text-zinc-500 cursor-not-allowed transition-all opacity-70">
+         <div className="flex items-center gap-3">
+           {Icon && <Icon className="h-4.5 w-4.5 shrink-0 opacity-60" />}
+           <span className="truncate">{children}</span>
+         </div>
+         <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-1.5 py-0.5 rounded-md">Soon</span>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={finalHref}
+      onClick={onNavClick}
+      className={`group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12.5px] font-semibold transition-all duration-200 ${
+        isActive
+          ? 'bg-gray-100/60 dark:bg-zinc-900/60 text-zinc-950 dark:text-zinc-50 border border-gray-200/30 dark:border-zinc-800/40 shadow-sm'
+          : 'text-gray-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-gray-100/30 dark:hover:bg-zinc-900/30 hover:translate-x-[2px]'
+      }`}
+    >
+      {isActive && (
+        <span className="absolute left-0 top-2 bottom-2 w-0.75 rounded-r-full bg-[#FF6B35] shadow-[0_0_8px_#FF6B35]" />
+      )}
+      {Icon && <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#FF6B35]' : 'text-gray-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors'}`} />}
+      <span className="flex-1 truncate">{children}</span>
+      {(children === 'Inbox' || children === 'Tickets') && openTicketsCount > 0 && (
+        <span 
+          className="absolute top-1/2 -translate-y-1/2 right-2.5 flex items-center justify-center rounded-full font-bold text-white bg-[#FF6B35] shadow-sm animate-pulse"
+          style={{
+            width: '16px',
+            height: '16px',
+            fontSize: '9px',
+            lineHeight: '1',
+          }}
+        >
+          {openTicketsCount >= 10 ? '9+' : openTicketsCount}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function NavSection({ title, children }: { title: string, children: React.ReactNode }) {
+  return (
+    <div className="mb-5 last:mb-0">
+      <div className="px-2.5 mb-1.5 text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">{title}</div>
+      <div className="space-y-0.5">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -95,65 +169,19 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const NavLink = ({ href, icon: Icon, children, exact = false, isLocked = false }: any) => {
-    const isActive = exact ? pathname === href : (pathname === href || pathname.startsWith(href));
-    
-    // Auto-tether active context
-    const finalHref = (activeAgentId && !href.startsWith('/agents') && href !== '#' && !href.includes('?')) 
-      ? `${href}?agentId=${activeAgentId}` 
-      : href;
-
-    if (isLocked) {
-      return (
-        <div className="group flex items-center justify-between rounded-xl px-3 py-2.5 text-[13px] font-medium text-gray-400 dark:text-zinc-500 cursor-not-allowed transition-all opacity-70">
-           <div className="flex items-center gap-3">
-             {Icon && <Icon className="h-4.5 w-4.5 shrink-0 opacity-60" />}
-             <span className="truncate">{children}</span>
-           </div>
-           <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 px-1.5 py-0.5 rounded-md">Soon</span>
-        </div>
-      );
-    }
-
-    return (
-      <Link
-        href={finalHref}
-        onClick={onNavClick}
-        className={`group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[12.5px] font-semibold transition-all duration-200 ${
-          isActive
-            ? 'bg-gray-100/60 dark:bg-zinc-900/60 text-zinc-950 dark:text-zinc-50 border border-gray-200/30 dark:border-zinc-800/40 shadow-sm'
-            : 'text-gray-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-gray-100/30 dark:hover:bg-zinc-900/30 hover:translate-x-[2px]'
-        }`}
-      >
-        {isActive && (
-          <span className="absolute left-0 top-2 bottom-2 w-0.75 rounded-r-full bg-[#FF6B35] shadow-[0_0_8px_#FF6B35]" />
-        )}
-        {Icon && <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[#FF6B35]' : 'text-gray-400 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300 transition-colors'}`} />}
-        <span className="flex-1 truncate">{children}</span>
-        {(children === 'Inbox' || children === 'Tickets') && openTicketsCount > 0 && (
-          <span 
-            className="absolute top-1/2 -translate-y-1/2 right-2.5 flex items-center justify-center rounded-full font-bold text-white bg-[#FF6B35] shadow-sm animate-pulse"
-            style={{
-              width: '16px',
-              height: '16px',
-              fontSize: '9px',
-              lineHeight: '1',
-            }}
-          >
-            {openTicketsCount >= 10 ? '9+' : openTicketsCount}
-          </span>
-        )}
-      </Link>
-    );
-  };
-
-  const NavSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <div className="mb-5 last:mb-0">
-      <div className="px-2.5 mb-1.5 text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">{title}</div>
-      <div className="space-y-0.5">
-        {children}
-      </div>
-    </div>
+  const renderLink = (href: string, icon: any, label: string, exact = false, isLocked = false) => (
+    <NavLink
+      href={href}
+      icon={icon}
+      exact={exact}
+      isLocked={isLocked}
+      pathname={pathname}
+      activeAgentId={activeAgentId}
+      onNavClick={onNavClick}
+      openTicketsCount={openTicketsCount}
+    >
+      {label}
+    </NavLink>
   );
 
   const filteredAgents = agents?.filter((a: any) => a.name.toLowerCase().includes(searchQuery.toLowerCase())) || [];
@@ -245,29 +273,29 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       {/* 2. MAIN NAVIGATION */}
       <nav className="flex-1 overflow-y-auto px-3 py-1 custom-scrollbar">
         <NavSection title="Main">
-          <NavLink href={`/agents/${activeAgentId || ''}`} icon={PlayCircle} exact>AI Preview</NavLink>
-          <NavLink href="/dashboard/inbox" icon={Inbox}>Inbox</NavLink>
-          <NavLink href="/dashboard/tickets" icon={Ticket}>Tickets</NavLink>
-          <NavLink href="/dashboard" icon={PieChart} exact>Insights</NavLink>
+          {renderLink(`/agents/${activeAgentId || ''}`, PlayCircle, 'AI Preview', true)}
+          {renderLink('/dashboard/inbox', Inbox, 'Inbox')}
+          {renderLink('/dashboard/tickets', Ticket, 'Tickets')}
+          {renderLink('/dashboard', PieChart, 'Insights', true)}
         </NavSection>
 
         <NavSection title="AI Agent">
-          <NavLink href={`/agents/${activeAgentId || ''}/identity`} icon={Fingerprint} exact>Identity</NavLink>
-          <NavLink href="/knowledge" icon={Database}>Training Data</NavLink>
-          <NavLink href="/dashboard/deploy" icon={Rocket}>Deploy</NavLink>
-          <NavLink href="#" icon={Network} isLocked>Integrations</NavLink>
+          {renderLink(`/agents/${activeAgentId || ''}/identity`, Fingerprint, 'Identity', true)}
+          {renderLink('/knowledge', Database, 'Training Data')}
+          {renderLink('/dashboard/deploy', Rocket, 'Deploy')}
+          {renderLink('#', Network, 'Integrations', false, true)}
         </NavSection>
 
         <NavSection title="General">
-          <NavLink href="/settings" icon={Settings}>Settings</NavLink>
+          {renderLink('/settings', Settings, 'Settings')}
         </NavSection>
       </nav>
 
       {/* 3. BOTTOM BAR */}
       <div className="p-3 mt-auto border-t border-gray-200/40 dark:border-zinc-900 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-md">
         <div className="space-y-0.5 mb-3">
-           <NavLink href="/dashboard/upgrade" icon={Zap} exact>Upgrade</NavLink>
-           <NavLink href="/usage" icon={BarChart3} exact>Usage</NavLink>
+           {renderLink('/dashboard/upgrade', Zap, 'Upgrade', true)}
+           {renderLink('/usage', BarChart3, 'Usage', true)}
         </div>
 
         <div className="flex items-center justify-between px-1.5 pt-2.5 border-t border-gray-200/40 dark:border-zinc-900">

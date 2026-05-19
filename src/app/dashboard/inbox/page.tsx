@@ -118,6 +118,15 @@ export default function InboxDashboardPage() {
     sandboxEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [sandboxMessages])
 
+  // AI Sandbox Chat Simulator handler
+  const resetSandboxChat = (agent: Agent) => {
+    setSandboxMessages([
+      { role: 'assistant', content: agent.welcomeMessage || `Hi! I'm ${agent.name}. How can I assist you today?` }
+    ])
+    setSandboxInput('')
+    setSandboxConvId(null)
+  }
+
   // Fetch all conversations
   const fetchConversations = async (silent = false) => {
     if (!silent) setIsLoadingList(true)
@@ -238,14 +247,7 @@ export default function InboxDashboardPage() {
     return list
   }, [conversations, activeFilter, searchQuery])
 
-  // AI Sandbox Chat Simulator handler
-  const resetSandboxChat = (agent: Agent) => {
-    setSandboxMessages([
-      { role: 'assistant', content: agent.welcomeMessage || `Hi! I'm ${agent.name}. How can I assist you today?` }
-    ])
-    setSandboxInput('')
-    setSandboxConvId(null)
-  }
+
 
   const handleSendSandboxMessage = async (e: React.FormEvent) => {
     e.preventDefault()
