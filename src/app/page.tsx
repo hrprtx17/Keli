@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Bot, Sun, Moon, Menu, X, ChevronRight, MessageSquare, Zap, Shield, 
-  BarChart3, Star, Check, UploadCloud, Code2, Rocket, Globe, Users, 
-  ArrowRight, PlayCircle, Sparkles, Mail, Headphones, FileText, Briefcase
+  Sun, Moon, Menu, X, MessageSquare, Zap, Shield, 
+  BarChart3, Star, Check, UploadCloud, Code2, Rocket, Globe,
+  ArrowRight, Sparkles, FileText, Bot
 } from 'lucide-react';
+import { AgentDeskLogo } from '@/components/Logo';
 
 // --- COMPONENT: TYPING EFFECT LOOP ---
 const TYPING_WORDS = ["Ready", "Online", "Watching", "Learning", "Working"];
@@ -58,8 +59,7 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [priceAnnual, setPriceAnnual] = useState(false);
 
-  const { scrollYProgress } = useScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+
 
   useEffect(() => {
     setMounted(true);
@@ -93,12 +93,7 @@ export default function LandingPage() {
         `}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1.5 sm:gap-2.5 group">
-            <div className="w-7 h-7 sm:w-9 sm:h-9 bg-gradient-to-br from-orange-500 to-amber-400 rounded-[10px] sm:rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform transition group-hover:rotate-6">
-              <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white stroke-[2.5px]" />
-            </div>
-            <span className="font-black text-[16px] sm:text-lg md:text-xl tracking-tighter text-zinc-900 dark:text-zinc-50">Agent Desk</span>
-          </Link>
+          <AgentDeskLogo size="md" />
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
@@ -194,86 +189,121 @@ export default function LandingPage() {
             transition={{ duration: 0.6 }}
             className="text-left"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3 h-3" /> AI Support Core v2.0
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-[11px] font-bold uppercase tracking-widest mb-7">
+              <Sparkles className="w-3 h-3" /> AI-Powered Customer Support
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-6">
-              Your AI Support Team Is Always <br />
-              <TypingText />
+            <h1 className="text-[46px] sm:text-[58px] lg:text-[68px] font-black leading-[1.08] tracking-[-0.03em] mb-6">
+              Your AI Support<br />Team Is Always{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-400">
+                <TypingText />
+              </span>
             </h1>
-            <p className="text-lg text-zinc-600 dark:text-zinc-400 font-medium mb-10 max-w-xl leading-relaxed">
-              Agent Desk injects intelligent adaptive layers into your website. Answer customers instantly, automate complex ticketing workflows, and 10x your resolution rates.
+            <p className="text-[17px] text-zinc-600 dark:text-zinc-400 font-medium mb-10 max-w-lg leading-[1.7]">
+              Deploy AI agents trained on your content. Resolve tickets instantly, automate workflows, and deliver 24/7 support without hiring a single rep.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
               <Link href="/register">
-                <motion.button whileHover={{ scale: 1.03 }} className="h-14 px-8 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full font-bold shadow-xl flex items-center gap-2">
-                  Get Started
+                <motion.button whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}
+                  className="h-13 px-8 py-3.5 bg-black dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-[15px] shadow-lg flex items-center gap-2 transition-all">
+                  Start Free — No Card Needed <ArrowRight className="w-4 h-4" />
                 </motion.button>
               </Link>
               <a href="#how-it-works">
-                <motion.button whileHover={{ scale: 1.03 }} className="h-14 px-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-full font-bold shadow-sm flex items-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                  How It Works
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  className="h-13 px-8 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl font-bold text-[15px] shadow-sm flex items-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all">
+                  See How It Works
                 </motion.button>
               </a>
             </div>
 
-            <div className="mt-12 grid grid-cols-3 gap-6 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-8">
+            <div className="mt-10 grid grid-cols-3 gap-4 border-t border-zinc-200/50 dark:border-zinc-800/50 pt-8">
               {[
-                { val: '↓ 90%', label: 'Resolution Time' },
-                { val: '↓ 65%', label: 'Operational Cost' },
-                { val: '↑ 98%', label: 'CSAT Score' },
+                { val: '90%', label: 'Fewer tickets', sub: 'resolved by AI' },
+                { val: '< 1s', label: 'Response time', sub: 'always fast' },
+                { val: '24/7', label: 'Always online', sub: 'zero downtime' },
               ].map((stat, i) => (
                 <div key={i}>
-                  <div className="text-2xl font-black text-orange-600 dark:text-orange-500">{stat.val}</div>
-                  <div className="text-xs font-bold text-zinc-500 uppercase mt-1">{stat.label}</div>
+                  <div className="text-[22px] sm:text-[26px] font-black text-zinc-900 dark:text-zinc-100 tracking-tight">{stat.val}</div>
+                  <div className="text-[11px] font-bold text-zinc-500 mt-0.5">{stat.label}</div>
+                  <div className="text-[10px] text-zinc-400 dark:text-zinc-500">{stat.sub}</div>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          {/* Right Column: Premium Mockup */}
+          {/* Right Column: Dashboard Mockup */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22,1,0.36,1] }}
+            className="relative hidden lg:block"
           >
-            <div className="absolute -inset-4 bg-gradient-to-br from-orange-500/20 to-amber-500/20 blur-2xl rounded-full opacity-50" />
-            <div className="relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl shadow-black/10 overflow-hidden aspect-[4/3] flex flex-col">
-              <div className="h-12 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 px-4 flex items-center gap-2">
+            {/* Glow */}
+            <div className="absolute -inset-6 bg-gradient-to-br from-orange-500/15 via-amber-400/10 to-transparent blur-3xl rounded-full" />
+            
+            {/* Browser chrome */}
+            <div className="relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[24px] shadow-2xl shadow-black/10 overflow-hidden">
+              {/* Browser bar */}
+              <div className="h-11 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 px-4 flex items-center gap-3">
                 <div className="flex gap-1.5">
-                  <div className="w-3 h-3 bg-red-400 rounded-full" />
-                  <div className="w-3 h-3 bg-amber-400 rounded-full" />
-                  <div className="w-3 h-3 bg-emerald-400 rounded-full" />
+                  <div className="w-2.5 h-2.5 bg-red-400 rounded-full" />
+                  <div className="w-2.5 h-2.5 bg-amber-400 rounded-full" />
+                  <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full" />
                 </div>
-                <div className="mx-auto text-xs font-bold text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-4 py-1 rounded-lg flex items-center gap-1.5">
-                  <Bot className="w-3 h-3" /> AgentDesk Admin console
+                <div className="flex-1 bg-zinc-100 dark:bg-zinc-900 rounded-md h-6 flex items-center px-3 gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                  <span className="text-[11px] font-medium text-zinc-400">agentdesk-xi.vercel.app/dashboard</span>
                 </div>
               </div>
-              <div className="flex-1 p-6 bg-[#fafafa] dark:bg-zinc-950 flex flex-col gap-6">
-                <div className="grid grid-cols-3 gap-4">
-                   {[1,2,3].map(i => (
-                     <div key={i} className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm animate-pulse" style={{ animationDelay: `${i*200}ms` }}>
-                        <div className="w-1/2 h-2 bg-zinc-200 dark:bg-zinc-800 rounded mb-3" />
-                        <div className="w-full h-4 bg-orange-500/20 rounded" />
-                     </div>
-                   ))}
+
+              {/* Dashboard body */}
+              <div className="p-5 bg-[#fafafa] dark:bg-zinc-950 space-y-4">
+                {/* Stats row */}
+                <div className="grid grid-cols-3 gap-3">
+                  {[{l:'Resolved Today',v:'142',c:'text-emerald-600'},{l:'Avg Response',v:'0.8s',c:'text-orange-600'},{l:'CSAT Score',v:'98%',c:'text-blue-600'}].map((s,i)=>(
+                    <div key={i} className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 shadow-sm">
+                      <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1">{s.l}</div>
+                      <div className={`text-[20px] font-black tracking-tight ${s.c}`}>{s.v}</div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm relative overflow-hidden">
-                   <div className="flex items-center gap-3 border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold">A</div>
-                      <div className="font-bold text-sm">Training Neural Model</div>
-                   </div>
-                   <div className="space-y-3">
-                      <div className="h-3 w-3/4 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" />
-                      <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" style={{ animationDelay: '300ms' }} />
-                      <div className="h-3 w-2/3 bg-zinc-100 dark:bg-zinc-800 rounded animate-pulse" style={{ animationDelay: '600ms' }} />
-                   </div>
-                   {/* Floating chat pop over mockup */}
-                   <div className="absolute bottom-4 right-4 w-48 bg-orange-500 text-white p-3 rounded-2xl shadow-xl shadow-orange-500/20 font-medium text-xs border border-orange-400 animate-bounce-slow">
-                      👋 Hi, welcome! How can our AI agent assist you today?
-                   </div>
+
+                {/* Chat panel */}
+                <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+                  <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white">
+                      <div className="w-2.5 h-2.5 bg-white rounded-sm rotate-45" />
+                    </div>
+                    <span className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200">Live Chat — Support Agent</span>
+                    <span className="ml-auto flex items-center gap-1 text-[10px] font-bold text-emerald-500">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />Online
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div className="flex gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold flex-shrink-0">U</div>
+                      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-tl-sm px-3 py-2 text-[12px] text-zinc-700 dark:text-zinc-300 max-w-[75%]">How do I reset my password?</div>
+                    </div>
+                    <div className="flex gap-2.5 justify-end">
+                      <div className="bg-orange-500 rounded-2xl rounded-tr-sm px-3 py-2 text-[12px] text-white max-w-[75%]">
+                        Sure! Go to Settings → Security → Reset Password. I&apos;ll send a link to your email right away.
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0">
+                        <div className="w-2 h-2 bg-white rounded-sm rotate-45" />
+                      </div>
+                    </div>
+                    <div className="flex gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold flex-shrink-0">U</div>
+                      <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-tl-sm px-3 py-2 text-[12px] text-zinc-700 dark:text-zinc-300">
+                        <span className="flex gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{animationDelay:'0ms'}} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{animationDelay:'150ms'}} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style={{animationDelay:'300ms'}} />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -340,17 +370,17 @@ export default function LandingPage() {
                <div className="hidden lg:block absolute top-1/2 left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-orange-500 via-orange-500/20 to-transparent -translate-y-1/2 z-0 opacity-30" />
                
                {[
-                 { step: 1, icon: UploadCloud, t: 'Train Your AI', d: 'Paste your website link or upload document PDF files to ingest logic.' },
-                 { step: 2, icon: Code2, t: 'Embed Anywhere', d: 'Copy/paste one line of script or iframe to ship your active agent.' },
-                 { step: 3, icon: Rocket, t: 'Automate & Scale', d: 'Sit back as AI resolves thousands of queries autonomously 24/7.' },
+                 { step: '01', icon: UploadCloud, t: 'Name Your Agent', d: 'Give your AI a name and role. No website scraping, no complexity — just describe what it does.' },
+                 { step: '02', icon: Code2, t: 'Embed One Script', d: 'Copy a single <script> tag and paste it into your site. Works on any platform in seconds.' },
+                 { step: '03', icon: Rocket, t: 'Go Live Instantly', d: 'Your AI handles real conversations 24/7. Watch tickets resolve automatically while you sleep.' },
                ].map((s, i) => (
-                 <div key={i} className="relative z-10 text-center flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-full bg-white dark:bg-zinc-900 border-2 border-orange-500/50 flex items-center justify-center text-orange-500 shadow-xl shadow-orange-500/10 mb-8 transition-transform hover:scale-105 hover:border-orange-500">
-                       <s.icon className="w-8 h-8" />
+                 <div key={i} className="relative z-10 flex flex-col">
+                    <div className="w-14 h-14 rounded-2xl bg-white dark:bg-zinc-900 border-2 border-orange-500/30 hover:border-orange-500 flex items-center justify-center text-orange-500 shadow-lg shadow-orange-500/10 mb-6 transition-all hover:scale-105">
+                       <s.icon className="w-6 h-6" />
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-black absolute -top-2 right-1/2 translate-x-12 shadow-md">0{s.step}</div>
-                    <h4 className="text-2xl font-bold mb-4">{s.t}</h4>
-                    <p className="text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed px-6">{s.d}</p>
+                    <div className="text-[11px] font-black text-orange-500 tracking-widest uppercase mb-2">{s.step}</div>
+                    <h4 className="text-[20px] font-bold mb-3 text-zinc-900 dark:text-zinc-100">{s.t}</h4>
+                    <p className="text-[14px] text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">{s.d}</p>
                  </div>
                ))}
             </div>
@@ -576,11 +606,8 @@ export default function LandingPage() {
       <footer className="bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800/50 pt-20 pb-10 px-6">
          <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-16">
             <div className="col-span-2">
-               <div className="flex items-center gap-2.5 mb-6">
-                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white"><Bot className="w-5 h-5" /></div>
-                  <span className="font-black text-lg">Agent Desk</span>
-               </div>
-               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Injecting autonomous atomic intelligence into scaling workflows worldwide.</p>
+               <div className="mb-5"><AgentDeskLogo size="md" /></div>
+               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Intelligent AI agents that resolve customer issues 24/7, automatically.</p>
             </div>
             {[
               { t: 'Product', links: [
