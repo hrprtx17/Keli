@@ -253,7 +253,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex-1 bg-zinc-100 dark:bg-zinc-900 rounded-md h-6 flex items-center px-3 gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  <span className="text-[11px] font-medium text-zinc-400">agentdesk-xi.vercel.app/dashboard</span>
+                  <span className="text-[11px] font-medium text-zinc-400">localhost:3000/dashboard</span>
                 </div>
               </div>
 
