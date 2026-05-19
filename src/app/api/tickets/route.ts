@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
         ticketId: result.insertedId.toString()
       }).catch((e: any) => console.error('Email send failed:', e.message))
     } else {
-      console.log('[AgentDesk] No notification email could be resolved for agent:', agent.name)
+      console.log('[Keli AI] No notification email could be resolved for agent:', agent.name)
     }
     
     return Response.json(

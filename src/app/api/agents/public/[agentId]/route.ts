@@ -63,7 +63,7 @@ export async function GET(
     }, { headers: CORS_HEADERS })
     
   } catch (error) {
-    console.error('[AgentDesk] Public agent API error:', error)
+    console.error('[Keli AI] Public agent API error:', error)
     return Response.json(
       { error: 'Server error' },
       { status: 500, headers: CORS_HEADERS }

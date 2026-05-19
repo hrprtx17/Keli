@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         }
       }
     } catch (e: any) {
-      console.log('[AgentDesk] RAG skipped:', e.message)
+      console.log('[Keli AI] RAG skipped:', e.message)
     }
     
     // Construct System Prompt
@@ -200,7 +200,7 @@ Important rules:
     
     if (!groqRes.ok) {
       const err = await groqRes.text()
-      console.error('[AgentDesk] Groq error:', err)
+      console.error('[Keli AI] Groq error:', err)
       return Response.json(
         { error: 'AI service unavailable' },
         { status: 502, headers: CORS_HEADERS }
@@ -269,7 +269,7 @@ Important rules:
     })
     
   } catch (error) {
-    console.error('[AgentDesk] widget-chat error:', error)
+    console.error('[Keli AI] widget-chat error:', error)
     return Response.json(
       { error: 'Server error' },
       { status: 500, headers: CORS_HEADERS }

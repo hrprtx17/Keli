@@ -149,9 +149,9 @@ function DeployPageContent() {
   const actualOrigin = origin || 'http://localhost:3000';
 
   const scripts = {
-    widget: `<!-- AgentDesk AI Assistant Widget -->\n<script\n  src="${actualOrigin}/agentdesk.js"\n  data-agent-id="${agentId}"\n  async\n></script>`,
+    widget: `<!-- Keli AI Assistant Widget -->\n<script\n  src="${actualOrigin}/keli.js"\n  data-agent-id="${agentId}"\n  async\n></script>`,
     frame: `<iframe \n  src="${actualOrigin}/widget/chat?agent=${agentId}"\n  width="100%" \n  height="600px" \n  frameborder="0" \n  style="border: 1px solid #e4e4e7; border-radius: 16px; overflow: hidden;"\n  allow="microphone; clipboard-write"\n></iframe>`,
-    sdk: `import { AgentWidget } from '@agentdesk/react';\n\nexport default function App() {\n  return (\n    <AgentWidget \n      agentId="${agentId}" \n      themeColor="${primaryColor}" \n    />\n  );\n}`
+    sdk: `import { AgentWidget } from '@keli-ai/react';\n\nexport default function App() {\n  return (\n    <AgentWidget \n      agentId="${agentId}" \n      themeColor="${primaryColor}" \n    />\n  );\n}`
   };
 
   const methods = [

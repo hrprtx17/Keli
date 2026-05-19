@@ -102,7 +102,7 @@ export default function InboxDashboardPage() {
   // Load viewed conversations from localStorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('agentdesk_viewed_sessions')
+      const stored = localStorage.getItem('keli_viewed_sessions')
       if (stored) {
         setViewedSessionIds(new Set(JSON.parse(stored)))
       }
@@ -176,7 +176,7 @@ export default function InboxDashboardPage() {
       if (!next.has(conv._id)) {
         next.add(conv._id)
         try {
-          localStorage.setItem('agentdesk_viewed_sessions', JSON.stringify(Array.from(next)))
+          localStorage.setItem('keli_viewed_sessions', JSON.stringify(Array.from(next)))
         } catch (e) {}
       }
       return next

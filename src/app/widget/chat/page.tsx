@@ -625,8 +625,8 @@ function ChatWidgetContent() {
   const agentId = searchParams.get('agent');
 
   const [config, setConfig] = useState<ChatConfig>({
-    agentName: 'AgentDesk AI Support',
-    welcomeMessage: "Hey 👋\nNeed help with AgentDesk?\nI'm here to answer questions and assist you.",
+    agentName: 'Keli AI Support',
+    welcomeMessage: "Hey 👋\nNeed help with Keli AI?\nI'm here to answer questions and assist you.",
     primaryColor: '#F97316',
     showBranding: true,
   });
@@ -660,7 +660,7 @@ function ChatWidgetContent() {
   useEffect(() => {
     const welcome: Message = {
       role: 'agent',
-      text: "Hey 👋\nNeed help with AgentDesk?\nI'm here to answer questions and assist you.",
+      text: "Hey 👋\nNeed help with Keli AI?\nI'm here to answer questions and assist you.",
       time: 'Just now',
       isTyping: true,
     };
@@ -671,7 +671,7 @@ function ChatWidgetContent() {
         .then(data => {
           if (data) {
             const cfg: ChatConfig = {
-              agentName: data.agentName || 'AgentDesk AI Support',
+              agentName: data.agentName || 'Keli AI Support',
               welcomeMessage: data.welcomeMessage || welcome.text,
               primaryColor: data.primaryColor || '#F97316',
               showBranding: data.showBranding !== false,
@@ -702,7 +702,7 @@ function ChatWidgetContent() {
           ...prev,
           {
             role: 'agent',
-            text: "Thanks for reaching out! This is a live preview — connect an agent ID to enable full AI responses. I'm happy to help with anything AgentDesk-related! 🚀",
+            text: "Thanks for reaching out! This is a live preview — connect an agent ID to enable full AI responses. I'm happy to help with anything Keli AI-related! 🚀",
             time: now(),
             isTyping: true,
           },
@@ -974,7 +974,7 @@ function ChatWidgetContent() {
           <div className="w-header-left">
             <div className="w-logo"><BotIcon /></div>
             <div>
-              <div className="w-title">AgentDesk AI Support</div>
+              <div className="w-title">Keli AI Support</div>
               <div className="w-sub">
                 <span className="w-dot" />
                 Always online
@@ -982,10 +982,16 @@ function ChatWidgetContent() {
             </div>
           </div>
           <div className="w-actions">
-            <button className="w-btn" onClick={() => window.parent.postMessage({ type: 'AGENTDESK_WIDGET_EXPAND' }, '*')} title="Open in new tab">
+            <button className="w-btn" onClick={() => {
+              window.parent.postMessage({ type: 'KELI_WIDGET_EXPAND' }, '*');
+              window.parent.postMessage({ type: 'AGENTDESK_WIDGET_EXPAND' }, '*');
+            }} title="Open in new tab">
               <ExternalIcon />
             </button>
-            <button className="w-btn" onClick={() => window.parent.postMessage({ type: 'AGENTDESK_WIDGET_CLOSE' }, '*')} title="Close">
+            <button className="w-btn" onClick={() => {
+              window.parent.postMessage({ type: 'KELI_WIDGET_CLOSE' }, '*');
+              window.parent.postMessage({ type: 'AGENTDESK_WIDGET_CLOSE' }, '*');
+            }} title="Close">
               <CloseIcon />
             </button>
           </div>
@@ -1040,7 +1046,7 @@ function ChatWidgetContent() {
           </div>
           {config.showBranding && (
             <div className="w-branding">
-              Powered by AgentDesk
+              Powered by Keli AI
             </div>
           )}
         </footer>

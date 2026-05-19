@@ -54,7 +54,7 @@ export default function UpgradePage() {
     "Standard PDF & Markdown training",
     "Basic Web Embed & Iframe integration",
     "Standard LLM Execution Speed",
-    "AgentDesk branding on widget"
+    "Keli AI branding on widget"
   ];
 
   const proFeatures = [

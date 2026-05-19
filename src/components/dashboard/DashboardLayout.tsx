@@ -61,7 +61,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <div className="font-semibold text-[15px] tracking-tight font-heading">AgentDesk</div>
+          <div className="font-semibold text-[15px] tracking-tight font-heading">Keli AI</div>
           <div className="w-5" />
         </header>
 

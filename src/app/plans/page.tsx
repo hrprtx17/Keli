@@ -82,8 +82,8 @@ export default function PlansPage() {
       a: "Yes. You can train the AI by pasting your website URLs or uploading files (PDF, TXT, DOCX). The AI learns your specific brand content within seconds."
     },
     {
-      q: "What is AgentDesk branding?",
-      a: "The free plan displays 'Powered by AgentDesk' with a backlink at the bottom of the chat widget. Upgrading to the Premium plan removes this branding completely."
+      q: "What is Keli AI branding?",
+      a: "The free plan displays 'Powered by Keli AI' with a backlink at the bottom of the chat widget. Upgrading to the Premium plan removes this branding completely."
     },
     {
       q: "How does the 14-day trial work?",
@@ -120,7 +120,7 @@ export default function PlansPage() {
             <div className="w-7 h-7 sm:w-9 sm:h-9 bg-gradient-to-br from-orange-500 to-amber-400 rounded-[10px] sm:rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform transition group-hover:rotate-6">
               <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white stroke-[2.5px]" />
             </div>
-            <span className="font-black text-[16px] sm:text-lg md:text-xl tracking-tighter text-zinc-900 dark:text-zinc-50">Agent Desk</span>
+            <span className="font-black text-[16px] sm:text-lg md:text-xl tracking-tighter text-zinc-900 dark:text-zinc-50">Keli AI</span>
           </Link>
 
           {/* Desktop Links */}
@@ -307,7 +307,7 @@ export default function PlansPage() {
                     { t: 'Deploy via HTML embed', active: true },
                     { t: 'Ticket system (10 tickets/month)', active: true },
                     { t: 'Email notifications', active: true },
-                    { t: 'AgentDesk branding (cannot remove)', active: true },
+                    { t: 'Keli AI branding (cannot remove)', active: true },
                     { t: 'Custom domain', active: false },
                     { t: 'Multiple agents', active: false },
                     { t: 'Priority support', active: false },
@@ -388,7 +388,7 @@ export default function PlansPage() {
                     'Unlimited website training URLs',
                     'Unlimited file uploads (50MB each)',
                     'Advanced widget customization',
-                    'Remove AgentDesk branding',
+                    'Remove Keli AI branding',
                     'Unlimited tickets',
                     'Analytics dashboard',
                     'Conversation history (90 days)',
@@ -583,7 +583,7 @@ export default function PlansPage() {
             Ready to put AI to work?
           </h2>
           <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 font-medium mt-4 max-w-xl mx-auto leading-relaxed">
-            Join businesses using AgentDesk to automate support
+            Join businesses using Keli AI to automate support
           </p>
           
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -613,7 +613,7 @@ export default function PlansPage() {
             <div className="col-span-2">
                <div className="flex items-center gap-2.5 mb-6">
                   <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white"><Bot className="w-5 h-5" /></div>
-                  <span className="font-black text-lg">Agent Desk</span>
+                  <span className="font-black text-lg">Keli AI</span>
                </div>
                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Injecting autonomous atomic intelligence into scaling workflows worldwide.</p>
             </div>
@@ -655,7 +655,7 @@ export default function PlansPage() {
             ))}
          </div>
          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-800/50 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-            <p>© 2026 AgentDesk Inc. All rights reserved.</p>
+            <p>© 2026 Keli AI Inc. All rights reserved.</p>
             <div className="flex gap-6">
                <a href="#">Privacy</a>
                <a href="#">Terms</a>

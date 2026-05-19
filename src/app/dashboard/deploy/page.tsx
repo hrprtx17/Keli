@@ -139,7 +139,7 @@ export default function DeployPage() {
     }
   }
 
-  const embedCode = `<!-- AgentDesk Widget -->\n<script\n  src="${siteUrl}/widget.js"\n  data-agent-id="${agent?._id || '[REAL_AGENT_ID]'}">\n</script>`
+  const embedCode = `<!-- Keli AI Widget -->\n<script\n  src="${siteUrl}/widget.js"\n  data-agent-id="${agent?._id || '[REAL_AGENT_ID]'}">\n</script>`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(embedCode)
@@ -238,7 +238,7 @@ export default function DeployPage() {
               <span className="text-xs font-black uppercase text-zinc-400 dark:text-zinc-500 tracking-wider">Embed code snippet</span>
               <div className="relative group">
                 <pre className="bg-[#0D0D0D] text-zinc-300 p-5 rounded-xl font-mono text-[13px] overflow-x-auto border border-zinc-800 leading-relaxed">
-                  <span className="text-[#8B8B8B]">&lt;!-- AgentDesk Widget --&gt;</span>{'\n'}
+                  <span className="text-[#8B8B8B]">&lt;!-- Keli AI Widget --&gt;</span>{'\n'}
                   <span className="text-[#EC592D]">&lt;script</span>{'\n'}
                   <span className="text-[#9CDCFE]">  src</span><span className="text-zinc-400">=</span><span className="text-[#CE9178]">&quot;{siteUrl}/widget.js&quot;</span>{'\n'}
                   <span className="text-[#9CDCFE]">  data-agent-id</span><span className="text-zinc-400">=</span><span className="text-[#CE9178]">&quot;{agent?._id || '[REAL_AGENT_ID]'}&quot;</span>{'\n'}
@@ -518,7 +518,7 @@ export default function DeployPage() {
               <div className="border-t border-zinc-100 dark:border-zinc-800/60 pt-5 space-y-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex flex-col">
-                    <label className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Show &apos;Powered by AgentDesk&apos;</label>
+                    <label className="text-sm font-bold text-zinc-800 dark:text-zinc-200">Show &apos;Powered by Keli AI&apos;</label>
                     {!isPremium && (
                       <span className="text-[11px] font-semibold text-orange-500 flex items-center gap-1.5 mt-1 select-none">
                         <Lock className="w-3.5 h-3.5" /> Premium feature

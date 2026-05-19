@@ -20,7 +20,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "AgentDesk",
+  title: "Keli AI",
   description: "Train custom AI agents on your data. Deploy to your website in minutes.",
 };
 

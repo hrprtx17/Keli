@@ -9,7 +9,7 @@ import {
   BarChart3, Star, Check, UploadCloud, Code2, Rocket, Globe,
   ArrowRight, Sparkles, FileText, Bot
 } from 'lucide-react';
-import { AgentDeskLogo } from '@/components/Logo';
+import { KeliAiLogo } from '@/components/Logo';
 
 // --- COMPONENT: TYPING EFFECT LOOP ---
 const TYPING_WORDS = ["Ready", "Online", "Watching", "Learning", "Working"];
@@ -93,7 +93,7 @@ export default function LandingPage() {
         `}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-          <AgentDeskLogo size="md" />
+          <KeliAiLogo size="md" />
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
@@ -606,7 +606,7 @@ export default function LandingPage() {
       <footer className="bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800/50 pt-20 pb-10 px-6">
          <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-16">
             <div className="col-span-2">
-               <div className="mb-5"><AgentDeskLogo size="md" /></div>
+               <div className="mb-5"><KeliAiLogo size="md" /></div>
                <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Intelligent AI agents that resolve customer issues 24/7, automatically.</p>
             </div>
             {[
@@ -648,7 +648,7 @@ export default function LandingPage() {
             ))}
          </div>
          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-800/50 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-            <p>© 2026 AgentDesk Inc. All rights reserved.</p>
+            <p>© 2026 Keli AI Inc. All rights reserved.</p>
             <div className="flex gap-6">
                <a href="#" title="Coming soon">Privacy</a>
                <a href="#" title="Coming soon">Terms</a>

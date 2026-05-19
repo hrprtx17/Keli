@@ -20,7 +20,7 @@ export async function connectDB(): Promise<Db> {
   }
 
   const client = await global._mongoClient
-  return client.db(process.env.MONGODB_DB_NAME || 'agentdesk')
+  return client.db(process.env.MONGODB_DB_NAME || 'keli')
 }
 
 // Export a getter helper for default client if needed in legacy parts

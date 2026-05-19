@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         conversationId: conversationId || ''
       })
     } else {
-      console.log('[AgentDesk] Talk to human alert skipped (no notification email resolved):', agent.name)
+      console.log('[Keli AI] Talk to human alert skipped (no notification email resolved):', agent.name)
     }
 
     return Response.json(

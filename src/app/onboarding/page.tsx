@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Loader2, Sparkles, ArrowRight, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
-import { AgentDeskLogo } from '@/components/Logo';
+import { KeliAiLogo } from '@/components/Logo';
 
 const SUGGESTIONS = [
   'Support Assistant',
@@ -115,7 +115,7 @@ export default function OnboardingPage() {
 
       {/* Logo top-left */}
       <div className="fixed top-6 left-8 z-20">
-        <AgentDeskLogo size="md" />
+        <KeliAiLogo size="md" />
       </div>
 
       {/* Main card */}

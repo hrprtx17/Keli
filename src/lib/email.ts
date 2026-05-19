@@ -15,12 +15,12 @@ export async function sendTicketEmail(params: EmailTicketParams) {
   } = params
   
   if (!to) {
-    console.log('[AgentDesk] No notification email configured for this agent')
+    console.log('[Keli AI] No notification email configured for this agent')
     return
   }
   
   if (!process.env.RESEND_API_KEY) {
-    console.log('[AgentDesk] Email skipped (no RESEND_API_KEY):', {
+    console.log('[Keli AI] Email skipped (no RESEND_API_KEY):', {
       to, subject, visitorEmail
     })
     return
@@ -34,7 +34,7 @@ export async function sendTicketEmail(params: EmailTicketParams) {
       <div style="background:#FF6B35;padding:20px 24px;border-radius:12px 12px 0 0;">
         <h1 style="color:white;margin:0;font-size:20px;">New Support Ticket</h1>
         <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px;">
-          ${agentName} — AgentDesk
+          ${agentName} — Keli AI
         </p>
       </div>
       <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;
@@ -69,7 +69,7 @@ export async function sendTicketEmail(params: EmailTicketParams) {
         </a>
         
         <p style="margin-top:20px;font-size:12px;color:#9ca3af;">
-          This notification was sent by AgentDesk. 
+          This notification was sent by Keli AI. 
           The customer expects a reply at ${visitorEmail}.
         </p>
       </div>
@@ -84,7 +84,7 @@ export async function sendTicketEmail(params: EmailTicketParams) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: `AgentDesk Notifications <${fromEmail}>`,
+      from: `Keli AI Notifications <${fromEmail}>`,
       to: [to],
       subject: `[New Ticket] ${subject} — from ${visitorName}`,
       html
@@ -115,12 +115,12 @@ export async function sendHumanNotificationEmail(params: EmailHumanParams) {
   } = params
   
   if (!to) {
-    console.log('[AgentDesk] No notification email configured for this agent')
+    console.log('[Keli AI] No notification email configured for this agent')
     return
   }
   
   if (!process.env.RESEND_API_KEY) {
-    console.log('[AgentDesk] Human Alert Email skipped (no RESEND_API_KEY):', {
+    console.log('[Keli AI] Human Alert Email skipped (no RESEND_API_KEY):', {
       to, visitorEmail
     })
     return
@@ -134,7 +134,7 @@ export async function sendHumanNotificationEmail(params: EmailHumanParams) {
       <div style="background:#F97316;padding:20px 24px;border-radius:12px 12px 0 0;">
         <h1 style="color:white;margin:0;font-size:20px;">Human Support Request</h1>
         <p style="color:rgba(255,255,255,0.85);margin:4px 0 0;font-size:14px;">
-          ${agentName} — AgentDesk
+          ${agentName} — Keli AI
         </p>
       </div>
       <div style="background:#f9f9f9;padding:24px;border-radius:0 0 12px 12px;
@@ -177,7 +177,7 @@ export async function sendHumanNotificationEmail(params: EmailHumanParams) {
         ` : ''}
         
         <p style="margin-top:24px;font-size:12px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:12px;">
-          This notification was sent by AgentDesk. 
+          This notification was sent by Keli AI. 
           Please contact the customer directly at <a href="mailto:${visitorEmail}" style="color:#9ca3af;">${visitorEmail}</a>.
         </p>
       </div>
@@ -192,7 +192,7 @@ export async function sendHumanNotificationEmail(params: EmailHumanParams) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: `AgentDesk Live Alert <${fromEmail}>`,
+      from: `Keli AI Live Alert <${fromEmail}>`,
       to: [to],
       subject: `[Live Support Request] from ${visitorName}`,
       html

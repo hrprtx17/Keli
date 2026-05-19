@@ -4,7 +4,7 @@
   // Capture script attributes for configuration
   const script = document.currentScript || document.querySelector('script[data-agent-id]') || document.querySelector('script[data-agent]');
   if (!script) {
-    console.error('[AgentDesk Widget Error]: Script tag could not be identified.');
+    console.error('[Keli AI Widget Error]: Script tag could not be identified.');
     return;
   }
 
@@ -13,9 +13,9 @@
 
   // Inject optimized and self-contained CSS styles into parent document
   const style = document.createElement('style');
-  style.id = 'agentdesk-widget-styles';
+  style.id = 'keli-widget-styles';
   style.textContent = `
-    #agentdesk-launcher {
+    #keli-launcher {
       position: fixed;
       bottom: 24px;
       right: 24px;
@@ -32,13 +32,13 @@
       border: 1px solid rgba(255,255,255,0.1);
       outline: none;
     }
-    #agentdesk-launcher:hover {
+    #keli-launcher:hover {
       transform: scale(1.08);
     }
-    #agentdesk-launcher:active {
+    #keli-launcher:active {
       transform: scale(0.95);
     }
-    #agentdesk-window {
+    #keli-window {
       position: fixed;
       bottom: 96px;
       right: 24px;
@@ -56,12 +56,12 @@
       transition: opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1), transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
       overflow: hidden;
     }
-    #agentdesk-window.is-open {
+    #keli-window.is-open {
       opacity: 1;
       pointer-events: auto;
       transform: translateY(0) scale(1);
     }
-    #agentdesk-iframe {
+    #keli-iframe {
       width: 100%;
       height: 100%;
       border: 1px solid rgba(0,0,0,0.06);
@@ -69,7 +69,7 @@
       background-color: #FFFFFF;
     }
     @media (max-width: 640px) {
-      #agentdesk-window {
+      #keli-window {
         bottom: 0;
         right: 0;
         width: 100%;
@@ -79,14 +79,14 @@
         transform: translateY(100%);
         box-shadow: none;
       }
-      #agentdesk-window.is-open {
+      #keli-window.is-open {
         transform: translateY(0);
       }
-      #agentdesk-iframe {
+      #keli-iframe {
         border: none;
         border-radius: 0;
       }
-      .agentdesk-launcher-hidden {
+      .keli-launcher-hidden {
         opacity: 0;
         pointer-events: none;
         transform: scale(0.8) !important;
@@ -110,17 +110,17 @@
 
   // Create Launcher Button
   const launcher = document.createElement('button');
-  launcher.id = 'agentdesk-launcher';
+  launcher.id = 'keli-launcher';
   launcher.setAttribute('aria-label', 'Open Support Chat');
   launcher.style.backgroundColor = primaryColor;
   launcher.innerHTML = sparkleIcon;
 
   // Create Iframe Container
   const chatWindow = document.createElement('div');
-  chatWindow.id = 'agentdesk-window';
+  chatWindow.id = 'keli-window';
 
   const iframe = document.createElement('iframe');
-  iframe.id = 'agentdesk-iframe';
+  iframe.id = 'keli-iframe';
   
   // Resolve host automatically
   let host = 'http://localhost:3000';
@@ -141,12 +141,12 @@
       chatWindow.classList.add('is-open');
       launcher.innerHTML = closeIcon;
       if (window.innerWidth <= 640) {
-        launcher.classList.add('agentdesk-launcher-hidden');
+        launcher.classList.add('keli-launcher-hidden');
       }
     } else {
       chatWindow.classList.remove('is-open');
       launcher.innerHTML = sparkleIcon;
-      launcher.classList.remove('agentdesk-launcher-hidden');
+      launcher.classList.remove('keli-launcher-hidden');
     }
   };
 
@@ -155,10 +155,10 @@
 
   // Listen for iframe action triggers (e.g. Close Event)
   window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'AGENTDESK_WIDGET_CLOSE') {
+    if (event.data && (event.data.type === 'KELI_WIDGET_CLOSE' || event.data.type === 'AGENTDESK_WIDGET_CLOSE')) {
       toggleWidget(false);
     }
-    if (event.data && event.data.type === 'AGENTDESK_WIDGET_EXPAND') {
+    if (event.data && (event.data.type === 'KELI_WIDGET_EXPAND' || event.data.type === 'AGENTDESK_WIDGET_EXPAND')) {
       window.open(`${host}/widget/chat?agent=${agentId}`, '_blank');
     }
   });

@@ -12,7 +12,7 @@ const sizes = {
   lg: { icon: 'w-10 h-10 rounded-[12px]', dot: 'w-4 h-4', text: 'text-[20px]', gap: 'gap-3' },
 };
 
-export function AgentDeskLogo({ href = '/', size = 'md', className = '' }: LogoProps) {
+export function KeliAiLogo({ href = '/', size = 'md', className = '' }: LogoProps) {
   const s = sizes[size];
   const inner = (
     <span className={`inline-flex items-center ${s.gap} group ${className}`}>
@@ -22,7 +22,7 @@ export function AgentDeskLogo({ href = '/', size = 'md', className = '' }: LogoP
         <span className={`${s.dot} bg-white rounded-sm rotate-45 shadow-sm`} />
       </span>
       <span className={`font-bold ${s.text} tracking-tight text-zinc-900 dark:text-zinc-100`}>
-        AgentDesk
+        Keli AI
       </span>
     </span>
   );

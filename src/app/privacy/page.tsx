@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
 
           <section>
             <h2 className="text-xl font-semibold text-foreground">3. Cookies and Telemetry</h2>
-            <p>AgentDesk employs essential tracking to maintain authenticated workspace states and combat fraudulent bot deployment behaviors, minimizing non-operational data extraction.</p>
+            <p>Keli AI employs essential tracking to maintain authenticated workspace states and combat fraudulent bot deployment behaviors, minimizing non-operational data extraction.</p>
           </section>
           
           <div className="bg-muted/30 p-6 rounded-xl border text-sm">

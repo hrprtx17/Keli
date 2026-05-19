@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { Eye, EyeOff, Loader2, Bot, Globe, MessageSquare } from 'lucide-react';
-import { AgentDeskLogo } from '@/components/Logo';
+import { KeliAiLogo } from '@/components/Logo';
 
 const GoogleIcon = () => (
   <svg className="h-[18px] w-[18px] flex-shrink-0" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@ export default function RegisterPage() {
       {/* Form Panel */}
       <div className="flex w-full md:w-[46%] lg:w-[42%] min-h-screen items-center justify-center px-6 sm:px-10 relative z-10 bg-white dark:bg-zinc-900 border-r border-gray-100 dark:border-zinc-800 py-10">
         <div className="w-full max-w-[380px] space-y-5">
-          <AgentDeskLogo size="md" />
+          <KeliAiLogo size="md" />
 
           <div>
             <h1 className="text-[26px] font-bold tracking-tight text-gray-900 dark:text-zinc-100 leading-tight">Create your account</h1>

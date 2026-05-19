@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgentDesk AI · Widget Playground</title>
+  <title>Keli AI · Widget Playground</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -373,7 +373,7 @@
           <path d="M8 15h.01M12 15h.01M16 15h.01" stroke-width="2"/>
         </svg>
       </div>
-      <span>AgentDesk</span>
+      <span>Keli AI</span>
     </a>
     <div class="status-badge">
       <span class="status-dot"></span>
@@ -406,7 +406,7 @@
         <div class="input-label">Client Embedding Snippet</div>
         <div class="code-box">
           <button class="copy-btn" id="copy-btn">Copy</button>
-          <pre id="code-snippet"><span class="comment">&lt;!-- AgentDesk Support Widget --&gt;</span>
+          <pre id="code-snippet"><span class="comment">&lt;!-- Keli AI Support Widget --&gt;</span>
 <span class="keyword">&lt;script</span>
   <span class="attr">src</span>=<span class="val">"/widget.js"</span>
   <span class="attr">data-agent-id</span>=<span class="val">"<span id="code-agent-id">demo-preview</span>"</span><span class="keyword">&gt;&lt;/script&gt;</span></pre>
@@ -428,7 +428,7 @@
         <div class="step">
           <div class="step-num">3</div>
           <h3>Unified Scripts</h3>
-          <p>Both /widget.js and /agentdesk.js are identical and feature the lightweight launcher.</p>
+          <p>Both /widget.js and /keli.js are identical and feature the lightweight launcher.</p>
         </div>
       </div>
     </div>
@@ -436,7 +436,7 @@
 
   <!-- Footer -->
   <footer>
-    &copy; 2026 <a href="/">AgentDesk AI</a> · Sandboxed Support Widget Demo Page
+    &copy; 2026 <a href="/">Keli AI</a> · Sandboxed Support Widget Demo Page
   </footer>
 
   <script>
@@ -462,9 +462,9 @@
     // Inject Script into page dynamically
     launchBtn.addEventListener('click', () => {
       // Clear previous widget instances if any
-      const oldLauncher = document.getElementById('agentdesk-launcher');
-      const oldWindow = document.getElementById('agentdesk-window');
-      const oldStyle = document.getElementById('agentdesk-widget-styles');
+      const oldLauncher = document.getElementById('keli-launcher');
+      const oldWindow = document.getElementById('keli-window');
+      const oldStyle = document.getElementById('keli-widget-styles');
       
       if (oldLauncher) oldLauncher.remove();
       if (oldWindow) oldWindow.remove();

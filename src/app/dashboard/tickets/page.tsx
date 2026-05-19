@@ -117,7 +117,7 @@ export default function TicketsDashboardPage() {
   // Load viewed tickets from localstorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('agentdesk_viewed_tickets')
+      const stored = localStorage.getItem('keli_viewed_tickets')
       if (stored) {
         setViewedIds(new Set(JSON.parse(stored)))
       }
@@ -191,7 +191,7 @@ export default function TicketsDashboardPage() {
         if (!next.has(selectedTicket._id)) {
           next.add(selectedTicket._id)
           try {
-            localStorage.setItem('agentdesk_viewed_tickets', JSON.stringify(Array.from(next)))
+            localStorage.setItem('keli_viewed_tickets', JSON.stringify(Array.from(next)))
           } catch (e) {}
         }
         return next
@@ -898,7 +898,7 @@ export default function TicketsDashboardPage() {
                                 className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
                               >
                                 <span className="text-[9px] text-gray-450 dark:text-zinc-500 font-semibold mb-1 uppercase tracking-wider">
-                                  {isUser ? 'Visitor' : `AI Agent (${selectedTicket.agentName || 'AgentDesk'})`}
+                                  {isUser ? 'Visitor' : `AI Agent (${selectedTicket.agentName || 'Keli AI'})`}
                                 </span>
                                 <div className={`px-4 py-2.5 rounded-2xl text-xs max-w-[85%] break-words shadow-xs leading-relaxed ${
                                   isUser 
