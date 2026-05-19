@@ -413,7 +413,7 @@ export default function DeployPage() {
               </div>
               <div className="pt-2">
                 <a 
-                  href="http://localhost:3000/widget-test.html" 
+                  href={`${siteUrl}/widget-test.html`} 
                   target="_blank" 
                   className="text-xs text-[#FF6B35] hover:underline font-bold inline-flex items-center gap-1.5"
                 >

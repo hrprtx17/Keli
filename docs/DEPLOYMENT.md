@@ -10,7 +10,7 @@ Add ALL of these in Netlify → Site Settings → Environment Variables:
 | GROQ_API_KEY | Groq AI API key | console.groq.com |
 | HUGGINGFACE_API_KEY | HuggingFace API key | huggingface.co/settings/tokens |
 | NEXTAUTH_SECRET | Random 32+ char secret | run: openssl rand -base64 32 |
-| NEXTAUTH_URL | Your live URL | https://agentdeskk.netlify.app |
+| NEXTAUTH_URL | Your live URL | https://agentdesk-xi.vercel.app |
 | RESEND_API_KEY | Email service key | resend.com (free tier) |
 
 ## MongoDB Atlas Setup
@@ -29,9 +29,9 @@ Add ALL of these in Netlify → Site Settings → Environment Variables:
 5. Add all environment variables above
 
 ## Testing Checklist After Deploy
-[ ] https://agentdeskk.netlify.app/ loads
-[ ] https://agentdeskk.netlify.app/widget.js shows JS code (not error page)
-[ ] https://agentdeskk.netlify.app/widget-test.html shows orange button
+[ ] https://agentdesk-xi.vercel.app/ loads
+[ ] https://agentdesk-xi.vercel.app/widget.js shows JS code (not error page)
+[ ] https://agentdesk-xi.vercel.app/widget-test.html shows orange button
 [ ] /register creates a user in MongoDB
 [ ] /login works and sets session cookie
 [ ] Dashboard loads after login
