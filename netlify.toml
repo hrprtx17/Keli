@@ -1,0 +1,71 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# This MUST come before any catch-all redirects injected by Netlify plugins
+[[redirects]]
+  from = "/widget.js"
+  to = "/widget.js"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/keli.js"
+  to = "/keli.js"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/widget-test.html"
+  to = "/widget-test.html"
+  status = 200
+  force = true
+
+# Headers for static files and CORS
+[[headers]]
+  for = "/widget.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=60"
+
+[[headers]]
+  for = "/keli.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    Access-Control-Allow-Origin = "*"
+    Cache-Control = "public, max-age=60"
+
+[[headers]]
+  for = "/widget-test.html"
+  [headers.values]
+    X-Frame-Options = "ALLOWALL"
+
+[[headers]]
+  for = "/api/widget-chat"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+[[headers]]
+  for = "/api/agents/public/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

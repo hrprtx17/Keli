@@ -1,8 +1,8 @@
 // Programmatically enforce correct NextAuth/Auth.js base URL in production/serverless environments
-if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
-  let deploymentUrl = '';
+if (process.env.NODE_ENV === 'production' || process.env.NETLIFY === 'true' || process.env.VERCEL === '1') {
+  let deploymentUrl = process.env.URL || process.env.DEPLOY_PRIME_URL || '';
   
-  if (process.env.VERCEL_URL) {
+  if (!deploymentUrl && process.env.VERCEL_URL) {
     deploymentUrl = `https://${process.env.VERCEL_URL}`;
   }
   
