@@ -1,7 +1,7 @@
 # AgentDesk Deployment Guide
 
 ## Environment Variables (Required)
-Add ALL of these in Netlify → Site Settings → Environment Variables:
+Add ALL of these in your .env.local file (for local development) or your hosting provider's environment settings:
 
 | Variable | Description | Where to get |
 |---|---|---|
@@ -16,17 +16,15 @@ Add ALL of these in Netlify → Site Settings → Environment Variables:
 ## MongoDB Atlas Setup
 1. Create cluster (M0 free tier is fine for MVP)
 2. Create database user with readWrite permissions
-3. Network access: Allow 0.0.0.0/0 (all IPs) for Netlify serverless
+3. Network access: Allow 0.0.0.0/0 (all IPs) or restrict to your hosting environment's IP range
 4. Create vector search index on knowledgechunks collection:
    Index name: vector_index
    Field: embedding (type: vector, dimensions: 384, similarity: cosine)
 
-## Netlify Setup
-1. Connect GitHub repo to Netlify
-2. Build command: npm run build
-3. Publish directory: .next
-4. Add @netlify/plugin-nextjs plugin
-5. Add all environment variables above
+## Deployment / Running Locally
+1. Run `npm run build` to build the Next.js production bundle.
+2. Run `npm run start` to start the standalone production server.
+3. Configure all environment variables listed above.
 
 ## Testing Checklist After Deploy
 [ ] http://localhost:3000/ loads

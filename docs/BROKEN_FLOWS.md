@@ -45,7 +45,7 @@ Status: MVP Development
 
 1. RESEND_API_KEY not set
    Impact: Ticket email notifications don't send
-   Fix: Sign up at resend.com → get API key → add to Netlify env vars
+   Fix: Sign up at resend.com → get API key → add to .env.local or production env vars
 
 2. HuggingFace cold start latency
    Impact: First embedding call takes 10-15s, may timeout
@@ -53,11 +53,11 @@ Status: MVP Development
    AI still responds. Mitigated but not fully fixed.
 
 3. MongoDB Atlas IP allowlist
-   Impact: If Atlas is restricted, Netlify IPs may be blocked
+   Impact: If Atlas is restricted, serverless/hosting IPs may be blocked
    Fix: In MongoDB Atlas → Network Access → Allow all (0.0.0.0/0)
-   for development, or add Netlify IP ranges for production.
+   for development, or add your hosting provider's IP ranges for production.
 
 4. Google OAuth
    Impact: "Continue with Google" button may not work
    Fix: Create Google OAuth app at console.cloud.google.com
-   Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to Netlify env vars
+   Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env.local or production env vars

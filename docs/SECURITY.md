@@ -26,19 +26,19 @@ The widget APIs (/api/widget-chat, /api/agents/public/[id]) are intentionally pu
 - isActive check: inactive agents return 403
 
 ## Data Security
-- MongoDB Atlas: network access restricted to Netlify IPs recommended
+- MongoDB Atlas: network access restricted to production hosting IPs recommended
 - Sensitive fields never returned by public APIs:
   systemPrompt, userId, ownerId, notificationEmail
 - User passwords: never stored in plaintext (bcrypt)
 - Conversation history: stored per session, linked to agentId only
 
 ## API Keys
-Required environment variables (set in Netlify, never in code):
+Required environment variables (set in environment configuration, never in code):
   MONGODB_URI          - MongoDB Atlas connection string
   GROQ_API_KEY         - Groq AI API key  
   HUGGINGFACE_API_KEY  - HuggingFace embedding API key
   NEXTAUTH_SECRET      - Random 32+ char string for JWT signing
-  NEXTAUTH_URL         - Production URL (https://agentdeskk.netlify.app)
+  NEXTAUTH_URL         - Production/local URL (http://localhost:3000)
   RESEND_API_KEY       - Email notification service
 
 ## Known Limitations (MVP)
@@ -52,7 +52,7 @@ Required environment variables (set in Netlify, never in code):
   → Conversations stored as plaintext in MongoDB
 
 ## Security Headers
-Applied via netlify.toml:
+Applied via headers:
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
@@ -64,7 +64,7 @@ Widget.js headers:
 
 ## Incident Response
 If API keys are compromised:
-1. Immediately rotate in Netlify environment variables
+1. Immediately rotate in environment variables
 2. Rotate in respective service dashboards (Groq, HuggingFace)
 3. Invalidate all user sessions by changing NEXTAUTH_SECRET
 4. Review MongoDB Atlas access logs
