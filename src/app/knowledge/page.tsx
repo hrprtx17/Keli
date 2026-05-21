@@ -174,7 +174,7 @@ function KnowledgePageContent() {
         {/* HEADER AREA */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-bold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
               <Sparkles className="w-3.5 h-3.5" /> AI BRAIN MANAGEMENT
             </div>
             <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Training Data</h1>
@@ -193,7 +193,7 @@ function KnowledgePageContent() {
                 setDocTitle('');
                 setDocContent('');
               }}
-              className="w-full md:w-auto appearance-none bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl pl-10 pr-10 py-3 text-[14px] font-semibold text-zinc-800 dark:text-zinc-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all cursor-pointer backdrop-blur-md"
+              className="w-full md:w-auto appearance-none bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl pl-10 pr-10 py-3 text-[14px] font-medium text-zinc-800 dark:text-zinc-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all cursor-pointer backdrop-blur-md"
             >
               {!agents?.length && <option className="dark:bg-zinc-900">No agents found</option>}
               {agents?.map((a: any) => (
@@ -243,7 +243,7 @@ function KnowledgePageContent() {
                         setDocContent('');
                         toast.success('Cleared editing session');
                       }}
-                      className="text-[12px] font-bold text-zinc-400 hover:text-red-500 transition-colors px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800/60 cursor-pointer"
+                      className="text-[12px] font-medium text-zinc-400 hover:text-red-500 transition-colors px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800/60 cursor-pointer"
                     >
                       Cancel Edit
                     </button>
@@ -253,7 +253,7 @@ function KnowledgePageContent() {
                 <form onSubmit={handleTrain} className="space-y-4">
                   {/* Title Box */}
                   <div>
-                    <label className="block text-[12px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">
+                    <label className="block text-[12px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">
                       Document Title
                     </label>
                     <input 
@@ -270,10 +270,10 @@ function KnowledgePageContent() {
                   {/* Body Editor Box */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <label className="text-[12px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                      <label className="text-[12px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                         Knowledge Content
                       </label>
-                      <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-600">
+                      <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-600">
                         {docContent.length} chars
                       </span>
                     </div>
@@ -298,7 +298,7 @@ function KnowledgePageContent() {
                           exit={{ opacity: 0, y: -10 }}
                           className="bg-orange-50/50 dark:bg-orange-950/10 border border-orange-500/20 rounded-xl p-4 flex flex-col gap-3"
                         >
-                          <div className="flex justify-between items-center text-[13px] font-bold">
+                          <div className="flex justify-between items-center text-[13px] font-medium">
                             <span className="text-orange-600 dark:text-orange-400 flex items-center gap-2">
                               <Loader2 className="w-4 h-4 animate-spin" />
                               {ingestStage || 'Training AI Assistant...'}
@@ -329,7 +329,7 @@ function KnowledgePageContent() {
                           whileTap={{ scale: 0.98 }}
                           type="submit"
                           disabled={!docTitle.trim() || docContent.trim().length < 10}
-                          className="w-full h-11 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 transition-all hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer"
+                          className="w-full h-11 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-medium text-[14px] flex items-center justify-center gap-2 transition-all hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer"
                         >
                           <Database className="w-4 h-4" />
                           {editingSourceId ? 'Update & Train Agent' : 'Train Agent on Text'}
@@ -349,10 +349,10 @@ function KnowledgePageContent() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/3" />
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="space-y-1">
-                    <div className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">AI Memory State</div>
+                    <div className="text-[12px] text-zinc-500 font-medium uppercase tracking-wider">AI Memory State</div>
                     <h3 className="text-[18px] font-bold text-white leading-tight">{activeAgentName}</h3>
                   </div>
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
                     <Check className="w-3.5 h-3.5 stroke-[2.5]" /> Active
                   </div>
                 </div>
@@ -428,10 +428,10 @@ function KnowledgePageContent() {
                                   <FileText className="w-4 h-4" />
                                 </div>
                                 <div className="min-w-0">
-                                  <h4 className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100 truncate pr-2">
+                                  <h4 className="text-[13px] font-semibold text-zinc-900 dark:text-zinc-100 truncate pr-2">
                                     {source.name.replace(/\.txt$/, '')}
                                   </h4>
-                                  <div className="flex items-center gap-2 text-[11px] text-zinc-400 dark:text-zinc-500 font-semibold mt-0.5">
+                                  <div className="flex items-center gap-2 text-[11px] text-zinc-400 dark:text-zinc-500 font-normal mt-0.5">
                                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(source.createdAt).toLocaleDateString()}</span>
                                     <span>•</span>
                                     <span>{wordCount} words</span>
@@ -462,7 +462,7 @@ function KnowledgePageContent() {
 
                             {/* PREVIEW BODY TEXT */}
                             {source.content && (
-                              <p className="text-[12px] text-zinc-500 dark:text-zinc-400 line-clamp-2 bg-zinc-50/50 dark:bg-zinc-900/30 p-2 rounded-lg border border-zinc-200/20 dark:border-zinc-800/40 leading-relaxed italic">
+                              <p className="text-[12px] text-zinc-500 dark:text-zinc-400 line-clamp-2 bg-zinc-50/50 dark:bg-zinc-900/30 p-2 rounded-lg border border-zinc-200/20 dark:border-zinc-800/40 leading-relaxed">
                                 "{source.content}"
                               </p>
                             )}

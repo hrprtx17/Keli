@@ -89,7 +89,7 @@ export default function UpgradePage() {
             <div className="bg-zinc-100/80 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800 p-1 rounded-full flex items-center shadow-xs">
               <button 
                 onClick={() => setBillingCycle('monthly')}
-                className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
                   billingCycle === 'monthly' 
                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs' 
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
@@ -99,7 +99,7 @@ export default function UpgradePage() {
               </button>
               <button 
                 onClick={() => setBillingCycle('yearly')}
-                className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 ${
+                className={`px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 ${
                   billingCycle === 'yearly' 
                     ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs' 
                     : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
@@ -121,7 +121,7 @@ export default function UpgradePage() {
           <div className="bg-white/80 dark:bg-zinc-950/80 border border-zinc-200/60 dark:border-zinc-900 rounded-2xl p-6 sm:p-8 flex flex-col justify-between transition-all hover:border-zinc-300 dark:hover:border-zinc-800 shadow-xs">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Free Tier</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">Free Tier</span>
                 <span className="text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-500">Current Scope</span>
               </div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Starter</h3>
@@ -150,7 +150,7 @@ export default function UpgradePage() {
             <div className="pt-8">
               <button 
                 disabled 
-                className="w-full h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 font-bold text-[11px] tracking-wider uppercase cursor-not-allowed border border-zinc-200/20 dark:border-zinc-800/30"
+                className="w-full h-10 rounded-xl bg-zinc-50 dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 font-medium text-[11px] tracking-wider uppercase cursor-not-allowed border border-zinc-200/20 dark:border-zinc-800/30"
               >
                 Current Tier
               </button>
@@ -165,7 +165,7 @@ export default function UpgradePage() {
             
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#FF6B35]">Premium Plan</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest text-[#FF6B35]">Premium Plan</span>
                 <span className="text-[10px] font-semibold bg-[#FF6B35]/10 px-2 py-0.5 rounded text-[#FF6B35] border border-[#FF6B35]/10">Unlimited Pro</span>
               </div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Unlimited</h3>
@@ -195,7 +195,7 @@ export default function UpgradePage() {
               <button 
                 onClick={handleUpgrade}
                 disabled={loadingTier !== null || isPremium}
-                className="group w-full h-10 rounded-xl bg-[#FF6B35] hover:bg-[#e05621] text-white font-bold text-[11px] tracking-wider flex items-center justify-center gap-1 transition-all duration-200 disabled:opacity-60 uppercase shadow-sm"
+                className="group w-full h-10 rounded-xl bg-[#FF6B35] hover:bg-[#e05621] text-white font-medium text-[11px] tracking-wider flex items-center justify-center gap-1 transition-all duration-200 disabled:opacity-60 uppercase shadow-sm"
               >
                 {loadingTier === 'premium' ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
@@ -233,7 +233,7 @@ export default function UpgradePage() {
               }
             ].map((faq, i) => (
               <div key={i} className="pb-4 border-b border-zinc-100 dark:border-zinc-900 last:border-b-0">
-                <h4 className="font-semibold text-xs text-zinc-800 dark:text-zinc-200 mb-1">{faq.q}</h4>
+                <h4 className="font-medium text-xs text-zinc-800 dark:text-zinc-200 mb-1">{faq.q}</h4>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">{faq.a}</p>
               </div>
             ))}

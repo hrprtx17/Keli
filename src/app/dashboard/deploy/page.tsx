@@ -170,7 +170,7 @@ export default function DeployPage() {
           {/* PAGE HEADER */}
           <div className="mb-8 text-center sm:text-left">
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">Widget Integration</h1>
-            <p className="text-zinc-500 dark:text-zinc-400 mt-1.5 text-sm sm:text-[15px] leading-relaxed">
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1.5 text-sm sm:text-[15px] leading-relaxed font-normal">
               Add {agent.name} to your HTML website in just one step.
             </p>
           </div>
@@ -180,8 +180,8 @@ export default function DeployPage() {
             <CardContent className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-center sm:text-left">
                 <div className="flex flex-col">
-                  <span className="font-bold text-zinc-900 dark:text-zinc-50 text-base leading-tight">{agent.name}</span>
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-50 text-base leading-tight">{agent.name}</span>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 font-medium">
                     Widget status control
                   </span>
                 </div>
@@ -190,18 +190,18 @@ export default function DeployPage() {
               <div className="flex items-center gap-4 shrink-0">
                 <div>
                   {agent.isActive ? (
-                    <span className="bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border border-green-200/50 dark:border-green-900/50 px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5">
+                    <span className="bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border border-green-200/50 dark:border-green-900/50 px-3 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Active & Online
                     </span>
                   ) : (
-                    <span className="bg-zinc-50 dark:bg-zinc-900 text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5">
+                    <span className="bg-zinc-50 dark:bg-zinc-900 text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-3 py-1 rounded-full text-[11px] font-medium flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> Offline
                     </span>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800 rounded-xl px-3 py-1.5">
-                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Live Status</span>
+                  <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Live Status</span>
                   {isStatusSaving ? (
                     <Loader2 className="w-4 h-4 text-orange-500 animate-spin" />
                   ) : (
@@ -257,7 +257,7 @@ export default function DeployPage() {
                   </div>
 
                   <div className="pt-2 space-y-4">
-                    <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Step-by-step instructions</h3>
+                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Step-by-step instructions</h3>
                     
                     <div className="space-y-3.5">
                       {[
@@ -294,7 +294,7 @@ export default function DeployPage() {
                     />
                     <Button 
                       onClick={handleTest} 
-                      className="bg-[#FF6B35] hover:bg-orange-600 text-white font-bold text-xs px-6 shadow-sm flex items-center gap-1.5 shrink-0"
+                      className="bg-[#FF6B35] hover:bg-orange-600 text-white font-medium text-xs px-6 shadow-sm flex items-center gap-1.5 shrink-0"
                     >
                       Verify Site <ExternalLink className="w-3.5 h-3.5" />
                     </Button>
@@ -303,7 +303,7 @@ export default function DeployPage() {
                     <a 
                       href={`${siteUrl}/widget-test.html`} 
                       target="_blank" 
-                      className="text-xs text-[#FF6B35] hover:underline font-semibold inline-flex items-center gap-1"
+                      className="text-xs text-[#FF6B35] hover:underline font-medium inline-flex items-center gap-1"
                     >
                       Open test sandbox website →
                     </a>
@@ -317,7 +317,7 @@ export default function DeployPage() {
               
               {/* MINI SIMULATED BROWSER */}
               <div className="space-y-2.5">
-                <span className="text-xs font-bold uppercase text-zinc-400 dark:text-zinc-500 tracking-wider">Preview on your site</span>
+                <span className="text-xs font-medium uppercase text-zinc-400 dark:text-zinc-500 tracking-wider">Preview on your site</span>
                 <div className="border border-zinc-200/80 dark:border-zinc-800 rounded-xl overflow-hidden shadow-xs bg-white dark:bg-zinc-950">
                   <div className="h-9 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-4 justify-between">
                     <div className="flex gap-1">
@@ -363,7 +363,7 @@ export default function DeployPage() {
 
                   {/* Widget Color */}
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold uppercase text-zinc-400 tracking-wider">Accent Color</label>
+                    <label className="text-[11px] font-medium uppercase text-zinc-400 tracking-wider">Accent Color</label>
                     <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg p-1.5">
                       <div 
                         className="w-8 h-8 rounded border border-zinc-200 dark:border-zinc-800 shrink-0 shadow-xs" 
@@ -375,13 +375,13 @@ export default function DeployPage() {
                         onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })} 
                         className="flex-grow h-8 p-0.5 cursor-pointer bg-transparent border-none" 
                       />
-                      <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase px-1.5">{settings.primaryColor}</span>
+                      <span className="text-[10px] font-mono font-medium text-zinc-500 uppercase px-1.5">{settings.primaryColor}</span>
                     </div>
                   </div>
 
                   {/* Welcome Message */}
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold uppercase text-zinc-400 tracking-wider">Welcome Message</label>
+                    <label className="text-[11px] font-medium uppercase text-zinc-400 tracking-wider">Welcome Message</label>
                     <Input 
                       placeholder="Hi! How can I help you today?" 
                       value={settings.welcomeMessage} 
@@ -394,7 +394,7 @@ export default function DeployPage() {
                   <div className="border-t border-zinc-100 dark:border-zinc-800/60 pt-4 space-y-2.5">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex flex-col">
-                        <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Show &apos;Powered by Keli AI&apos;</label>
+                        <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Show &apos;Powered by Keli AI&apos;</label>
                         {!isPremium && (
                           <span className="text-[10px] font-semibold text-orange-500 flex items-center gap-1 mt-0.5">
                             <Lock className="w-3 h-3" /> Premium Feature
@@ -413,7 +413,7 @@ export default function DeployPage() {
                   <Button 
                     onClick={handleSaveSettings} 
                     disabled={isSaving}
-                    className="w-full bg-[#FF6B35] hover:bg-orange-600 text-white font-bold text-xs py-3 rounded-lg shadow-sm flex items-center justify-center gap-1.5 mt-2"
+                    className="w-full bg-[#FF6B35] hover:bg-orange-600 text-white font-medium text-xs py-3 rounded-lg shadow-sm flex items-center justify-center gap-1.5 mt-2"
                   >
                     {isSaving ? (
                       <>

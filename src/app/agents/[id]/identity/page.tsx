@@ -146,10 +146,10 @@ export default function AgentIdentityPage() {
          
          {/* Header */}
          <div className="mb-10">
-            <div className="flex items-center gap-2 text-[11px] font-extrabold text-orange-500 tracking-widest uppercase mb-2">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 tracking-widest uppercase mb-2">
                <Fingerprint className="w-3.5 h-3.5" /> Agent Configuration
             </div>
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">AI Identity</h1>
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">AI Identity</h1>
             <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed font-medium">
                Define how your AI assistant behaves, responds, and communicates.
             </p>
@@ -161,7 +161,7 @@ export default function AgentIdentityPage() {
                <button 
                  key={t}
                  onClick={() => setActiveTab(t)}
-                 className={`relative z-10 px-7 py-2.5 text-[13px] font-bold rounded-xl transition-colors duration-200 ${activeTab === t ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
+                 className={`relative z-10 px-7 py-2.5 text-[13px] font-medium rounded-xl transition-colors duration-200 ${activeTab === t ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
                >
                   {t === 'profile' ? 'Profile & Rules' : 'Conversation Style'}
                   {activeTab === t && (
@@ -185,7 +185,7 @@ export default function AgentIdentityPage() {
                >
                   {/* Agent Name */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
-                     <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">Agent Name</h3>
+                     <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Agent Name</h3>
                      <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-4 font-medium">The public name shown to users during conversations.</p>
                      <input 
                         type="text"
@@ -199,11 +199,11 @@ export default function AgentIdentityPage() {
                   {/* System Prompt */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] overflow-hidden shadow-sm">
                      <div className="p-6 pb-0">
-                        <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">AI Instructions</h3>
+                        <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">AI Instructions</h3>
                         <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-4 font-medium">Define your AI&apos;s core role, tone, and behaviors in natural language.</p>
                      </div>
                      <div className="border-t border-zinc-100 dark:border-zinc-800/60">
-                        <div className="bg-zinc-50/50 dark:bg-zinc-900/30 px-5 py-2.5 flex flex-wrap gap-4 items-center text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800/60">
+                        <div className="bg-zinc-50/50 dark:bg-zinc-900/30 px-5 py-2.5 flex flex-wrap gap-4 items-center text-[10px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800/60">
                            <div className="flex items-center gap-1.5"><MessageSquare className="w-3 h-3" /> Role</div>
                            <div className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Boundaries</div>
                            <div className="flex items-center gap-1.5"><Lightbulb className="w-3 h-3" /> Rules</div>
@@ -221,12 +221,12 @@ export default function AgentIdentityPage() {
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
                      <div className="flex items-center justify-between mb-5">
                         <div>
-                           <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">Behavior Rules</h3>
+                           <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Behavior Rules</h3>
                            <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 font-medium">Short guidelines your AI must always follow.</p>
                         </div>
                         <button 
                           onClick={addRule}
-                          className="text-[12px] font-bold text-orange-600 dark:text-orange-400 flex items-center gap-1.5 bg-orange-50 dark:bg-orange-950/30 px-3.5 py-2 rounded-xl border border-orange-100 dark:border-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-all shadow-xs"
+                          className="text-[12px] font-medium text-orange-600 dark:text-orange-400 flex items-center gap-1.5 bg-orange-50 dark:bg-orange-950/30 px-3.5 py-2 rounded-xl border border-orange-100 dark:border-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-all shadow-xs"
                         >
                            <Plus className="w-3.5 h-3.5" /> Add Rule
                         </button>
@@ -281,7 +281,7 @@ export default function AgentIdentityPage() {
                   
                   {/* Tone */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
-                     <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">Conversation Tone</h3>
+                     <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Conversation Tone</h3>
                      <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-5 font-medium">Determine vocabulary and warmth of responses.</p>
                      <div className="grid grid-cols-2 gap-3">
                         {toneOptions.map(tone => {
@@ -292,7 +292,7 @@ export default function AgentIdentityPage() {
                                 onClick={() => updateForm('config.tone', tone.value)}
                                 className={`text-left p-4 rounded-xl border transition-all ${active ? 'border-orange-500/50 bg-orange-50/50 dark:bg-orange-950/20 ring-2 ring-orange-500/10 shadow-sm' : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-xs'}`}
                               >
-                                 <div className="font-bold text-[13px] text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
+                                 <div className="font-semibold text-[13px] text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
                                     {tone.value}
                                     {active && <CheckCircle2 className="w-4 h-4 text-orange-500" />}
                                  </div>
@@ -305,7 +305,7 @@ export default function AgentIdentityPage() {
 
                   {/* Role */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
-                     <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">Assistant Role</h3>
+                     <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Assistant Role</h3>
                      <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-5 font-medium">Select a foundational framework for the agent&apos;s purpose.</p>
                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {roleOptions.map(role => {
@@ -319,7 +319,7 @@ export default function AgentIdentityPage() {
                               >
                                  <div className="flex items-center gap-2 mb-1">
                                     <Icon className={`w-4 h-4 ${isSel ? 'text-orange-500' : 'text-zinc-400'}`} />
-                                    <span className="font-bold text-[13px] text-zinc-900 dark:text-zinc-100">{role.l}</span>
+                                    <span className="font-medium text-[13px] text-zinc-900 dark:text-zinc-100">{role.l}</span>
                                  </div>
                                  <p className={`text-[11px] ${isSel ? 'text-orange-600/70 dark:text-orange-400/70' : 'text-zinc-500'}`}>{role.desc}</p>
                                  {isSel && <CheckCircle2 className="w-4 h-4 text-orange-500 absolute top-4 right-4" />}
@@ -331,7 +331,7 @@ export default function AgentIdentityPage() {
 
                   {/* Creativity */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
-                     <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">AI Creativity</h3>
+                     <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">AI Creativity</h3>
                      <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-5 font-medium">How much the AI improvises when knowledge is missing.</p>
                      <div className="bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl flex w-full max-w-md relative overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50">
                         {[
@@ -342,7 +342,7 @@ export default function AgentIdentityPage() {
                            <button 
                              key={opt.l}
                              onClick={() => updateForm('config.temperature', opt.v)}
-                             className={`flex-1 relative z-10 py-3 text-[13px] font-bold rounded-lg transition-colors duration-200 ${formData.config.temperature === opt.v ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400'}`}
+                             className={`flex-1 relative z-10 py-3 text-[13px] font-medium rounded-lg transition-colors duration-200 ${formData.config.temperature === opt.v ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400'}`}
                            >
                               {opt.l}
                               {formData.config.temperature === opt.v && (
@@ -355,7 +355,7 @@ export default function AgentIdentityPage() {
 
                   {/* Response Length */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
-                     <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">Response Length</h3>
+                     <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Response Length</h3>
                      <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-5 font-medium">Control how verbose the assistant&apos;s responses are.</p>
                      <div className="bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl flex w-full max-w-md relative overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50">
                         {[
@@ -366,7 +366,7 @@ export default function AgentIdentityPage() {
                            <button 
                              key={opt.l}
                              onClick={() => updateForm('config.maxTokens', opt.v)}
-                             className={`flex-1 relative z-10 py-3 text-[13px] font-bold rounded-lg transition-colors duration-200 ${formData.config.maxTokens === opt.v ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400'}`}
+                             className={`flex-1 relative z-10 py-3 text-[13px] font-medium rounded-lg transition-colors duration-200 ${formData.config.maxTokens === opt.v ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400'}`}
                            >
                               {opt.l}
                               {formData.config.maxTokens === opt.v && (
@@ -379,7 +379,7 @@ export default function AgentIdentityPage() {
 
                   {/* Link Usage */}
                   <div className="bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 rounded-[24px] p-6 shadow-sm">
-                     <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 mb-1">Link Usage</h3>
+                     <h3 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Link Usage</h3>
                      <p className="text-[12.5px] text-zinc-500 dark:text-zinc-400 mb-5 font-medium">Controls how often links are included in responses.</p>
                      <div className="flex gap-3 max-w-md">
                         {(['normal', 'high'] as const).map(mode => {
@@ -388,7 +388,7 @@ export default function AgentIdentityPage() {
                               <button 
                                 key={mode}
                                 onClick={() => updateForm('config.linkUsage', mode)}
-                                className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl border font-bold text-[13px] capitalize transition-all ${active ? 'border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-xs'}`}
+                                className={`flex-1 flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl border font-medium text-[13px] capitalize transition-all ${active ? 'border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-md' : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-xs'}`}
                               >
                                  {active && <Zap className="w-3.5 h-3.5 fill-current text-orange-400" />}
                                  {mode}
@@ -413,12 +413,12 @@ export default function AgentIdentityPage() {
                   <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-5 py-3 rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.3)] border border-white/10 dark:border-zinc-900/10 flex items-center justify-between gap-10 pointer-events-auto min-w-[360px] max-w-lg">
                      <div className="flex items-center gap-3 pl-1">
                         <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                        <span className="text-[13px] font-bold">Unsaved changes</span>
+                        <span className="text-[13px] font-medium">Unsaved changes</span>
                      </div>
                      <button 
                        onClick={handleSave}
                        disabled={isSaving}
-                       className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-bold text-[12px] px-5 h-9 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95 flex items-center gap-2 shadow-md"
+                       className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-medium text-[12px] px-5 h-9 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95 flex items-center gap-2 shadow-md"
                      >
                         {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                         Save Changes

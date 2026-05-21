@@ -131,7 +131,7 @@ export default function UsagePage() {
         {/* HEADER & CONTROL ROW */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-bold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
               <BarChart3 className="w-3.5 h-3.5" /> METRICS & CONSUMPTION
             </div>
             <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Usage Analytics</h1>
@@ -147,7 +147,7 @@ export default function UsagePage() {
             <div className="relative" ref={agentRef}>
               <button 
                 onClick={() => setAgentDropdownOpen(!agentDropdownOpen)}
-                className="w-full sm:w-auto flex items-center justify-between gap-2.5 bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-2.5 text-[13.5px] font-bold text-zinc-700 dark:text-zinc-200 shadow-xs hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all cursor-pointer backdrop-blur-md"
+                className="w-full sm:w-auto flex items-center justify-between gap-2.5 bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-2.5 text-[13.5px] font-medium text-zinc-700 dark:text-zinc-200 shadow-xs hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all cursor-pointer backdrop-blur-md"
               >
                 <div className="flex items-center gap-2">
                   <Bot className="w-4 h-4 text-orange-500" />
@@ -170,7 +170,7 @@ export default function UsagePage() {
                         setSelectedAgentFilter('all');
                         setAgentDropdownOpen(false);
                       }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-left transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-left transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
                         <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
@@ -206,7 +206,7 @@ export default function UsagePage() {
             <div className="relative" ref={rangeRef}>
               <button 
                 onClick={() => setRangeDropdownOpen(!rangeDropdownOpen)}
-                className="w-full sm:w-auto flex items-center justify-between gap-2.5 bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-2.5 text-[13.5px] font-bold text-zinc-700 dark:text-zinc-200 shadow-xs hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all cursor-pointer backdrop-blur-md"
+                className="w-full sm:w-auto flex items-center justify-between gap-2.5 bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl px-4 py-2.5 text-[13.5px] font-medium text-zinc-700 dark:text-zinc-200 shadow-xs hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-all cursor-pointer backdrop-blur-md"
               >
                 <div className="flex items-center gap-2">
                   <CalendarDays className="w-4 h-4 text-orange-500" />
@@ -235,7 +235,7 @@ export default function UsagePage() {
                           setSelectedRange(opt.value as any);
                           setRangeDropdownOpen(false);
                         }}
-                        className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-left transition-colors cursor-pointer"
                       >
                         <span>{opt.label}</span>
                         {selectedRange === opt.value && <Check className="w-3.5 h-3.5 text-orange-500 stroke-[3]" />}
@@ -256,7 +256,7 @@ export default function UsagePage() {
           <div className="bg-white/40 dark:bg-zinc-900/35 border border-zinc-200/50 dark:border-zinc-800/60 rounded-[28px] p-6 backdrop-blur-xl shadow-xs relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full blur-[40px] pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[13px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Credits Consumed</h3>
+              <h3 className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Credits Consumed</h3>
               <div title="Credits used during training and API search transactions">
                 <Info className="h-4 w-4 text-zinc-300 dark:text-zinc-600 cursor-help" />
               </div>
@@ -274,7 +274,7 @@ export default function UsagePage() {
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">{displayCreditsUsed}</span>
-                  <span className="text-[14px] font-bold text-zinc-400 dark:text-zinc-500">/ {displayTotalCredits}</span>
+                  <span className="text-[14px] font-medium text-zinc-400 dark:text-zinc-500">/ {displayTotalCredits}</span>
                 </div>
                 <p className="text-[12px] text-zinc-400 dark:text-zinc-500 font-medium mt-1">
                   Credits consumed by {activeAgentName} this window.
@@ -287,7 +287,7 @@ export default function UsagePage() {
           <div className="bg-white/40 dark:bg-zinc-900/35 border border-zinc-200/50 dark:border-zinc-800/60 rounded-[28px] p-6 backdrop-blur-xl shadow-xs relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-[40px] pointer-events-none" />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[13px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Agents Created</h3>
+              <h3 className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Agents Created</h3>
               <Bot className="h-4 w-4 text-zinc-300 dark:text-zinc-600" />
             </div>
 
@@ -303,7 +303,7 @@ export default function UsagePage() {
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">{usedAgentsCount}</span>
-                  <span className="text-[14px] font-bold text-zinc-400 dark:text-zinc-500">/ {maxAgentsCount}</span>
+                  <span className="text-[14px] font-medium text-zinc-400 dark:text-zinc-500">/ {maxAgentsCount}</span>
                 </div>
                 <p className="text-[12px] text-zinc-400 dark:text-zinc-500 font-medium mt-1">
                   AI bots allocated in your workspace plan.
@@ -392,7 +392,7 @@ export default function UsagePage() {
                 const percent = displayCreditsUsed > 0 ? Math.round((itemVal / displayCreditsUsed) * 100) : 0;
                 
                 return (
-                  <div key={idx} className="flex items-center justify-between text-[12.5px] font-bold py-2 border-b border-zinc-200/30 dark:border-zinc-800/40 last:border-0">
+                  <div key={idx} className="flex items-center justify-between text-[12.5px] font-medium py-2 border-b border-zinc-200/30 dark:border-zinc-800/40 last:border-0">
                     <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
                       <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
                       <span className="truncate max-w-[200px]">{item.name}</span>
