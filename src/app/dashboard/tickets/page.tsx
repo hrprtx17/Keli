@@ -476,41 +476,41 @@ export default function TicketsDashboardPage() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col h-[calc(100vh-120px)] max-w-7xl mx-auto space-y-6 px-4 md:px-0 font-outfit"
+        className="flex flex-col h-[calc(100vh-120px)] max-w-7xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-4 md:px-0 font-outfit"
       >
         
         {/* PAGE HEADER */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 flex-shrink-0">
           <div className="text-left">
-            <h1 className="text-3xl font-black tracking-tight text-zinc-900 font-space">Tickets Panel</h1>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 font-space">Tickets Panel</h1>
             <p className="text-[13px] text-zinc-500 font-medium mt-0.5">Manage customer support requests and transfers</p>
           </div>
 
           {/* Stats Bar (Redesigned with Premium Glassmorphism) */}
-          <div className="p-1.5 bg-zinc-100/60 border border-zinc-200/50 rounded-[20px] grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full lg:w-auto shadow-xs backdrop-blur-md">
-            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
-              <span className="text-[20px] font-black text-zinc-900 leading-none font-space">
+          <div className="p-1.5 bg-zinc-100/60 border border-zinc-200/50 rounded-2xl sm:rounded-[20px] grid grid-cols-2 sm:flex sm:flex-row gap-1.5 sm:gap-2 w-full lg:w-auto shadow-xs backdrop-blur-md">
+            <div className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white border border-zinc-200/50 rounded-xl sm:rounded-2xl min-w-[80px] sm:min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
+              <span className="text-[18px] sm:text-[20px] font-black text-zinc-900 leading-none font-space">
                 {isLoading ? '—' : stats.total}
               </span>
               <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Total</span>
             </div>
             
-            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
-              <span className="text-[20px] font-black text-orange-600 leading-none font-space animate-pulse">
+            <div className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white border border-zinc-200/50 rounded-xl sm:rounded-2xl min-w-[80px] sm:min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
+              <span className="text-[18px] sm:text-[20px] font-black text-orange-600 leading-none font-space animate-pulse">
                 {isLoading ? '—' : stats.open}
               </span>
               <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Open</span>
             </div>
 
-            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
-              <span className="text-[20px] font-black text-blue-600 leading-none font-space">
+            <div className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white border border-zinc-200/50 rounded-xl sm:rounded-2xl min-w-[80px] sm:min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
+              <span className="text-[18px] sm:text-[20px] font-black text-blue-600 leading-none font-space">
                 {isLoading ? '—' : stats.active}
               </span>
               <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Active</span>
             </div>
 
-            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs col-span-2 sm:col-span-1">
-              <span className="text-[20px] font-black text-emerald-600 leading-none font-space">
+            <div className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white border border-zinc-200/50 rounded-xl sm:rounded-2xl min-w-[80px] sm:min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs col-span-2 sm:col-span-1">
+              <span className="text-[18px] sm:text-[20px] font-black text-emerald-600 leading-none font-space">
                 {isLoading ? '—' : stats.resolvedToday}
               </span>
               <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Resolved</span>
@@ -519,9 +519,9 @@ export default function TicketsDashboardPage() {
         </div>
 
         {/* FILTER TOOLBAR (Redesigned) */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 flex-shrink-0 bg-white border border-zinc-200/60 p-3.5 rounded-[22px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4 flex-shrink-0 bg-white border border-zinc-200/60 p-2.5 sm:p-3.5 rounded-2xl sm:rounded-[22px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] backdrop-blur-md">
           {/* Status Tabs (Left Side) */}
-          <div className="flex bg-zinc-100/70 p-1 rounded-xl text-xs font-semibold overflow-x-auto scrollbar-none gap-1 w-full lg:w-auto">
+          <div className="flex bg-zinc-100/70 p-1 rounded-xl text-[11px] sm:text-xs font-semibold overflow-x-auto scrollbar-none gap-0.5 sm:gap-1 w-full lg:w-auto">
             {([
               { id: 'all', label: 'All Requests' },
               { id: 'open', label: 'Open' },
@@ -537,7 +537,7 @@ export default function TicketsDashboardPage() {
                     setActiveTab(tab.id)
                     setPage(1)
                   }}
-                  className={`flex-1 lg:flex-none py-2 px-4.5 rounded-lg capitalize whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
+                  className={`flex-1 lg:flex-none py-2 px-3 sm:px-4.5 rounded-lg capitalize whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
                     isActive 
                       ? 'bg-zinc-950 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)]' 
                       : 'text-zinc-500 hover:text-zinc-900'
@@ -597,7 +597,7 @@ export default function TicketsDashboardPage() {
         </div>
 
         {/* WORKSPACE VIEWPORTS */}
-        <div className="flex-1 flex gap-5 min-h-[480px] overflow-hidden">
+        <div className="flex-1 flex gap-3 sm:gap-5 min-h-[400px] sm:min-h-[480px] overflow-hidden">
           
           {/* TICKET LIST PANEL (Left Column) */}
           <div className={`w-full md:w-[290px] lg:w-[390px] shrink-0 bg-white border border-zinc-200/60 rounded-3xl flex flex-col overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.015)] ${selectedTicket && showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
@@ -725,7 +725,7 @@ export default function TicketsDashboardPage() {
               <div className="flex-1 flex flex-col overflow-hidden">
                 
                 {/* Detail Header bar */}
-                <div className="p-5 border-b border-zinc-200/60 bg-zinc-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
+                <div className="p-4 sm:p-5 border-b border-zinc-200/60 bg-zinc-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 flex-shrink-0">
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setShowMobileDetail(false)}
@@ -734,7 +734,7 @@ export default function TicketsDashboardPage() {
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <div className="min-w-0 text-left">
-                      <h2 className="text-[20px] font-black text-zinc-900 font-space truncate">
+                      <h2 className="text-[18px] sm:text-[20px] font-black text-zinc-900 font-space truncate">
                         {selectedTicket.visitorName || 'Anonymous Visitor'}
                       </h2>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -1024,8 +1024,8 @@ export default function TicketsDashboardPage() {
                 </ScrollArea>
 
                 {/* Bottom Action controls footer bar */}
-                <div className="p-4.5 border-t border-zinc-200/60 bg-white flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 flex-shrink-0">
-                  <div className="flex flex-wrap items-center gap-2">
+                <div className="p-3 sm:p-4.5 border-t border-zinc-200/60 bg-white flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-3 flex-shrink-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     {/* Mark In Progress */}
                     <Button
                       variant="outline"

@@ -207,23 +207,23 @@ export default function InboxDashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-60px)] max-w-[1400px] mx-auto px-4 py-6 antialiased font-jakarta">
+      <div className="flex flex-col h-[calc(100vh-60px)] max-w-[1400px] mx-auto px-2 sm:px-4 py-4 sm:py-6 antialiased font-jakarta">
 
         {/* HEADER */}
         <div className="flex items-center justify-between mb-6 shrink-0">
           <div>
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight flex items-center gap-3">
-              <Inbox className="w-7 h-7 text-orange-500" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight flex items-center gap-2 sm:gap-3">
+              <Inbox className="w-6 h-6 sm:w-7 sm:h-7 text-orange-500" />
               Inbox
             </h1>
-            <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-1.5 font-medium">
+            <p className="text-[13px] sm:text-[14px] text-zinc-500 dark:text-zinc-400 mt-1 sm:mt-1.5 font-medium">
               Manage and review your live customer interactions in real-time.
             </p>
           </div>
         </div>
 
         {/* MAIN DISPLAY VIEW */}
-        <div className="flex-1 flex gap-6 overflow-hidden rounded-3xl bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
+        <div className="flex-1 flex gap-0 sm:gap-6 overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
 
           {/* LEFT SIDEBAR: ALL SESSIONS LIST */}
           <div className={`w-full md:w-[360px] shrink-0 border-r border-zinc-200/60 dark:border-zinc-800/60 flex flex-col overflow-hidden ${selectedConversation && showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
@@ -330,8 +330,8 @@ export default function InboxDashboardPage() {
               <div className="flex-1 flex flex-col h-full overflow-hidden">
 
                 {/* Top Header Card */}
-                <div className="px-6 py-5 border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md flex items-center justify-between gap-4 shrink-0 shadow-sm relative z-10">
-                  <div className="flex items-center gap-4">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md flex items-center justify-between gap-3 sm:gap-4 shrink-0 shadow-sm relative z-10">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                     <button
                       onClick={() => setShowMobileDetail(false)}
                       className="p-1.5 border border-zinc-200 dark:border-zinc-800 rounded-lg md:hidden text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shadow-xs"
@@ -341,8 +341,8 @@ export default function InboxDashboardPage() {
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
-                          Session {selectedConversation.sessionId}
+                        <h3 className="text-[13px] sm:text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight truncate">
+                          Session ...{selectedConversation.sessionId?.slice(-8) || selectedConversation.sessionId}
                         </h3>
                         <button
                           onClick={() => handleCopy(selectedConversation.sessionId, 'Session ID')}
@@ -352,7 +352,7 @@ export default function InboxDashboardPage() {
                           {copiedField === selectedConversation.sessionId ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
-                      <div className="flex items-center gap-2 text-[12px] text-zinc-500 dark:text-zinc-400 font-medium">
+                      <div className="flex items-center gap-2 text-[11px] sm:text-[12px] text-zinc-500 dark:text-zinc-400 font-medium flex-wrap">
                         <span className="flex items-center gap-1"><Bot className="w-3.5 h-3.5" /> AI Agent</span>
                         <span>•</span>
                         <span>{new Date(selectedConversation.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</span>
@@ -369,7 +369,7 @@ export default function InboxDashboardPage() {
                 </div>
 
                 {/* Transcript Scroll Area */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6 flex flex-col relative">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-5 sm:space-y-6 flex flex-col relative">
                   {isLoadingMessages ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm z-10">
                       <RotateCw className="w-8 h-8 animate-spin text-orange-500" />
@@ -416,7 +416,7 @@ export default function InboxDashboardPage() {
                 </div>
 
                 {/* Metadata card footer */}
-                <div className="p-4 border-t border-zinc-200/60 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md grid grid-cols-2 lg:grid-cols-4 gap-3 text-left shrink-0">
+                <div className="p-3 sm:p-4 border-t border-zinc-200/60 dark:border-zinc-800/60 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md grid grid-cols-2 gap-2 sm:gap-3 text-left shrink-0">
                   <div className="bg-zinc-50 dark:bg-zinc-950/50 p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 shadow-xs">
                     <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-bold tracking-widest block mb-1">Name</span>
                     <span className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200 block truncate">

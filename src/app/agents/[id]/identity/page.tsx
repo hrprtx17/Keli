@@ -142,26 +142,26 @@ export default function AgentIdentityPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto pb-32 px-4 pt-6 font-jakarta antialiased">
+      <div className="max-w-3xl mx-auto pb-32 px-2 sm:px-4 pt-4 sm:pt-6 font-jakarta antialiased">
          
          {/* Header */}
-         <div className="mb-10">
+         <div className="mb-8 sm:mb-10">
             <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 tracking-widest uppercase mb-2">
                <Fingerprint className="w-3.5 h-3.5" /> Agent Configuration
             </div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">AI Identity</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">AI Identity</h1>
             <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-2 leading-relaxed font-medium">
                Define how your AI assistant behaves, responds, and communicates.
             </p>
          </div>
 
          {/* Tabs */}
-         <div className="bg-zinc-100 dark:bg-zinc-900 p-1 rounded-2xl inline-flex mb-10 relative overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
+         <div className="bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl sm:rounded-2xl inline-flex mb-8 sm:mb-10 relative overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm">
             {(['profile', 'style'] as const).map(t => (
                <button 
                  key={t}
                  onClick={() => setActiveTab(t)}
-                 className={`relative z-10 px-7 py-2.5 text-[13px] font-medium rounded-xl transition-colors duration-200 ${activeTab === t ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
+                 className={`relative z-10 px-5 sm:px-7 py-2 sm:py-2.5 text-[12px] sm:text-[13px] font-medium rounded-lg sm:rounded-xl transition-colors duration-200 ${activeTab === t ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'}`}
                >
                   {t === 'profile' ? 'Profile & Rules' : 'Conversation Style'}
                   {activeTab === t && (
@@ -410,7 +410,7 @@ export default function AgentIdentityPage() {
                  exit={{ y: 50, opacity: 0 }}
                  className="fixed bottom-8 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none"
                >
-                  <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-5 py-3 rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.3)] border border-white/10 dark:border-zinc-900/10 flex items-center justify-between gap-10 pointer-events-auto min-w-[360px] max-w-lg">
+                  <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 sm:px-5 py-3 rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.3)] border border-white/10 dark:border-zinc-900/10 flex items-center justify-between gap-4 sm:gap-10 pointer-events-auto w-[calc(100%-2rem)] sm:w-auto sm:min-w-[360px] max-w-lg">
                      <div className="flex items-center gap-3 pl-1">
                         <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
                         <span className="text-[13px] font-medium">Unsaved changes</span>

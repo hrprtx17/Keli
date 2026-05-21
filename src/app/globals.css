@@ -150,3 +150,44 @@
     font-size: 16px !important;
   }
 }
+
+/* Custom scrollbar for clean look */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(161, 161, 170, 0.3) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.25);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.45);
+}
+
+/* Hide scrollbar completely */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile touch optimization */
+button, a, [role="button"], input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* GPU-accelerated scrolling */
+.overflow-y-auto, .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}

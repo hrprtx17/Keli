@@ -13,7 +13,7 @@ function StatCard({ title, value, sub, icon: Icon, loading, gradient }: any) {
   return (
     <motion.div 
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
-      className="relative overflow-hidden bg-white/70 backdrop-blur-md border border-zinc-200/60 rounded-3xl p-6 shadow-sm transition-all hover:shadow-md hover:border-zinc-300"
+      className="relative overflow-hidden bg-white/70 backdrop-blur-md border border-zinc-200/60 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm transition-all hover:shadow-md hover:border-zinc-300"
     >
       {/* Background Glow */}
       <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-[40px] opacity-10 pointer-events-none bg-gradient-to-br ${gradient}`} />
@@ -26,7 +26,7 @@ function StatCard({ title, value, sub, icon: Icon, loading, gradient }: any) {
       </div>
       
       <div className="space-y-1">
-        <h3 className="text-3xl font-extrabold text-zinc-900 tracking-tight">
+        <h3 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
           {loading ? <div className="h-9 w-24 bg-zinc-100 animate-pulse rounded-lg" /> : value}
         </h3>
         <p className="text-[12.5px] font-medium text-zinc-500">
@@ -70,7 +70,7 @@ export default function InsightsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-8 pb-20 relative font-jakarta">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 pb-20 relative font-jakarta">
         
         {/* Background mesh grid */}
         <div className="absolute inset-0 pointer-events-none -z-10 opacity-[0.02]"
@@ -82,7 +82,7 @@ export default function InsightsPage() {
             <div className="flex items-center gap-1.5 text-[11px] font-semibold text-orange-500 tracking-wider uppercase mb-1.5">
               <Sparkles className="w-3.5 h-3.5" /> SYSTEM PERFORMANCE & VOLUME
             </div>
-            <h1 className="text-3xl font-extrabold text-zinc-950 tracking-tight">Insights Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">Insights Dashboard</h1>
             <p className="text-sm text-zinc-500 mt-1 max-w-lg leading-relaxed">
               Track operational latency, message volumes, resolution rates, and credit capacity.
             </p>
@@ -90,7 +90,7 @@ export default function InsightsPage() {
         </div>
 
         {/* Top Analytics KPIs */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard 
             title="Conversation Volume" 
             value={isLoading ? '—' : stats?.conversations ?? 0} 
@@ -118,7 +118,7 @@ export default function InsightsPage() {
         </div>
         
         {/* Secondary Detailed Metrics Row */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <div className="bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-zinc-200/50 flex items-center justify-between shadow-xs">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">Response Speed</p>
@@ -161,7 +161,7 @@ export default function InsightsPage() {
               <p className="text-[12.5px] text-zinc-400 mt-0.5">Statistical hourly distribution across a 7-day calendar.</p>
             </div>
           </CardHeader>
-          <CardContent className="h-[340px] p-6">
+          <CardContent className="h-[260px] sm:h-[340px] p-4 sm:p-6">
             {creditsUsed === 0 ? (
               <div className="h-full w-full flex flex-col items-center justify-center text-center border border-dashed border-zinc-200 rounded-2xl bg-zinc-50/50">
                 <MessageSquare className="h-7 w-7 text-zinc-300 mb-3" />

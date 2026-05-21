@@ -169,15 +169,15 @@ function KnowledgePageContent() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto pb-24 font-jakarta">
+      <div className="max-w-6xl mx-auto pb-24 font-jakarta px-0">
         
         {/* HEADER AREA */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 mb-8 sm:mb-10">
           <div>
             <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
               <Sparkles className="w-3.5 h-3.5" /> AI BRAIN MANAGEMENT
             </div>
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Training Data</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Training Data</h1>
             <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-1 max-w-lg leading-relaxed">
               Write custom business guidelines, FAQs, and scripts to instantly train your agent.
             </p>

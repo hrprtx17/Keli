@@ -126,7 +126,7 @@ export default function UsagePage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto pb-24 font-jakarta space-y-8">
+      <div className="max-w-6xl mx-auto pb-24 font-jakarta space-y-6 sm:space-y-8">
         
         {/* HEADER & CONTROL ROW */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -134,7 +134,7 @@ export default function UsagePage() {
             <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
               <BarChart3 className="w-3.5 h-3.5" /> METRICS & CONSUMPTION
             </div>
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Usage Analytics</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Usage Analytics</h1>
             <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-1">
               Monitor credits utilization and search query volumes across your assistants.
             </p>
@@ -273,7 +273,7 @@ export default function UsagePage() {
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">{displayCreditsUsed}</span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">{displayCreditsUsed}</span>
                   <span className="text-[14px] font-medium text-zinc-400 dark:text-zinc-500">/ {displayTotalCredits}</span>
                 </div>
                 <p className="text-[12px] text-zinc-400 dark:text-zinc-500 font-medium mt-1">
@@ -302,7 +302,7 @@ export default function UsagePage() {
 
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">{usedAgentsCount}</span>
+                  <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">{usedAgentsCount}</span>
                   <span className="text-[14px] font-medium text-zinc-400 dark:text-zinc-500">/ {maxAgentsCount}</span>
                 </div>
                 <p className="text-[12px] text-zinc-400 dark:text-zinc-500 font-medium mt-1">
