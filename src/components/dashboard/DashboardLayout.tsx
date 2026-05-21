@@ -5,6 +5,7 @@ import { Menu, X, ChevronRight, Loader2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -70,7 +71,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Upscaled content area with maximized breathing room */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none p-4 sm:p-8 md:p-10 lg:p-12 xl:p-14 bg-[#fafafa] dark:bg-zinc-950">
           <div className="mx-auto max-w-[1400px] min-h-full">
-            {children}
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+            >
+              {children}
+            </motion.div>
           </div>
         </main>
       </div>

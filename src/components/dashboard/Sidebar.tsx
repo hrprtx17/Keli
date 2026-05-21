@@ -6,12 +6,11 @@ import {
   MessageSquare, Settings, LogOut, ChevronDown, Zap, 
   BarChart3, Database, Rocket, Bot, Plus, Search, Check,
   UserCircle, CreditCard, PieChart, Inbox, PlayCircle, Fingerprint, Network,
-  Sun, Moon, Ticket
+  Ticket
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from 'next-themes';
 
 interface NavLinkProps {
   href: string;
@@ -26,7 +25,7 @@ interface NavLinkProps {
 }
 
 function NavLink({ href, icon: Icon, children, exact = false, isLocked = false, pathname, activeAgentId, onNavClick, openTicketsCount }: NavLinkProps) {
-  const isActive = exact ? pathname === href : (pathname === href || pathname.startsWith(href));
+  const isActive = exact ? pathname === href : (href === '/dashboard' ? pathname === href : (pathname === href || pathname.startsWith(href)));
   
   const finalHref = (activeAgentId && !href.startsWith('/agents') && href !== '#' && !href.includes('?')) 
     ? `${href}?agentId=${activeAgentId}` 
@@ -95,7 +94,6 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const { theme, setTheme } = useTheme();
   
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -305,13 +303,8 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       {/* 3. BOTTOM BAR */}
       <div className="p-3.5 mt-auto border-t border-zinc-200/30 dark:border-zinc-800/40 bg-white/20 dark:bg-zinc-950/20 backdrop-blur-xl">
         <button 
-          onClick={async (e) => {
-            e.preventDefault();
-            try {
-              await signOut({ callbackUrl: '/login', redirect: true });
-            } catch (err) {
-              window.location.href = '/login';
-            }
+          onClick={() => {
+            signOut({ callbackUrl: '/login' });
           }}
           className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-bold text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 bg-zinc-900/[0.02] dark:bg-white/[0.02] hover:bg-red-500/5 dark:hover:bg-red-500/10 border border-zinc-200/40 dark:border-zinc-800/40 hover:border-red-500/20 dark:hover:border-red-500/30 shadow-xs transition-all duration-200 cursor-pointer"
           title="Sign Out"

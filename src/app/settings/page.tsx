@@ -7,10 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { 
   Save, RefreshCw, Trash2, AlertTriangle, 
-  Building, Info, Link as LinkIcon, X, ShieldAlert, Bot,
-  Sun, Moon, Laptop
+  Building, Info, Link as LinkIcon, X, ShieldAlert, Bot
 } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 
 function SettingsPageContent() {
@@ -18,7 +16,6 @@ function SettingsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const agentId = searchParams.get('agentId');
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -28,7 +25,6 @@ function SettingsPageContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState('');
 
   const { data: agent, isLoading: isLoadingAgent } = useQuery({
     queryKey: ['agent', agentId],
@@ -112,18 +108,14 @@ function SettingsPageContent() {
 
   const handleDelete = async () => {
     if (!agentId) return;
-    if (deleteConfirm !== agent?.name) {
-       toast.error('Verification failed: Input text does not match agent identity.');
-       return;
-    }
     setIsDeleting(true);
     try {
       const res = await fetch(`/api/agents/${agentId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Deletion sequence aborted');
-      toast.success('AI Agent has been decommissioned successfully.');
+      await queryClient.invalidateQueries({ queryKey: ['agents'] });
+      toast.success('AI Agent has been deleted successfully.');
       setShowDeleteModal(false);
-      queryClient.invalidateQueries({ queryKey: ['agents'] });
-      setTimeout(() => router.replace('/dashboard'), 500);
+      router.replace('/agents');
     } catch (err) {
       toast.error('Failed to delete agent entity.');
       setIsDeleting(false);
@@ -225,48 +217,7 @@ function SettingsPageContent() {
                </motion.div>
             )}
 
-            {/* Card 2: Appearance & Theme */}
-            {mounted && (
-               <motion.div 
-                 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-                 className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[24px] shadow-sm overflow-hidden"
-               >
-                  <div className="p-6 sm:p-8">
-                     <h2 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100 mb-2">Appearance & Theme</h2>
-                     <p className="text-[13px] text-gray-500 dark:text-zinc-400 mb-6">Customize your interface background and visual preference.</p>
-                     
-                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {[
-                           { id: 'light', label: 'Light Mode', icon: Sun, desc: 'Clean and crisp interface' },
-                           { id: 'dark', label: 'Dark Mode', icon: Moon, desc: 'Easy on the eyes at night' },
-                           { id: 'system', label: 'System', icon: Laptop, desc: 'Follow computer settings' },
-                        ].map((opt) => {
-                           const Icon = opt.icon;
-                           const isActive = theme === opt.id;
-                           return (
-                              <button
-                                key={opt.id}
-                                onClick={() => setTheme(opt.id)}
-                                className={`group relative flex flex-col items-start text-left p-4 rounded-2xl border-2 transition-all cursor-pointer active:scale-[0.98] ${
-                                  isActive 
-                                    ? 'border-orange-500 bg-orange-50/30 dark:bg-orange-500/5 text-orange-600 dark:text-orange-400 ring-4 ring-orange-500/10' 
-                                    : 'border-gray-100 dark:border-zinc-800 bg-gray-50/30 dark:bg-zinc-950/30 hover:border-gray-300 dark:hover:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:shadow-sm'
-                                }`}
-                              >
-                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-all group-hover:scale-105 duration-300 ${
-                                    isActive ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'
-                                 }`}>
-                                    <Icon className="w-5 h-5" />
-                                 </div>
-                                 <div className="font-bold text-[14px] mb-1 leading-none">{opt.label}</div>
-                                 <div className="text-[11px] text-gray-500 dark:text-zinc-500 font-medium">{opt.desc}</div>
-                              </button>
-                           )
-                        })}
-                     </div>
-                  </div>
-               </motion.div>
-            )}
+
 
             {/* Danger Zone for Current Agent */}
             {agentId && (
@@ -348,36 +299,25 @@ function SettingsPageContent() {
                             <X className="w-5 h-5" />
                          </button>
                       </div>
-                      <h3 className="text-[18px] font-semibold text-gray-900 dark:text-zinc-100 tracking-tight">Terminate Active Agent</h3>
-                      <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-2 leading-relaxed">
-                         This operation is final. You are about to permanently retire the <span className="font-bold text-gray-900 dark:text-zinc-200">{agent?.name}</span> entity. Memory contexts and configured settings cannot be recovered.
+                      <h3 className="text-[18px] font-semibold text-gray-900 tracking-tight">Delete Active Agent</h3>
+                      <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">
+                         This operation is final. You are about to permanently delete the assistant <span className="font-bold text-gray-900">{agent?.name}</span>. Memory contexts and configured settings cannot be recovered.
                       </p>
-
-                      <div className="mt-6 bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 rounded-xl p-4">
-                         <p className="text-[12px] font-medium text-gray-600 dark:text-zinc-400 mb-3">Type <span className="font-mono bg-gray-200 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 px-1.5 py-0.5 rounded text-[11px]">{agent?.name}</span> to verify:</p>
-                         <input 
-                           type="text" 
-                           value={deleteConfirm}
-                           onChange={e => setDeleteConfirm(e.target.value)}
-                           className="w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-800 dark:text-zinc-100 focus:border-red-400 focus:ring-2 focus:ring-red-100/10 transition-all outline-none"
-                           placeholder="Enter agent name to proceed"
-                         />
-                      </div>
 
                       <div className="grid grid-cols-2 gap-3 mt-8">
                          <button 
-                           onClick={() => { setShowDeleteModal(false); setDeleteConfirm(''); }}
-                           className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl py-2.5 text-[13px] font-semibold text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+                           onClick={() => setShowDeleteModal(false)}
+                           className="bg-gray-100 hover:bg-gray-200 rounded-xl py-2.5 text-[13px] font-semibold text-gray-700 transition-colors"
                          >
                             Cancel
                          </button>
                          <button 
-                           disabled={deleteConfirm !== agent?.name || isDeleting}
+                           disabled={isDeleting}
                            onClick={handleDelete}
-                           className="bg-red-600 text-white rounded-xl py-2.5 text-[13px] font-semibold hover:bg-red-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                           className="bg-red-600 hover:bg-red-700 text-white rounded-xl py-2.5 text-[13px] font-semibold transition-all flex items-center justify-center gap-2"
                          >
                             {isDeleting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                            Confirm Destruct
+                            Confirm Delete
                          </button>
                       </div>
                    </motion.div>
