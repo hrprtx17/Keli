@@ -23,7 +23,7 @@ export default function DeployPage() {
   const [testUrl, setTestUrl] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isStatusSaving, setIsStatusSaving] = useState(false)
-  const [siteUrl, setSiteUrl] = useState('http://localhost:3000')
+  const [siteUrl, setSiteUrl] = useState('https://kelii.netlify.app')
   const [settings, setSettings] = useState({
     primaryColor: '#FF6B35',
     welcomeMessage: '',

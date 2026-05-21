@@ -101,7 +101,7 @@ function DeployPageContent() {
     );
   }
 
-  const actualOrigin = origin || 'http://localhost:3000';
+  const actualOrigin = origin || 'https://kelii.netlify.app';
   const embedCode = `<!-- Keli AI Assistant Widget -->\n<script\n  src="${actualOrigin}/keli.js"\n  data-agent-id="${agentId}"\n  async\n></script>`;
 
   return (

@@ -26,7 +26,7 @@ Last Updated: 2026-05-21
   - Digital Agencies looking to offer premium custom chat widgets to clients.
 
 * Live Deployment:
-  - Production URL: https://keliai.netlify.app
+  - Production URL: https://kelii.netlify.app
   - Hosted on Netlify with @netlify/plugin-nextjs
 
 --------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ HuggingFace's all-MiniLM-L6-v2 model.
 [Step 2: Deploy Custom AI Widget]
 An elegant, tiny JavaScript script (widget.js / keli.js) code block is copied
 and pasted into the client's website. The widget loads as a cross-origin iframe
-from keliai.netlify.app with configurable colors, greetings, and branding.
+from kelii.netlify.app with configurable colors, greetings, and branding.
 CORS headers are configured in netlify.toml for seamless external embedding.
 
 [Step 3: Autonomous AI Handling]

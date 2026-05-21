@@ -123,7 +123,7 @@
   iframe.id = 'keli-iframe';
   
   // Resolve host automatically
-  let host = 'http://localhost:3000';
+  let host = 'https://kelii.netlify.app';
   try {
     host = new URL(script.src).origin;
   } catch (e) {}
