@@ -53,17 +53,19 @@ export async function POST(req: Request) {
     }
 
     const apiKey = generateApiKey();
+    const capitalizedName = name.trim().split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+
     const newAgent = await Agent.create({
       workspaceId,
-      name,
+      name: capitalizedName,
       description: description || '',
-      systemPrompt: systemPrompt || `You are ${name}, a helpful customer support AI assistant. Be concise, friendly, and accurate.`,
+      systemPrompt: systemPrompt || `You are ${capitalizedName}, a helpful customer support AI assistant. Be concise, friendly, and accurate.`,
       apiKey,
       model: 'llama-3.1-8b-instant',
       config: { temperature: 0.7, maxTokens: 500 },
       widgetConfig: {
         primaryColor: '#F97316',
-        welcomeMessage: `Hi! I'm ${name}. How can I help you today?`,
+        welcomeMessage: `Hi! I'm ${capitalizedName}. How can I help you today?`,
         showBranding: true,
       }
     });

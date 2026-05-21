@@ -39,7 +39,9 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
 
   // Prevent overriding crucial fields unintentionally via spread
   const updateData: any = {};
-  if (body.name) updateData.name = body.name;
+  if (body.name) {
+    updateData.name = body.name.trim().split(' ').map((w: string) => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+  }
   if (body.description !== undefined) updateData.description = body.description;
   if (body.systemPrompt) updateData.systemPrompt = body.systemPrompt;
   if (body.widgetConfig) updateData.widgetConfig = body.widgetConfig;

@@ -185,6 +185,11 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
     </NavLink>
   );
 
+  const formatAgentName = (name: string) => {
+    if (!name) return '';
+    return name.trim().split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+  };
+
   const filteredAgents = agents?.filter((a: any) => a.name.toLowerCase().includes(searchQuery.toLowerCase())) || [];
 
   return (
@@ -201,12 +206,12 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
               <Bot className="w-3.5 h-3.5" />
             </div>
             <span className="font-bold text-[13.5px] text-zinc-900 dark:text-zinc-100 truncate tracking-tight">
-               {activeAgent?.name || 'Select Agent'}
+               {formatAgentName(activeAgent?.name) || 'Select Agent'}
             </span>
           </div>
           <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-255 ${dropdownOpen ? 'rotate-180 text-orange-500' : ''}`} />
         </button>
-
+ 
         {/* DROPDOWN PANEL */}
         <AnimatePresence>
           {dropdownOpen && (
@@ -249,7 +254,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
                           <Bot className="w-3 h-3" />
                         </div>
                         <div className="min-w-0">
-                           <div className="font-bold text-[12.5px] text-zinc-900 dark:text-zinc-100 truncate leading-none">{agent.name}</div>
+                           <div className="font-bold text-[12.5px] text-zinc-900 dark:text-zinc-100 truncate leading-none">{formatAgentName(agent.name)}</div>
                            <div className="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider font-bold mt-0.5">{agent.model || 'GPT-4'}</div>
                         </div>
                       </div>
@@ -299,42 +304,21 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
 
       {/* 3. BOTTOM BAR */}
       <div className="p-3.5 mt-auto border-t border-zinc-200/30 dark:border-zinc-800/40 bg-white/20 dark:bg-zinc-950/20 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-400 to-amber-500 border border-white/20 flex items-center justify-center text-[12px] font-black text-white shrink-0 shadow-sm">
-              {session?.user?.name?.[0]?.toUpperCase() || 'U'}
-            </div>
-            <div className="min-w-0">
-              <div className="text-[12.5px] font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight">{session?.user?.name || 'User'}</div>
-              <div className="text-[10px] font-medium text-zinc-500 dark:text-zinc-500 truncate mt-0.5">{session?.user?.email}</div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-1 shrink-0">
-            {mounted && (
-              <button 
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="text-zinc-400 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 rounded-lg p-1.5 transition-all shrink-0 cursor-pointer"
-                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
-            )}
-            <button 
-              onClick={async () => {
-                try {
-                  await signOut({ redirectTo: '/login', redirect: true });
-                } catch (e) {
-                  window.location.href = '/login';
-                }
-              }} 
-              className="text-zinc-400 hover:text-red-500 hover:bg-red-50/50 dark:hover:bg-red-950/10 rounded-lg p-1.5 transition-all shrink-0 cursor-pointer"
-              title="Log out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        <button 
+          onClick={async (e) => {
+            e.preventDefault();
+            try {
+              await signOut({ callbackUrl: '/login', redirect: true });
+            } catch (err) {
+              window.location.href = '/login';
+            }
+          }}
+          className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-bold text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 bg-zinc-900/[0.02] dark:bg-white/[0.02] hover:bg-red-500/5 dark:hover:bg-red-500/10 border border-zinc-200/40 dark:border-zinc-800/40 hover:border-red-500/20 dark:hover:border-red-500/30 shadow-xs transition-all duration-200 cursor-pointer"
+          title="Sign Out"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </div>
   );

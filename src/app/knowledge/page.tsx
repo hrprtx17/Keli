@@ -1,27 +1,14 @@
 'use client';
-import { useState, useRef, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { 
-  Database, FileText, Globe, UploadCloud, Bot, Trash2, 
-  RefreshCcw, Loader2, AlertCircle, ChevronRight, Link as LinkIcon, Blocks
+  Database, Bot, Trash2, Loader2, Check, ChevronRight, 
+  Sparkles, FileText, Edit2, RefreshCcw, BookOpen, Clock
 } from 'lucide-react';
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, y: 0,
-    transition: { staggerChildren: 0.04, delayChildren: 0.02, type: 'spring', stiffness: 300, damping: 25 }
-  }
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 8, scale: 0.99 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 350, damping: 28 } }
-};
 
 function KnowledgePageContent() {
   const queryClient = useQueryClient();
@@ -29,21 +16,15 @@ function KnowledgePageContent() {
   const urlAgentId = searchParams.get('agentId');
   
   const [selectedAgent, setSelectedAgent] = useState<string>(urlAgentId || '');
+  const [docTitle, setDocTitle] = useState('');
+  const [docContent, setDocContent] = useState('');
+  const [editingSourceId, setEditingSourceId] = useState<string | null>(null);
   
-  useEffect(() => {
-    if (urlAgentId) setSelectedAgent(urlAgentId);
-  }, [urlAgentId]);
-
-  const [activeTab, setActiveTab] = useState<'document' | 'website' | null>(null);
-  const [crawlUrl, setCrawlUrl] = useState('');
-  const [uploading, setUploading] = useState(false);
+  const [training, setTraining] = useState(false);
   const [ingestStage, setIngestStage] = useState<string | null>(null);
   const [ingestProgress, setIngestProgress] = useState<{current: number, total: number} | null>(null);
-  
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load agents
   const { data: agents, isLoading: isLoadingAgents } = useQuery({
     queryKey: ['agents'],
     queryFn: async () => {
@@ -52,6 +33,7 @@ function KnowledgePageContent() {
     }
   });
 
+  // Load data sources for the selected agent
   const { data: dataSources, isLoading: isLoadingData } = useQuery({
     queryKey: ['datasources', selectedAgent],
     queryFn: async () => {
@@ -62,61 +44,53 @@ function KnowledgePageContent() {
     enabled: !!selectedAgent,
   });
 
+  // Select the first agent automatically if none is selected
   useEffect(() => {
     if (!selectedAgent && agents && agents.length > 0) {
        setSelectedAgent(agents[0]._id);
     }
   }, [agents, selectedAgent]);
 
-  const formatSize = (bytes: number) => {
-    if (!bytes) return '—';
-    const mb = bytes / (1024 * 1024);
-    if (mb >= 1) return `${mb.toFixed(2)} MB`;
-    return `${(bytes / 1024).toFixed(1)} KB`;
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
+  // Handle Training / Syncing custom text
+  const handleTrain = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsDragging(true);
-  };
-  
-  const handleDragLeave = () => setIsDragging(false);
-  
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) validateAndSetFile(file);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) validateAndSetFile(file);
-  };
-
-  const validateAndSetFile = (file: File) => {
-    const allowed = ['.pdf', '.docx', '.txt', '.csv', '.md'];
-    const isAllowed = allowed.some(ext => file.name.toLowerCase().endsWith(ext));
-    if (!isAllowed) {
-      toast.error('Format not supported. Use PDF, DOCX, TXT, CSV, MD.');
+    if (!selectedAgent) {
+      toast.error('Please select an agent first');
       return;
     }
-    setSelectedFile(file);
-    setActiveTab('document');
-  };
+    if (!docTitle.trim()) {
+      toast.error('Please enter a title for your knowledge base');
+      return;
+    }
+    if (!docContent.trim() || docContent.trim().length < 10) {
+      toast.error('Knowledge content must be at least 10 characters long');
+      return;
+    }
 
-  const handleUpload = async () => {
-    if (!selectedFile || !selectedAgent) return;
-    setUploading(true);
-    setIngestStage('Starting Upload');
-    
+    setTraining(true);
+    setIngestStage('Structuring Text');
+    setIngestProgress(null);
+
     try {
+      // If we are editing, we can delete the old source first to avoid double entries
+      if (editingSourceId) {
+        setIngestStage('Updating Source');
+        await fetch(`/api/datasources?id=${editingSourceId}`, { method: 'DELETE' });
+      }
+
+      // Convert custom text content to a dynamic .txt file representation
+      const file = new File(
+        [docContent], 
+        `${docTitle.trim().toLowerCase().replace(/[^a-z0-9]/g, '_')}.txt`, 
+        { type: 'text/plain' }
+      );
+
       const formData = new FormData();
       formData.append('agentId', selectedAgent);
-      formData.append('file', selectedFile);
+      formData.append('file', file);
 
       const res = await fetch('/api/datasources', { method: 'POST', body: formData });
-      if (!res.ok || !res.body) throw new Error('Ingestion channel creation failed');
+      if (!res.ok || !res.body) throw new Error('Failed to connect to training engine');
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -135,478 +109,373 @@ function KnowledgePageContent() {
             const payload = JSON.parse(line);
             const { stage, current, total, error } = payload;
 
-            if (stage === 'Failed') throw new Error(error || 'Internal pipeline fault');
+            if (stage === 'Failed') throw new Error(error || 'Training pipeline failed');
             setIngestStage(stage);
             if (current && total) setIngestProgress({ current, total });
 
             if (stage === 'Completed') {
-               toast.success(`Training complete! ${selectedFile.name} successfully synced.`);
-               queryClient.invalidateQueries({ queryKey: ['datasources', selectedAgent] });
-               resetState();
+              toast.success(editingSourceId ? 'Knowledge updated & retrained!' : 'AI trained successfully!');
+              queryClient.invalidateQueries({ queryKey: ['datasources', selectedAgent] });
+              
+              // Reset input form
+              setDocTitle('');
+              setDocContent('');
+              setEditingSourceId(null);
+              setIngestStage(null);
+              setIngestProgress(null);
             }
-          } catch (e: any) { if (e.message.includes('fault')) throw e; }
+          } catch (err: any) { 
+            if (err.message.includes('failed')) throw err; 
+          }
         }
       }
     } catch (err: any) {
-      toast.error(`Upload failed: ${err.message}`);
+      toast.error(`Training failed: ${err.message}`);
       setIngestStage('Failed');
     } finally {
-      setUploading(false);
+      setTraining(false);
     }
   };
 
-  const handleCrawl = async () => {
-    if (!crawlUrl || !selectedAgent) return;
-    
-    let validUrl = crawlUrl;
-    if (!validUrl.startsWith('http')) validUrl = 'https://' + validUrl;
-
-    setUploading(true);
-    setIngestStage('Connecting');
-    
-    try {
-      const res = await fetch('/api/datasources/crawl', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ agentId: selectedAgent, url: validUrl })
-      });
-
-      if (!res.ok || !res.body) throw new Error('Crawler offline');
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const { value, done: isDone } = await reader.read();
-        done = isDone;
-        if (!value) continue;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n').filter(l => l.trim());
-
-        for (const line of lines) {
-          try {
-            const payload = JSON.parse(line);
-            const { stage, current, total, error } = payload;
-
-            if (stage === 'Failed') throw new Error(error || 'Crawl failed');
-            setIngestStage(stage);
-            if (current && total) setIngestProgress({ current, total });
-
-            if (stage === 'Completed') {
-               toast.success(`Website synced successfully.`);
-               queryClient.invalidateQueries({ queryKey: ['datasources', selectedAgent] });
-               resetState();
-            }
-          } catch (e: any) { if (e.message.includes('crashed')) throw e; }
-        }
-      }
-    } catch (err: any) {
-      toast.error(`Connection failed: ${err.message}`);
-      setIngestStage('Failed');
-    } finally {
-      setUploading(false);
-    }
-  };
-
+  // Delete training source
   const handleDelete = async (id: string) => {
-     try {
-        const res = await fetch(`/api/datasources?id=${id}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Failed deleting source');
-        toast.success('Source deleted successfully');
-        queryClient.invalidateQueries({ queryKey: ['datasources', selectedAgent] });
-     } catch(e: any) {
-        toast.error('Could not delete source.');
-     }
+    try {
+      const res = await fetch(`/api/datasources?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Could not delete source');
+      toast.success('Source deleted and removed from AI brain');
+      queryClient.invalidateQueries({ queryKey: ['datasources', selectedAgent] });
+      
+      if (editingSourceId === id) {
+        setEditingSourceId(null);
+        setDocTitle('');
+        setDocContent('');
+      }
+    } catch (e: any) {
+      toast.error('Failed to delete training data.');
+    }
   };
 
-  const resetState = () => {
-    setSelectedFile(null);
-    setActiveTab(null);
-    setIngestStage(null);
-    setIngestProgress(null);
-    setCrawlUrl('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
+  // Load existing source back into editor for quick revision
+  const handleEdit = (source: any) => {
+    setEditingSourceId(source._id);
+    setDocTitle(source.name.replace(/\.txt$/, ''));
+    setDocContent(source.content || '');
+    toast.info(`Loaded "${source.name}" into editor for updating`);
   };
-
-  const triggerInput = () => fileInputRef.current?.click();
-
-  const activeAgentName = agents?.find((a: any) => a._id === selectedAgent)?.name || 'Select Agent';
+  const rawAgentName = agents?.find((a: any) => a._id === selectedAgent)?.name || '';
+  const activeAgentName = rawAgentName
+    ? rawAgentName.trim().split(' ').map((w: string) => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ')
+    : 'Select Agent';
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto pb-24">
+      <div className="max-w-6xl mx-auto pb-24 font-jakarta">
         
-        {/* Global Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-           <div>
-              <div className="flex items-center gap-2 text-[11px] font-medium text-orange-600 dark:text-orange-400 tracking-wider uppercase mb-2">
-                 KNOWLEDGE
-              </div>
-              <h1 className="text-3xl font-semibold text-gray-900 dark:text-zinc-100 tracking-tight">Training Data</h1>
-              <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-2 max-w-lg leading-relaxed">
-                 Manage the content your AI uses to answer questions and assist customers.
-              </p>
-           </div>
+        {/* HEADER AREA */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <div className="flex items-center gap-2 text-[11px] font-bold text-orange-500 dark:text-orange-400 tracking-wider uppercase mb-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> AI BRAIN MANAGEMENT
+            </div>
+            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">Training Data</h1>
+            <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-1 max-w-lg leading-relaxed">
+              Write custom business guidelines, FAQs, and scripts to instantly train your agent.
+            </p>
+          </div>
 
-           {/* Agent Quick Selector */}
-           <div className="relative shrink-0">
-              <select 
-                value={selectedAgent}
-                onChange={(e) => setSelectedAgent(e.target.value)}
-                className="appearance-none bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg pl-10 pr-10 py-2.5 text-[14px] font-medium text-gray-800 dark:text-zinc-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all cursor-pointer min-w-[200px]"
-              >
-                {!agents?.length && <option className="dark:bg-zinc-900">No agents found</option>}
-                {agents?.map((a: any) => (
-                   <option key={a._id} value={a._id} className="dark:bg-zinc-900">{a.name}</option>
-                ))}
-              </select>
-              <Bot className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              <ChevronRight className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 rotate-90 pointer-events-none" />
-           </div>
+          {/* Elegant Agent Selection Dropdown */}
+          <div className="relative shrink-0 w-full md:w-auto">
+            <select 
+              value={selectedAgent}
+              onChange={(e) => {
+                setSelectedAgent(e.target.value);
+                setEditingSourceId(null);
+                setDocTitle('');
+                setDocContent('');
+              }}
+              className="w-full md:w-auto appearance-none bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800/80 rounded-xl pl-10 pr-10 py-3 text-[14px] font-semibold text-zinc-800 dark:text-zinc-200 shadow-xs focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all cursor-pointer backdrop-blur-md"
+            >
+              {!agents?.length && <option className="dark:bg-zinc-900">No agents found</option>}
+              {agents?.map((a: any) => (
+                <option key={a._id} value={a._id} className="dark:bg-zinc-900">
+                  {a.name.trim().split(' ').map((w: string) => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ')}
+                </option>
+              ))}
+            </select>
+            <Bot className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 pointer-events-none" />
+            <ChevronRight className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 dark:text-zinc-500 rotate-90 pointer-events-none" />
+          </div>
         </div>
 
         {!selectedAgent ? (
-           <div className="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm">
-              <div className="w-14 h-14 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center mb-4">
-                 <Database className="w-6 h-6 text-gray-300 dark:text-zinc-600" />
-              </div>
-              <h3 className="text-[15px] font-medium text-gray-900 dark:text-zinc-100">No agent selected</h3>
-              <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-1">Please select an AI assistant to manage its knowledge base.</p>
-           </div>
+          <div className="bg-white/40 dark:bg-zinc-900/35 border border-zinc-200/50 dark:border-zinc-800/60 rounded-[28px] p-12 flex flex-col items-center justify-center text-center backdrop-blur-xl shadow-xs">
+            <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl flex items-center justify-center mb-4">
+              <Database className="w-6 h-6 text-zinc-400 dark:text-zinc-600" />
+            </div>
+            <h3 className="text-[16px] font-bold text-zinc-900 dark:text-white">No active agent selected</h3>
+            <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-1">Create or select an agent to modify its intelligence pool.</p>
+          </div>
         ) : (
-           <motion.div 
-             variants={containerVariants} initial="hidden" animate="visible"
-             className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
-           >
-              {/* MAIN INGESTION SYSTEM */}
-              <div className="lg:col-span-8 space-y-8">
-                 
-                 <motion.div variants={itemVariants} className="space-y-4">
-                    <div>
-                       <h2 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100">Add Training Data</h2>
-                       <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-1">Upload documents or connect your website to train your AI assistant.</p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* LEFT COLUMN: THE PREMIUM WRITER/EDITOR */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="bg-white/40 dark:bg-zinc-900/35 border border-zinc-200/50 dark:border-zinc-800/60 rounded-[28px] p-6 backdrop-blur-xl shadow-xs relative overflow-hidden">
+                
+                {/* Visual Glass highlights */}
+                <div className="absolute -top-24 -left-24 w-48 h-48 bg-orange-500/5 dark:bg-orange-500/10 rounded-full blur-[80px] pointer-events-none" />
+                
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-[16px] font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-orange-500" />
+                      {editingSourceId ? 'Modify Knowledge Block' : 'Draft New Knowledge'}
+                    </h2>
+                    <p className="text-[12.5px] text-zinc-400 dark:text-zinc-500 mt-0.5">
+                      Write or copy text directly to teach {activeAgentName}.
+                    </p>
+                  </div>
+                  {editingSourceId && (
+                    <button 
+                      onClick={() => {
+                        setEditingSourceId(null);
+                        setDocTitle('');
+                        setDocContent('');
+                        toast.success('Cleared editing session');
+                      }}
+                      className="text-[12px] font-bold text-zinc-400 hover:text-red-500 transition-colors px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800/60 cursor-pointer"
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
+
+                <form onSubmit={handleTrain} className="space-y-4">
+                  {/* Title Box */}
+                  <div>
+                    <label className="block text-[12px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">
+                      Document Title
+                    </label>
+                    <input 
+                      type="text"
+                      placeholder="e.g. Return Policy, Pricing FAQ"
+                      value={docTitle}
+                      onChange={(e) => setDocTitle(e.target.value)}
+                      disabled={training}
+                      maxLength={60}
+                      className="w-full h-11 px-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 outline-none text-[14px] font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-orange-500/40 focus:ring-4 focus:ring-orange-500/5 dark:focus:ring-orange-500/10 transition-all"
+                    />
+                  </div>
+
+                  {/* Body Editor Box */}
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-[12px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                        Knowledge Content
+                      </label>
+                      <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-600">
+                        {docContent.length} chars
+                      </span>
                     </div>
+                    <textarea 
+                      placeholder="Type or paste the raw knowledge context here. For example:&#10;Q: What is the delivery timeframe?&#10;A: Standard delivery takes 3-5 business days. Express shipping takes 1-2 days."
+                      value={docContent}
+                      onChange={(e) => setDocContent(e.target.value)}
+                      disabled={training}
+                      rows={12}
+                      className="w-full p-4 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 outline-none text-[14px] font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-orange-500/40 focus:ring-4 focus:ring-orange-500/5 dark:focus:ring-orange-500/10 transition-all resize-none leading-relaxed"
+                    />
+                  </div>
 
-                    <div className="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-[20px] shadow-sm overflow-hidden group hover:border-orange-200 dark:hover:border-orange-500/40 transition-colors">
-                       <div className="p-6">
-                          {!activeTab ? (
-                             <div className="space-y-4">
-                                {/* Drag Zone */}
-                                <div 
-                                  onDragOver={handleDragOver}
-                                  onDragLeave={handleDragLeave}
-                                  onDrop={handleDrop}
-                                  onClick={triggerInput}
-                                  className={`border border-dashed rounded-xl flex flex-col items-center justify-center py-10 px-6 cursor-pointer transition-all duration-200 ${
-                                     isDragging 
-                                      ? 'border-orange-400 bg-orange-50/50 dark:bg-orange-950/20' 
-                                      : 'border-gray-300 dark:border-zinc-700 hover:border-orange-300 dark:hover:border-orange-500/50 hover:bg-orange-50/30 dark:hover:bg-orange-950/10'
-                                  }`}
-                                >
-                                   <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.docx,.txt,.csv,.md" onChange={handleFileChange} />
-                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 transition-colors ${isDragging ? 'bg-orange-500 text-white' : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 group-hover:text-orange-500 group-hover:bg-orange-100 dark:group-hover:bg-orange-950/40'}`}>
-                                      <UploadCloud className="w-5 h-5" />
-                                   </div>
-                                   <p className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">Drop files here or browse to upload</p>
-                                   <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1">PDF, DOCX, TXT, CSV, Markdown</p>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                   <button 
-                                     onClick={() => setActiveTab('website')}
-                                     className="border border-gray-200 dark:border-zinc-800 rounded-xl p-4 text-left flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-zinc-950/50 hover:border-gray-300 dark:hover:border-zinc-700 transition-all hover:shadow-sm"
-                                   >
-                                      <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 text-gray-600 dark:text-zinc-400 flex items-center justify-center shrink-0">
-                                         <LinkIcon className="w-4 h-4"/>
-                                      </div>
-                                      <div>
-                                         <h4 className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">Website Crawl</h4>
-                                         <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-0.5">Train your AI using pages from your website.</p>
-                                      </div>
-                                   </button>
-                                   
-                                   <div className="border border-gray-200 dark:border-zinc-800 rounded-xl p-4 text-left flex items-start gap-3 opacity-60 bg-gray-50/50 dark:bg-zinc-950/30 cursor-default">
-                                      <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 border border-gray-100 dark:border-zinc-800 text-gray-400 dark:text-zinc-500 flex items-center justify-center shrink-0">
-                                         <Blocks className="w-4 h-4"/>
-                                      </div>
-                                      <div>
-                                         <div className="flex items-center gap-2 mb-0.5">
-                                            <h4 className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">Integrations</h4>
-                                            <span className="text-[10px] font-medium bg-gray-200/80 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 px-1.5 py-0.5 rounded-md">Soon</span>
-                                         </div>
-                                         <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-0.5">Connect tools like Notion, Slack, and Zendesk.</p>
-                                      </div>
-                                   </div>
-                                </div>
-                             </div>
-                          ) : activeTab === 'document' ? (
-                             <div className="animate-in slide-in-from-bottom-2 duration-300">
-                                <div className="flex items-center justify-between mb-4">
-                                   <h3 className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">Upload Document</h3>
-                                   <button onClick={resetState} className="text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white">Cancel</button>
-                                </div>
-                                <div className="bg-gray-50 dark:bg-zinc-950 border border-gray-200/60 dark:border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                   <div className="flex items-center gap-4 min-w-0 w-full">
-                                      <div className="w-10 h-10 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg shadow-sm flex items-center justify-center shrink-0">
-                                         <FileText className="w-5 h-5 text-gray-500 dark:text-zinc-400" />
-                                      </div>
-                                      <div className="min-w-0">
-                                         <h4 className="text-[14px] font-medium text-gray-900 dark:text-zinc-100 truncate">{selectedFile?.name || 'Loading file...'}</h4>
-                                         <p className="text-[13px] text-gray-500 dark:text-zinc-400">{formatSize(selectedFile?.size || 0)}</p>
-                                      </div>
-                                   </div>
-                                   
-                                   {!uploading ? (
-                                      <button 
-                                        onClick={handleUpload}
-                                        className="w-full sm:w-auto bg-gray-900 dark:bg-zinc-100 text-white dark:text-zinc-900 h-9 px-5 rounded-lg font-medium text-[13px] hover:bg-gray-800 dark:hover:bg-white transition-all whitespace-nowrap shadow-sm"
-                                      >
-                                         Upload & Train
-                                      </button>
-                                   ) : (
-                                      <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 px-4 h-9 rounded-lg border border-gray-200 dark:border-zinc-800 text-[13px] font-medium text-gray-900 dark:text-zinc-100 whitespace-nowrap shadow-sm">
-                                         <Loader2 className="w-3.5 h-3.5 animate-spin text-orange-500" /> 
-                                         {ingestStage === 'Embedding' && ingestProgress ? `${ingestProgress.current}/${ingestProgress.total}` : ingestStage || 'Processing...'}
-                                      </div>
-                                   )}
-                                </div>
-                             </div>
-                          ) : (
-                             <div className="animate-in slide-in-from-bottom-2 duration-300">
-                                <div className="flex items-center justify-between mb-4">
-                                   <h3 className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">Website Crawl</h3>
-                                   <button onClick={resetState} className="text-[13px] text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white">Cancel</button>
-                                </div>
-                                <div className="relative">
-                                   <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                                   <input 
-                                      type="text" 
-                                      placeholder="https://example.com" 
-                                      value={crawlUrl}
-                                      onChange={e => setCrawlUrl(e.target.value)}
-                                      disabled={uploading}
-                                      className="w-full bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 rounded-lg pl-10 pr-[120px] py-2.5 text-[14px] text-gray-900 dark:text-zinc-100 outline-none focus:bg-white dark:focus:bg-zinc-900 focus:border-orange-400 focus:ring-[3px] focus:ring-orange-500/10 transition-all"
-                                   />
-                                   <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
-                                      <button 
-                                        onClick={handleCrawl}
-                                        disabled={uploading || !crawlUrl}
-                                        className="bg-gray-900 dark:bg-zinc-100 text-white dark:text-zinc-900 h-7 px-3 rounded-md font-medium text-[12px] hover:bg-gray-800 dark:hover:bg-white disabled:opacity-50 transition-all flex items-center gap-2 shadow-sm"
-                                      >
-                                         {uploading ? <><Loader2 className="w-3 h-3 animate-spin" /> Training</> : 'Start Crawl'}
-                                      </button>
-                                   </div>
-                                </div>
-                                <p className="text-[12px] text-gray-500 dark:text-zinc-400 mt-2 px-1 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Crawls up to 10 subpages automatically.</p>
-                             </div>
-                          )}
-                       </div>
-                    </div>
-                 </motion.div>
-
-                 {/* LIVE TRACKING BAR */}
-                 <AnimatePresence>
-                    {uploading && (
-                       <motion.div 
-                         initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                         className="overflow-hidden"
-                       >
-                          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-[20px] p-5 shadow-sm mt-4">
-                             <div className="flex justify-between items-center mb-3">
-                                <div className="flex items-center gap-2 text-[13px] font-medium text-gray-900 dark:text-zinc-100">
-                                   <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" /> Training in progress
-                                </div>
-                                <div className="text-[12px] text-gray-500 dark:text-zinc-400">{ingestStage}...</div>
-                             </div>
-                             {ingestProgress ? (
-                                <div className="w-full bg-gray-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden relative">
-                                   <motion.div 
-                                     initial={{ width: '5%' }}
-                                     animate={{ width: `${Math.min(100, (ingestProgress.current / ingestProgress.total) * 100)}%` }}
-                                     className="h-full bg-orange-500 rounded-full"
-                                   />
-                                </div>
-                             ) : (
-                                <div className="w-full bg-gray-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                                   <div className="h-full w-1/3 bg-orange-500 rounded-full animate-[shimmer_1.5s_infinite]" />
-                                </div>
-                             )}
-                          </div>
-                       </motion.div>
-                    )}
-                 </AnimatePresence>
-
-                 {/* REPOSITORY LIST */}
-                 <motion.div variants={itemVariants} className="space-y-4">
-                    <div>
-                       <h2 className="text-[16px] font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-2">Connected Sources</h2>
-                       <p className="text-[14px] text-gray-500 dark:text-zinc-400 mt-1">Content currently used to train your AI assistant.</p>
-                    </div>
-
-                    <div className="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-[20px] shadow-sm overflow-hidden">
-                       <div className="overflow-x-auto">
-                          <table className="w-full text-left border-collapse">
-                             <thead>
-                                <tr className="text-[12px] font-medium text-gray-500 dark:text-zinc-400 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-950/50">
-                                   <th className="px-6 py-3">Source</th>
-                                   <th className="px-6 py-3">Status</th>
-                                   <th className="px-6 py-3">Size</th>
-                                   <th className="px-6 py-3 text-right">Actions</th>
-                                </tr>
-                             </thead>
-                             <tbody className="divide-y divide-gray-50 dark:divide-zinc-800">
-                                {isLoadingData ? (
-                                   [1, 2].map(k => (
-                                      <tr key={k} className="animate-pulse">
-                                         <td colSpan={4} className="px-6 py-4"><div className="h-5 bg-gray-100 dark:bg-zinc-800 rounded w-1/2" /></td>
-                                      </tr>
-                                   ))
-                                ) : !dataSources || dataSources.length === 0 ? (
-                                   <tr>
-                                      <td colSpan={4} className="px-6 py-12 text-center">
-                                         <div className="flex flex-col items-center">
-                                            <div className="w-12 h-12 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-3">
-                                               <Database className="w-5 h-5 text-gray-400 dark:text-zinc-600" />
-                                            </div>
-                                            <p className="text-[14px] font-medium text-gray-900 dark:text-zinc-100">No training data yet</p>
-                                            <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-1 max-w-[240px]">Upload documents or connect your website to start training your AI.</p>
-                                            <button 
-                                              onClick={triggerInput}
-                                              className="mt-4 text-[13px] font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:underline transition-colors"
-                                            >
-                                               Add First Source
-                                            </button>
-                                         </div>
-                                      </td>
-                                   </tr>
-                                ) : (
-                                   dataSources.map((source: any) => {
-                                      const isReady = source.status === 'ready';
-                                      const isUrl = source.type === 'url';
-                                      return (
-                                         <tr key={source._id} className="hover:bg-gray-50/50 dark:hover:bg-zinc-950/50 transition-colors group">
-                                            <td className="px-6 py-4 min-w-[220px]">
-                                               <div className="flex items-center gap-3">
-                                                  <div className={`w-8 h-8 rounded-md flex items-center justify-center border shrink-0 ${isUrl ? 'bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400' : 'bg-white dark:bg-zinc-950 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400'}`}>
-                                                     {isUrl ? <Globe className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                                                  </div>
-                                                  <div className="min-w-0">
-                                                     <p className="text-[13px] font-medium text-gray-900 dark:text-zinc-100 truncate max-w-[200px]">{source.name}</p>
-                                                     <p className="text-[12px] text-gray-500 dark:text-zinc-400 flex items-center gap-1 mt-0.5">
-                                                        Added {source.createdAt ? new Date(source.createdAt).toLocaleDateString() : 'Recently'}
-                                                     </p>
-                                                  </div>
-                                               </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                               <div className="flex items-center gap-1.5">
-                                                  {isReady ? (
-                                                     <>
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                                        <span className="text-[13px] text-gray-600 dark:text-zinc-300">Trained</span>
-                                                     </>
-                                                  ) : (
-                                                     <>
-                                                        <Loader2 className="w-3.5 h-3.5 animate-spin text-orange-500" />
-                                                        <span className="text-[13px] text-gray-600 dark:text-zinc-300">Training...</span>
-                                                     </>
-                                                  )}
-                                               </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                               <div className="text-[13px] text-gray-500 dark:text-zinc-400">
-                                                  {isUrl ? `${source.metadata?.pages || '?'} pages` : formatSize(source.metadata?.size)}
-                                               </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                               <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                  <button 
-                                                    onClick={() => toast.info("Retraining scheduled.")}
-                                                    className="p-1.5 rounded-md text-gray-400 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all"
-                                                    title="Refresh"
-                                                  >
-                                                     <RefreshCcw className="w-3.5 h-3.5" />
-                                                  </button>
-                                                  <button 
-                                                    onClick={() => handleDelete(source._id)}
-                                                    className="p-1.5 rounded-md text-gray-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
-                                                    title="Delete"
-                                                  >
-                                                     <Trash2 className="w-3.5 h-3.5" />
-                                                  </button>
-                                               </div>
-                                            </td>
-                                         </tr>
-                                      )
-                                   })
-                                )}
-                             </tbody>
-                          </table>
-                       </div>
-                    </div>
-                 </motion.div>
-              </div>
-
-              {/* SIDEBAR STATS/ACTIONS */}
-              <div className="lg:col-span-4 space-y-6">
-                 <motion.div variants={itemVariants} className="bg-[#18181B] text-white rounded-[20px] p-6 shadow-md relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/3 group-hover:bg-orange-500/30 transition-colors duration-500" />
-                    
-                    <div className="relative z-10">
-                       <h3 className="text-[13px] font-medium text-zinc-400 mb-6 flex items-center gap-2">
-                          <Bot className="w-4 h-4" /> AI Status
-                       </h3>
-
-                       <div className="space-y-6">
-                          <div>
-                             <div className="text-[12px] text-zinc-500 mb-1">Target Assistant</div>
-                             <div className="text-[15px] font-medium text-zinc-100">{activeAgentName}</div>
+                  {/* Actions & Dynamic Training Bar */}
+                  <div className="pt-2">
+                    <AnimatePresence mode="wait">
+                      {training ? (
+                        <motion.div 
+                          key="training-state"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="bg-orange-50/50 dark:bg-orange-950/10 border border-orange-500/20 rounded-xl p-4 flex flex-col gap-3"
+                        >
+                          <div className="flex justify-between items-center text-[13px] font-bold">
+                            <span className="text-orange-600 dark:text-orange-400 flex items-center gap-2">
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              {ingestStage || 'Training AI Assistant...'}
+                            </span>
+                            {ingestProgress && (
+                              <span className="text-zinc-500 dark:text-zinc-400">
+                                {Math.round((ingestProgress.current / ingestProgress.total) * 100)}%
+                              </span>
+                            )}
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-4 py-4 border-y border-zinc-800">
-                             <div>
-                                <div className="text-[24px] font-semibold text-white mb-0.5">
-                                   {dataSources?.length || 0}
-                                </div>
-                                <div className="text-[12px] text-zinc-500">Sources Added</div>
-                             </div>
-                             <div>
-                                <div className="text-[24px] font-semibold text-white flex items-center gap-1 mb-0.5">
-                                   100<span className="text-[16px] text-zinc-500">%</span>
-                                </div>
-                                <div className="text-[12px] text-zinc-500">Training Health</div>
-                             </div>
+                          {/* Progress Line */}
+                          <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden relative">
+                            {ingestProgress ? (
+                              <motion.div 
+                                initial={{ width: '5%' }}
+                                animate={{ width: `${(ingestProgress.current / ingestProgress.total) * 100}%` }}
+                                className="h-full bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
+                              />
+                            ) : (
+                              <div className="h-full w-1/3 bg-orange-500 rounded-full animate-[shimmer_1.5s_infinite]" />
+                            )}
                           </div>
-
-                          <button 
-                             onClick={() => toast.success('Retraining initiated.')}
-                             className="w-full h-[40px] bg-white text-zinc-900 rounded-lg font-medium text-[13px] flex items-center justify-center gap-2 hover:bg-zinc-100 transition-all active:scale-[0.98]"
-                          >
-                             <RefreshCcw className="w-3.5 h-3.5" /> Retrain AI
-                          </button>
-                       </div>
-                    </div>
-                 </motion.div>
-
-                 <motion.div variants={itemVariants} className="bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-800 rounded-[20px] p-6 shadow-sm">
-                    <h4 className="text-[14px] font-semibold text-gray-900 dark:text-zinc-100 mb-4">AI Configuration</h4>
-                    <div className="space-y-3">
-                       {[
-                          { t: 'Training Method', v: 'Semantic Search' },
-                          { t: 'AI Model', v: 'GPT-4 Optimized' },
-                          { t: 'Storage', v: 'Secure Vector DB' }
-                       ].map((inf, i) => (
-                          <div key={i} className="flex justify-between items-center text-[13px] border-b border-gray-50 dark:border-zinc-800 pb-2.5 last:border-0 last:pb-0">
-                             <span className="text-gray-500 dark:text-zinc-400">{inf.t}</span>
-                             <span className="text-gray-900 dark:text-zinc-100 font-medium">{inf.v}</span>
-                          </div>
-                       ))}
-                    </div>
-                 </motion.div>
+                        </motion.div>
+                      ) : (
+                        <motion.button 
+                          key="submit-state"
+                          whileTap={{ scale: 0.98 }}
+                          type="submit"
+                          disabled={!docTitle.trim() || docContent.trim().length < 10}
+                          className="w-full h-11 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold text-[14px] flex items-center justify-center gap-2 transition-all hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer"
+                        >
+                          <Database className="w-4 h-4" />
+                          {editingSourceId ? 'Update & Train Agent' : 'Train Agent on Text'}
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </form>
               </div>
-           </motion.div>
+            </div>
+
+            {/* RIGHT COLUMN: CURRENTLY TRAINED SOURCES */}
+            <div className="lg:col-span-5 space-y-6">
+              
+              {/* STATS OVERVIEW CARD */}
+              <div className="bg-zinc-900 dark:bg-zinc-900/40 text-white rounded-[24px] p-5 shadow-md relative overflow-hidden group border border-zinc-800/20">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/3" />
+                <div className="relative z-10 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="text-[12px] text-zinc-500 font-bold uppercase tracking-wider">AI Memory State</div>
+                    <h3 className="text-[18px] font-bold text-white leading-tight">{activeAgentName}</h3>
+                  </div>
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 stroke-[2.5]" /> Active
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-zinc-800/80">
+                  <div>
+                    <div className="text-[20px] font-extrabold text-white">
+                      {dataSources?.length || 0}
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-medium">Drafted Sources</div>
+                  </div>
+                  <div>
+                    <div className="text-[20px] font-extrabold text-white flex items-center gap-0.5">
+                      100<span className="text-[14px] text-zinc-500 font-medium">%</span>
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-medium">Accuracy Health</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* LIST CARD */}
+              <div className="bg-white/40 dark:bg-zinc-900/35 border border-zinc-200/50 dark:border-zinc-800/60 rounded-[28px] p-5 backdrop-blur-xl shadow-xs">
+                <h3 className="text-[14px] font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-orange-500" />
+                  Currently Trained Knowledge
+                </h3>
+
+                <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                  {isLoadingData ? (
+                    [1, 2].map(i => (
+                      <div key={i} className="animate-pulse flex items-center gap-3 p-3 bg-white dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 rounded-xl">
+                        <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-900 shrink-0" />
+                        <div className="space-y-1.5 w-full">
+                          <div className="h-4 bg-zinc-100 dark:bg-zinc-900 rounded w-2/3" />
+                          <div className="h-3 bg-zinc-100 dark:bg-zinc-900 rounded w-1/3" />
+                        </div>
+                      </div>
+                    ))
+                  ) : !dataSources || dataSources.length === 0 ? (
+                    <div className="text-center py-10 px-4 bg-zinc-50/20 dark:bg-zinc-950/20 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800/80">
+                      <Database className="w-8 h-8 text-zinc-400 dark:text-zinc-600 mx-auto mb-2.5" />
+                      <p className="text-[13px] font-bold text-zinc-900 dark:text-white">Brain is empty</p>
+                      <p className="text-[12px] text-zinc-400 dark:text-zinc-500 mt-1 max-w-[200px] mx-auto">
+                        Type custom text on the left to start teaching your AI assistant.
+                      </p>
+                    </div>
+                  ) : (
+                    <AnimatePresence initial={false}>
+                      {dataSources.map((source: any) => {
+                        const isSelectedForEdit = editingSourceId === source._id;
+                        const wordCount = source.content?.split(/\s+/).filter(Boolean).length || 0;
+                        
+                        return (
+                          <motion.div 
+                            key={source._id}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className={`p-3.5 rounded-xl border flex flex-col gap-2.5 transition-all group ${
+                              isSelectedForEdit 
+                                ? 'bg-orange-500/5 border-orange-500/30' 
+                                : 'bg-white dark:bg-zinc-950 border-zinc-200/50 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700/80'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${
+                                  isSelectedForEdit 
+                                    ? 'bg-orange-500 text-white border-orange-500/30' 
+                                    : 'bg-zinc-50 dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400'
+                                }`}>
+                                  <FileText className="w-4 h-4" />
+                                </div>
+                                <div className="min-w-0">
+                                  <h4 className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100 truncate pr-2">
+                                    {source.name.replace(/\.txt$/, '')}
+                                  </h4>
+                                  <div className="flex items-center gap-2 text-[11px] text-zinc-400 dark:text-zinc-500 font-semibold mt-0.5">
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(source.createdAt).toLocaleDateString()}</span>
+                                    <span>•</span>
+                                    <span>{wordCount} words</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* ACTIONS */}
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity shrink-0">
+                                <button 
+                                  onClick={() => handleEdit(source)}
+                                  disabled={training}
+                                  className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all cursor-pointer"
+                                  title="Edit & Retrain"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(source._id)}
+                                  disabled={training}
+                                  className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all cursor-pointer"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* PREVIEW BODY TEXT */}
+                            {source.content && (
+                              <p className="text-[12px] text-zinc-500 dark:text-zinc-400 line-clamp-2 bg-zinc-50/50 dark:bg-zinc-900/30 p-2 rounded-lg border border-zinc-200/20 dark:border-zinc-800/40 leading-relaxed italic">
+                                "{source.content}"
+                              </p>
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  )}
+                </div>
+              </div>
+            </div>
+
+          </div>
         )}
 
       </div>
@@ -616,7 +485,7 @@ function KnowledgePageContent() {
 
 export default function KnowledgePage() {
   return (
-    <Suspense fallback={<DashboardLayout><div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div></DashboardLayout>}>
+    <Suspense fallback={<DashboardLayout><div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-zinc-400" /></div></DashboardLayout>}>
       <KnowledgePageContent />
     </Suspense>
   );

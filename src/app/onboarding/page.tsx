@@ -42,7 +42,7 @@ export default function OnboardingPage() {
     const tick = setInterval(() => {
       stepIdx = Math.min(stepIdx + 1, CREATING_STEPS.length - 1);
       setCreatingStep(stepIdx);
-    }, 600);
+    }, 150);
 
     try {
       // Create workspace if needed
@@ -85,10 +85,10 @@ export default function OnboardingPage() {
       setDone(true);
       setLoading(false);
 
-      // Auto-navigate after 1.2s
+      // Auto-navigate after 200ms
       setTimeout(() => {
         router.push(`/agents/${ad._id}`);
-      }, 1200);
+      }, 200);
     } catch (e: any) {
       clearInterval(tick);
       setLoading(false);
