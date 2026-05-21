@@ -83,10 +83,10 @@ export default function LandingPage() {
         animate={{ y: 0 }}
         className={`fixed z-50 transition-all duration-300 ease-in-out
           top-4 inset-x-4 max-w-5xl md:mx-auto rounded-[24px] md:rounded-[28px]
-          border border-zinc-200/50 dark:border-zinc-850/85 bg-white/65 dark:bg-zinc-950/65 backdrop-blur-xl
+          border border-zinc-200/50 dark:border-zinc-800/85 bg-white/65 dark:bg-zinc-950/65 backdrop-blur-xl
           ${scrolled 
-            ? 'shadow-[0_12px_40px_-12px_rgba(249,115,22,0.12)] dark:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)] py-2 md:py-3 border-zinc-250 dark:border-zinc-800' 
-            : 'shadow-[0_8px_30px_rgba(0,0,0,0.03)] py-3 md:py-4 border-zinc-200/50 dark:border-zinc-850/85'
+            ? 'shadow-[0_12px_40px_-12px_rgba(249,115,22,0.12)] dark:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)] py-2 md:py-3 border-zinc-200 dark:border-zinc-800' 
+            : 'shadow-[0_8px_30px_rgba(0,0,0,0.03)] py-3 md:py-4 border-zinc-200/50 dark:border-zinc-800/85'
           }
         `}
       >

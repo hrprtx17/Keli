@@ -480,7 +480,7 @@ export default function PlansPage() {
                     {row.premium ? (
                       <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" />
                     ) : (
-                      <span className="text-zinc-300 dark:text-zinc-850 text-sm font-black">✗</span>
+                      <span className="text-zinc-300 dark:text-zinc-800 text-sm font-black">✗</span>
                     )}
                   </td>
                 </tr>
@@ -502,14 +502,14 @@ export default function PlansPage() {
                   <td className="py-4 px-6 text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{row.name}</td>
                   <td className="py-4 px-6 text-center text-[13px] text-zinc-500 dark:text-zinc-400 font-medium">
                     {typeof row.free === 'boolean' ? (
-                      row.free ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-300 dark:text-zinc-850 text-sm font-black">✗</span>
+                      row.free ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-300 dark:text-zinc-800 text-sm font-black">✗</span>
                     ) : (
                       row.free
                     )}
                   </td>
                   <td className="py-4 px-6 text-center text-[13px] font-bold text-zinc-900 dark:text-zinc-100 bg-orange-500/5 border-x border-orange-500/10">
                     {typeof row.premium === 'boolean' ? (
-                      row.premium ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-300 dark:text-zinc-850 text-sm font-black">✗</span>
+                      row.premium ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-300 dark:text-zinc-800 text-sm font-black">✗</span>
                     ) : (
                       row.premium
                     )}
@@ -534,14 +534,14 @@ export default function PlansPage() {
                   <td className="py-4 px-6 text-[13px] font-semibold text-zinc-700 dark:text-zinc-300">{row.name}</td>
                   <td className="py-4 px-6 text-center text-[13px] text-zinc-500 dark:text-zinc-400 font-medium">
                     {typeof row.free === 'boolean' ? (
-                      row.free ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-350 dark:text-zinc-800 text-sm font-black">✗</span>
+                      row.free ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-300 dark:text-zinc-800 text-sm font-black">✗</span>
                     ) : (
                       row.free
                     )}
                   </td>
                   <td className="py-4 px-6 text-center text-[13px] font-bold text-zinc-900 dark:text-zinc-100 bg-orange-500/5 border-x border-orange-500/10">
                     {typeof row.premium === 'boolean' ? (
-                      row.premium ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-350 dark:text-zinc-800 text-sm font-black">✗</span>
+                      row.premium ? <Check className="w-4.5 h-4.5 text-[#FF6B35] mx-auto stroke-[2.5px]" /> : <span className="text-zinc-300 dark:text-zinc-800 text-sm font-black">✗</span>
                     ) : (
                       row.premium
                     )}

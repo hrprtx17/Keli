@@ -156,7 +156,7 @@ function DeployPageContent() {
                   </div>
 
                   {/* CODE PREVIEW */}
-                  <div className="relative rounded-xl overflow-hidden bg-zinc-950 border border-zinc-850 shadow-inner mb-6">
+                  <div className="relative rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-inner mb-6">
                      <pre className="p-4 font-mono text-[12.5px] leading-relaxed text-zinc-300 overflow-x-auto whitespace-pre">
                         <code>{embedCode}</code>
                      </pre>

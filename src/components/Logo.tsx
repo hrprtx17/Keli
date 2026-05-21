@@ -19,7 +19,7 @@ export function KeliAiLogo({ href = '/', size = 'md', className = '' }: LogoProp
   
   const inner = (
     <span className={`inline-flex items-center group ${className}`}>
-      <span className={`font-sans font-black uppercase tracking-[0.22em] ${s.text} bg-gradient-to-r from-zinc-950 via-zinc-850 to-zinc-700 dark:from-white dark:via-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent transition-all duration-300 select-none flex items-center`}>
+      <span className={`font-sans font-black uppercase tracking-[0.22em] ${s.text} bg-gradient-to-r from-zinc-950 via-zinc-800 to-zinc-700 dark:from-white dark:via-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent transition-all duration-300 select-none flex items-center`}>
         Keli AI<span className="text-[#FF6B35] font-black tracking-normal ml-0.5 animate-pulse">.</span>
       </span>
     </span>

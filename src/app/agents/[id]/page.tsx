@@ -122,7 +122,7 @@ export default function AgentPlaygroundPage() {
         </div>
 
         {/* CENTERED PLAYGROUND CHAT BOX */}
-        <div className="flex items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/10 border border-zinc-200/50 dark:border-zinc-850 rounded-[28px] p-3 sm:p-6 md:p-10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.01)] min-h-[500px]">
+        <div className="flex items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/10 border border-zinc-200/50 dark:border-zinc-800 rounded-[28px] p-3 sm:p-6 md:p-10 shadow-[inset_0_2px_10px_rgba(0,0,0,0.01)] min-h-[500px]">
           
           <motion.div 
             initial={{ opacity: 0, y: 15, scale: 0.98 }}
@@ -164,7 +164,7 @@ export default function AgentPlaygroundPage() {
             >
               {/* Welcome Message */}
               <div className="flex flex-col gap-1 items-start max-w-[85%] animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div className="px-4 py-3 bg-white dark:bg-zinc-850 border border-zinc-100 dark:border-zinc-800 text-gray-800 dark:text-zinc-100 text-[13.5px] font-medium leading-relaxed rounded-2xl rounded-tl-sm shadow-xs">
+                <div className="px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800 text-gray-800 dark:text-zinc-100 text-[13.5px] font-medium leading-relaxed rounded-2xl rounded-tl-sm shadow-xs">
                   {welcomeMessage}
                 </div>
               </div>
@@ -184,7 +184,7 @@ export default function AgentPlaygroundPage() {
                         className={`px-4 py-2.5 text-[13.5px] font-medium leading-relaxed whitespace-pre-wrap ${
                           isUser 
                             ? 'text-white rounded-2xl rounded-tr-sm shadow-xs' 
-                            : 'bg-white dark:bg-zinc-850 border border-zinc-100 dark:border-zinc-800 text-gray-800 dark:text-zinc-100 rounded-2xl rounded-tl-sm shadow-xs'
+                            : 'bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800 text-gray-800 dark:text-zinc-100 rounded-2xl rounded-tl-sm shadow-xs'
                         }`}
                         style={isUser ? { backgroundColor: primaryColor } : {}}
                       >
@@ -204,7 +204,7 @@ export default function AgentPlaygroundPage() {
               {/* Loading indicator */}
               {isChatLoading && (
                 <div className="flex items-start max-w-[85%] animate-in fade-in">
-                  <div className="px-4 py-3 bg-white dark:bg-zinc-850 border border-zinc-100 dark:border-zinc-800 rounded-2xl rounded-tl-sm shadow-xs flex items-center">
+                  <div className="px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800 rounded-2xl rounded-tl-sm shadow-xs flex items-center">
                     <div className="flex gap-1.5">
                       <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-zinc-500 rounded-full animate-bounce" />
                       <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />

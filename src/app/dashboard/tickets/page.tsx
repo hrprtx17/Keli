@@ -515,7 +515,7 @@ export default function TicketsDashboardPage() {
         {/* FILTER TOOLBAR */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-shrink-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-3 rounded-lg shadow-sm">
           {/* Status Tabs (Left Side) */}
-          <div className="flex bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-850 p-1 rounded-md text-xs font-semibold overflow-x-auto scrollbar-none gap-1 w-full md:w-auto">
+          <div className="flex bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-1 rounded-md text-xs font-semibold overflow-x-auto scrollbar-none gap-1 w-full md:w-auto">
             {([
               { id: 'all', label: 'All' },
               { id: 'open', label: 'Open' },
@@ -628,17 +628,17 @@ export default function TicketsDashboardPage() {
                       </div>
                       <div className="h-3.5 bg-gray-200 dark:bg-zinc-800 rounded w-3/4" />
                       <div className="flex justify-between items-center">
-                        <div className="h-3 bg-gray-150 dark:bg-zinc-850 rounded w-36" />
+                        <div className="h-3 bg-gray-100 dark:bg-zinc-800 rounded w-36" />
                         <div className="flex gap-2">
-                          <div className="h-4 bg-gray-150 dark:bg-zinc-850 rounded w-10" />
-                          <div className="h-4 bg-gray-150 dark:bg-zinc-850 rounded w-14" />
+                          <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded w-10" />
+                          <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded w-14" />
                         </div>
                       </div>
                     </div>
                   ))
                 ) : filteredAndSortedTickets.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 py-24 text-center">
-                    <div className="w-14 h-14 bg-gray-50 dark:bg-zinc-950 rounded-2xl flex items-center justify-center mb-4 text-gray-300 dark:text-zinc-755 border border-gray-100 dark:border-zinc-850 shadow-xs">
+                    <div className="w-14 h-14 bg-gray-50 dark:bg-zinc-950 rounded-2xl flex items-center justify-center mb-4 text-gray-300 dark:text-zinc-550 border border-gray-100 dark:border-zinc-800 shadow-xs">
                       <Inbox className="w-7 h-7" />
                     </div>
                     <h3 className="text-[14px] font-semibold text-gray-700 dark:text-zinc-300">No tickets yet</h3>
@@ -832,7 +832,7 @@ export default function TicketsDashboardPage() {
                   <div className="p-5 space-y-6">
                     
                     {/* Subject highlight */}
-                    <div className="text-left bg-gray-50/50 dark:bg-zinc-950/20 p-4 border border-gray-150 dark:border-zinc-850 rounded-lg">
+                    <div className="text-left bg-gray-50/50 dark:bg-zinc-950/20 p-4 border border-gray-100 dark:border-zinc-800 rounded-lg">
                       <span className="text-[10px] tracking-widest font-bold uppercase text-[#FF6B35] block">Subject</span>
                       <h3 className="text-base font-bold text-gray-900 dark:text-zinc-150 mt-1">
                         {selectedTicket.subject || 'Support Request'}
@@ -903,7 +903,7 @@ export default function TicketsDashboardPage() {
                                 <div className={`px-4 py-2.5 rounded-2xl text-xs max-w-[85%] break-words shadow-xs leading-relaxed ${
                                   isUser 
                                     ? 'bg-[#FF6B35] text-white rounded-tr-none' 
-                                    : 'bg-gray-100 dark:bg-zinc-850 text-gray-800 dark:text-zinc-200 rounded-tl-none border border-gray-150 dark:border-zinc-800'
+                                    : 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none border border-gray-100 dark:border-zinc-800'
                                 }`}>
                                   {msg.content}
                                 </div>
@@ -938,7 +938,7 @@ export default function TicketsDashboardPage() {
                       <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">
                         Details
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50/50 dark:bg-zinc-950/20 border border-gray-250 dark:border-zinc-850 rounded-xl p-4 text-xs">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50/50 dark:bg-zinc-950/20 border border-gray-200 dark:border-zinc-800 rounded-xl p-4 text-xs">
                         <div className="space-y-3">
                           <div>
                             <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block mb-1">Ticket ID</span>

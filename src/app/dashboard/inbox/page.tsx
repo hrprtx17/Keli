@@ -434,16 +434,16 @@ export default function InboxDashboardPage() {
                   Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="p-4 flex flex-col gap-2 animate-pulse border-b border-gray-100 dark:border-zinc-800">
                       <div className="flex justify-between items-center">
-                        <div className="h-4 bg-gray-150 dark:bg-zinc-850 rounded w-1/3" />
-                        <div className="h-3 bg-gray-150 dark:bg-zinc-850 rounded w-10" />
+                        <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded w-1/3" />
+                        <div className="h-3 bg-gray-100 dark:bg-zinc-800 rounded w-10" />
                       </div>
-                      <div className="h-3.5 bg-gray-150 dark:bg-zinc-850 rounded w-2/3" />
-                      <div className="h-3 bg-gray-100 dark:bg-zinc-850 rounded w-1/2" />
+                      <div className="h-3.5 bg-gray-100 dark:bg-zinc-800 rounded w-2/3" />
+                      <div className="h-3 bg-gray-100 dark:bg-zinc-800 rounded w-1/2" />
                     </div>
                   ))
                 ) : filteredConversations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-8 py-20 text-center">
-                    <div className="w-12 h-12 bg-gray-50 dark:bg-zinc-950 rounded-2xl flex items-center justify-center mb-3 border border-gray-100 dark:border-zinc-850 text-gray-300">
+                    <div className="w-12 h-12 bg-gray-50 dark:bg-zinc-950 rounded-2xl flex items-center justify-center mb-3 border border-gray-100 dark:border-zinc-800 text-gray-300">
                       <Inbox className="w-6 h-6" />
                     </div>
                     <h3 className="text-xs font-bold text-gray-700 dark:text-zinc-350">No chat sessions</h3>
@@ -641,7 +641,7 @@ export default function InboxDashboardPage() {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-                  <div className="w-16 h-16 bg-gray-50 dark:bg-zinc-950 border border-gray-150 dark:border-zinc-850 text-gray-450 rounded-full flex items-center justify-center mb-3 shadow-3xs">
+                  <div className="w-16 h-16 bg-gray-50 dark:bg-zinc-950 border border-gray-100 dark:border-zinc-800 text-gray-400 rounded-full flex items-center justify-center mb-3 shadow-3xs">
                     <MessageSquare className="w-7 h-7" />
                   </div>
                   <h3 className="text-sm font-bold text-gray-800 dark:text-zinc-200">Inspect Conversational Sessions</h3>

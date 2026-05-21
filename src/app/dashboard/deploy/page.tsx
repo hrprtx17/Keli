@@ -229,7 +229,7 @@ export default function DeployPage() {
                   </div>
 
                   <div className="relative group">
-                    <pre className="bg-zinc-950 text-zinc-300 p-4.5 rounded-xl font-mono text-[12.5px] overflow-x-auto border border-zinc-850 leading-relaxed">
+                    <pre className="bg-zinc-950 text-zinc-300 p-4.5 rounded-xl font-mono text-[12.5px] overflow-x-auto border border-zinc-800 leading-relaxed">
                       <span className="text-[#8B8B8B]">&lt;!-- Keli AI Widget --&gt;</span>{'\n'}
                       <span className="text-[#EC592D]">&lt;script</span>{'\n'}
                       <span className="text-[#9CDCFE]">  src</span><span className="text-zinc-400">=</span><span className="text-[#CE9178]">&quot;{siteUrl}/widget.js&quot;</span>{'\n'}
@@ -240,7 +240,7 @@ export default function DeployPage() {
                     <Button 
                       size="sm" 
                       onClick={copyToClipboard} 
-                      className="absolute top-3 right-3 bg-zinc-900/80 hover:bg-zinc-900 text-white border border-zinc-850 shadow-xs"
+                      className="absolute top-3 right-3 bg-zinc-900/80 hover:bg-zinc-900 text-white border border-zinc-800 shadow-xs"
                     >
                       <AnimatePresence mode="wait">
                         {copied ? (
@@ -279,7 +279,7 @@ export default function DeployPage() {
               </Card>
 
               {/* TEST WIDGET CARD */}
-              <Card className="border-zinc-200/80 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-950/20">
+              <Card className="border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/20">
                 <CardContent className="p-5 space-y-4">
                   <div>
                     <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Verify your integration</h3>
@@ -386,7 +386,7 @@ export default function DeployPage() {
                       placeholder="Hi! How can I help you today?" 
                       value={settings.welcomeMessage} 
                       onChange={(e) => setSettings({ ...settings, welcomeMessage: e.target.value })} 
-                      className="bg-white dark:bg-zinc-950 text-xs border-zinc-200 dark:border-zinc-850"
+                      className="bg-white dark:bg-zinc-950 text-xs border-zinc-200 dark:border-zinc-800"
                     />
                   </div>
 
