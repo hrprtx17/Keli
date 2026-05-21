@@ -483,7 +483,7 @@ export default function TicketsDashboardPage() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 flex-shrink-0">
           <div className="text-left">
             <h1 className="text-3xl font-black tracking-tight text-zinc-900 font-space">Tickets Panel</h1>
-            <p className="text-[13px] text-zinc-500 font-semibold mt-0.5">Manage customer support requests and transfers</p>
+            <p className="text-[13px] text-zinc-500 font-medium mt-0.5">Manage customer support requests and transfers</p>
           </div>
 
           {/* Stats Bar (Redesigned with Premium Glassmorphism) */}
@@ -492,28 +492,28 @@ export default function TicketsDashboardPage() {
               <span className="text-[20px] font-black text-zinc-900 leading-none font-space">
                 {isLoading ? '—' : stats.total}
               </span>
-              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Total</span>
+              <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Total</span>
             </div>
             
             <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
               <span className="text-[20px] font-black text-orange-600 leading-none font-space animate-pulse">
                 {isLoading ? '—' : stats.open}
               </span>
-              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Open</span>
+              <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Open</span>
             </div>
 
             <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
               <span className="text-[20px] font-black text-blue-600 leading-none font-space">
                 {isLoading ? '—' : stats.active}
               </span>
-              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Active</span>
+              <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Active</span>
             </div>
 
             <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs col-span-2 sm:col-span-1">
               <span className="text-[20px] font-black text-emerald-600 leading-none font-space">
                 {isLoading ? '—' : stats.resolvedToday}
               </span>
-              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Resolved</span>
+              <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-widest mt-1.5">Resolved</span>
             </div>
           </div>
         </div>
@@ -568,7 +568,7 @@ export default function TicketsDashboardPage() {
               value={priorityFilter} 
               onValueChange={(val) => setPriorityFilter(val as any)}
             >
-              <SelectTrigger className="h-10 text-xs font-bold border-zinc-200 w-[125px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
+              <SelectTrigger className="h-10 text-xs font-medium border-zinc-200 w-[125px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                 <SelectValue placeholder="All priorities" />
               </SelectTrigger>
               <SelectContent>
@@ -584,7 +584,7 @@ export default function TicketsDashboardPage() {
               value={sortBy} 
               onValueChange={(val) => setSortBy(val as any)}
             >
-              <SelectTrigger className="h-10 text-xs font-bold border-zinc-200 w-[125px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
+              <SelectTrigger className="h-10 text-xs font-medium border-zinc-200 w-[125px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                 <SelectValue placeholder="Newest first" />
               </SelectTrigger>
               <SelectContent>
@@ -611,7 +611,7 @@ export default function TicketsDashboardPage() {
                     setFreshTicketsData(null)
                   }
                 }}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 text-xs font-bold text-center transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 text-xs font-medium text-center transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
               >
                 <RotateCw className="w-3.5 h-3.5 animate-spin" />
                 New tickets. Click to reload
@@ -643,7 +643,7 @@ export default function TicketsDashboardPage() {
                       <Inbox className="w-8 h-8" />
                     </div>
                     <h3 className="text-base font-bold text-zinc-800 font-space">No support tickets</h3>
-                    <p className="text-[12px] text-zinc-400 font-semibold mt-1.5 max-w-[240px] leading-relaxed">
+                    <p className="text-[12px] text-zinc-400 font-medium mt-1.5 max-w-[240px] leading-relaxed">
                       Escalations from custom widget chats will automatically display here
                     </p>
                   </div>
@@ -681,23 +681,23 @@ export default function TicketsDashboardPage() {
                               ((ticket.status as string) === 'in-progress' || (ticket.status as string) === 'in_progress') ? 'bg-blue-500' :
                               ticket.status === 'resolved' ? 'bg-green-500' : 'bg-zinc-400'
                             }`} />
-                            <span className="font-bold text-sm text-zinc-800 truncate">
+                            <span className="font-semibold text-sm text-zinc-800 truncate">
                               {ticket.visitorName || 'Anonymous User'}
                             </span>
                           </div>
-                          <span className="text-[11px] font-semibold text-zinc-400 shrink-0">
+                          <span className="text-[11px] font-medium text-zinc-400 shrink-0">
                             {timeAgo(ticket.createdAt)}
                           </span>
                         </div>
 
                         {/* Subject */}
-                        <div className="text-[12.5px] font-semibold text-zinc-500 truncate text-left pr-4">
+                        <div className="text-[12.5px] font-medium text-zinc-500 truncate text-left pr-4">
                           {ticket.subject || 'Support Request'}
                         </div>
 
                         {/* Info details row */}
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[11.5px] font-semibold text-zinc-400 truncate text-left max-w-[140px] lg:max-w-[190px]">
+                          <span className="text-[11.5px] font-medium text-zinc-400 truncate text-left max-w-[140px] lg:max-w-[190px]">
                             {ticket.visitorEmail}
                           </span>
                           <div className="flex items-center gap-1.5 shrink-0">
@@ -705,7 +705,7 @@ export default function TicketsDashboardPage() {
                               {ticket.priority}
                             </span>
                             {ticket.agentName && (
-                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-orange-500/30 text-orange-650 bg-orange-50/20 max-w-[70px] truncate">
+                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-medium border border-orange-500/30 text-orange-650 bg-orange-50/20 max-w-[70px] truncate">
                                 {ticket.agentName}
                               </span>
                             )}
@@ -740,7 +740,7 @@ export default function TicketsDashboardPage() {
                       <div className="flex flex-wrap items-center gap-2 mt-1">
                         <a 
                           href={`mailto:${selectedTicket.visitorEmail}`}
-                          className="text-[13.5px] font-bold text-orange-600 hover:underline truncate"
+                          className="text-[13.5px] font-medium text-orange-600 hover:underline truncate"
                         >
                           {selectedTicket.visitorEmail}
                         </a>
@@ -759,30 +759,30 @@ export default function TicketsDashboardPage() {
                       onValueChange={(val) => handleUpdateStatus(selectedTicket._id, val as any)}
                       disabled={isUpdating}
                     >
-                      <SelectTrigger className="h-9 text-xs font-bold border-zinc-200 w-[120px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
+                      <SelectTrigger className="h-9 text-xs font-medium border-zinc-200 w-[120px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="open">
-                          <span className="flex items-center gap-1.5 font-bold text-orange-600">
+                          <span className="flex items-center gap-1.5 font-medium text-orange-600">
                             <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
                             Open
                           </span>
                         </SelectItem>
                         <SelectItem value="in-progress">
-                          <span className="flex items-center gap-1.5 font-bold text-blue-600">
+                          <span className="flex items-center gap-1.5 font-medium text-blue-600">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                             In Progress
                           </span>
                         </SelectItem>
                         <SelectItem value="resolved">
-                          <span className="flex items-center gap-1.5 font-bold text-green-600">
+                          <span className="flex items-center gap-1.5 font-medium text-green-600">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                             Resolved
                           </span>
                         </SelectItem>
                         <SelectItem value="closed">
-                          <span className="flex items-center gap-1.5 font-bold text-zinc-500">
+                          <span className="flex items-center gap-1.5 font-medium text-zinc-500">
                             <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
                             Closed
                           </span>
@@ -796,18 +796,18 @@ export default function TicketsDashboardPage() {
                       onValueChange={(val) => handleUpdatePriority(selectedTicket._id, val as any)}
                       disabled={isUpdating}
                     >
-                      <SelectTrigger className="h-9 text-xs font-bold border-zinc-200 w-[100px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
+                      <SelectTrigger className="h-9 text-xs font-medium border-zinc-200 w-[100px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                         <SelectValue placeholder="Priority" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="low">
-                          <span className="font-bold text-zinc-500">Low</span>
+                          <span className="font-medium text-zinc-500">Low</span>
                         </SelectItem>
                         <SelectItem value="medium">
-                          <span className="font-bold text-amber-500">Medium</span>
+                          <span className="font-medium text-amber-500">Medium</span>
                         </SelectItem>
                         <SelectItem value="high">
-                          <span className="font-bold text-red-500">High</span>
+                          <span className="font-medium text-red-500">High</span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -817,7 +817,7 @@ export default function TicketsDashboardPage() {
                         size="sm"
                         onClick={() => handleUpdateStatus(selectedTicket._id, 'resolved')}
                         disabled={isUpdating}
-                        className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-xs h-9 cursor-pointer"
+                        className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-xl flex items-center gap-1 shadow-xs h-9 cursor-pointer"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Resolve
@@ -844,7 +844,7 @@ export default function TicketsDashboardPage() {
                         <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
                         AI Conversation Summary
                       </div>
-                      <p className="text-[14px] text-zinc-700 leading-relaxed font-semibold">
+                      <p className="text-[14px] text-zinc-700 leading-relaxed font-medium">
                         {getAiSummary(selectedTicket)}
                       </p>
                     </div>
@@ -852,16 +852,16 @@ export default function TicketsDashboardPage() {
                     {/* Visitor Metadata blocks */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
                       <div className="bg-zinc-50/30 border border-zinc-200/50 rounded-2xl p-3.5 shadow-xs">
-                        <span className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 block font-space">Visitor Name</span>
-                        <span className="text-sm font-bold text-zinc-800 mt-1 block truncate">
+                        <span className="text-[9px] uppercase tracking-wider font-medium text-zinc-400 block font-space">Visitor Name</span>
+                        <span className="text-sm font-medium text-zinc-800 mt-1 block truncate">
                           {selectedTicket.visitorName || 'Anonymous'}
                         </span>
                       </div>
                       
                       <div className="bg-zinc-50/30 border border-zinc-200/50 rounded-2xl p-3.5 shadow-xs flex items-center justify-between">
                         <div className="min-w-0">
-                          <span className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 block font-space">Email Address</span>
-                          <span className="text-sm font-bold text-zinc-800 mt-1 block truncate">
+                          <span className="text-[9px] uppercase tracking-wider font-medium text-zinc-400 block font-space">Email Address</span>
+                          <span className="text-sm font-medium text-zinc-800 mt-1 block truncate">
                             {selectedTicket.visitorEmail}
                           </span>
                         </div>
@@ -874,8 +874,8 @@ export default function TicketsDashboardPage() {
                       </div>
                       
                       <div className="bg-zinc-50/30 border border-zinc-200/50 rounded-2xl p-3.5 shadow-xs">
-                        <span className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 block font-space">Assigned Agent</span>
-                        <span className="text-sm font-bold text-zinc-800 mt-1 block truncate flex items-center gap-1.5">
+                        <span className="text-[9px] uppercase tracking-wider font-medium text-zinc-400 block font-space">Assigned Agent</span>
+                        <span className="text-sm font-medium text-zinc-800 mt-1 block truncate flex items-center gap-1.5">
                           <Bot className="w-4 h-4 text-orange-500 animate-pulse" />
                           {selectedTicket.agentName || 'Keli AI'}
                         </span>
@@ -896,7 +896,7 @@ export default function TicketsDashboardPage() {
                                 key={index} 
                                 className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
                               >
-                                <span className="text-[9.5px] text-zinc-400 font-bold mb-1 uppercase tracking-wider font-space">
+                                <span className="text-[9.5px] text-zinc-400 font-medium mb-1 uppercase tracking-wider font-space">
                                   {isUser ? 'Visitor' : `AI Agent (${selectedTicket.agentName || 'Keli AI'})`}
                                 </span>
                                 <div className={`px-4.5 py-3 rounded-2xl text-[13px] max-w-[80%] break-words shadow-[0_1px_6px_rgba(0,0,0,0.015)] leading-relaxed font-medium ${
@@ -926,7 +926,7 @@ export default function TicketsDashboardPage() {
                         Visitor original description
                       </h4>
                       <div className="bg-white border border-zinc-200/60 rounded-[22px] p-5 shadow-xs">
-                        <p className="text-[13.5px] text-zinc-700 leading-relaxed font-semibold whitespace-pre-wrap">
+                        <p className="text-[13.5px] text-zinc-700 leading-relaxed font-medium whitespace-pre-wrap">
                           {selectedTicket.description || 'No description provided.'}
                         </p>
                       </div>
@@ -940,7 +940,7 @@ export default function TicketsDashboardPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-zinc-50/50 border border-zinc-200/60 rounded-[24px] p-5 text-[12px] font-semibold text-zinc-650">
                         <div className="space-y-3.5">
                           <div>
-                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Ticket UID</span>
+                            <span className="text-[9px] uppercase font-medium text-zinc-400 block mb-1 font-space">Ticket UID</span>
                             <div className="flex items-center gap-1.5 font-mono text-zinc-800">
                               <span>{selectedTicket._id}</span>
                               <button
@@ -953,7 +953,7 @@ export default function TicketsDashboardPage() {
                           </div>
                           
                           <div>
-                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Created Timestamp</span>
+                            <span className="text-[9px] uppercase font-medium text-zinc-400 block mb-1 font-space">Created Timestamp</span>
                             <span className="text-zinc-800">
                               {new Date(selectedTicket.createdAt).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'medium' })}
                             </span>
@@ -962,7 +962,7 @@ export default function TicketsDashboardPage() {
                         
                         <div className="space-y-3.5">
                           <div>
-                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Session ID (Chat Node)</span>
+                            <span className="text-[9px] uppercase font-medium text-zinc-400 block mb-1 font-space">Session ID (Chat Node)</span>
                             <div className="flex items-center gap-1.5 font-mono text-zinc-800">
                               <span className="truncate max-w-[130px]">{selectedTicket.sessionId || 'anonymous'}</span>
                               {selectedTicket.sessionId && selectedTicket.sessionId !== 'unknown' && (
@@ -977,7 +977,7 @@ export default function TicketsDashboardPage() {
                           </div>
                           
                           <div>
-                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Traffic Source URL</span>
+                            <span className="text-[9px] uppercase font-medium text-zinc-400 block mb-1 font-space">Traffic Source URL</span>
                             <span className="text-zinc-800 break-all flex items-center gap-1 leading-snug">
                               {selectedTicket.sourceUrl || selectedTicket.source || 'Direct Dashboard Injection'}
                             </span>
@@ -1011,7 +1011,7 @@ export default function TicketsDashboardPage() {
                             size="sm"
                             onClick={handleSaveNotes}
                             disabled={isUpdating}
-                            className="border-orange-500 text-orange-650 hover:bg-orange-500/10 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all h-9 cursor-pointer"
+                            className="border-orange-500 text-orange-650 hover:bg-orange-500/10 text-xs font-medium rounded-xl flex items-center gap-1.5 transition-all h-9 cursor-pointer"
                           >
                             <Save className="w-3.5 h-3.5" />
                             Save Internal Notes
@@ -1032,7 +1032,7 @@ export default function TicketsDashboardPage() {
                       size="sm"
                       onClick={() => handleUpdateStatus(selectedTicket._id, 'in-progress')}
                       disabled={isUpdating || selectedTicket.status === 'in-progress'}
-                      className="border-blue-500 text-blue-600 hover:bg-blue-50 text-xs font-bold rounded-xl flex items-center gap-1.5 h-9 cursor-pointer"
+                      className="border-blue-500 text-blue-600 hover:bg-blue-50 text-xs font-medium rounded-xl flex items-center gap-1.5 h-9 cursor-pointer"
                     >
                       <CircleDot className="w-3.5 h-3.5 shrink-0" />
                       In Progress
@@ -1043,7 +1043,7 @@ export default function TicketsDashboardPage() {
                       size="sm"
                       onClick={() => handleUpdateStatus(selectedTicket._id, 'resolved')}
                       disabled={isUpdating || selectedTicket.status === 'resolved'}
-                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-xs h-9 cursor-pointer"
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-xl flex items-center gap-1.5 shadow-xs h-9 cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                       Resolve Request
@@ -1055,7 +1055,7 @@ export default function TicketsDashboardPage() {
                       size="sm"
                       onClick={() => handleUpdateStatus(selectedTicket._id, 'closed')}
                       disabled={isUpdating || selectedTicket.status === 'closed'}
-                      className="border-zinc-300 text-zinc-650 hover:bg-zinc-50 text-xs font-bold rounded-xl flex items-center gap-1.5 h-9 cursor-pointer"
+                      className="border-zinc-300 text-zinc-650 hover:bg-zinc-50 text-xs font-medium rounded-xl flex items-center gap-1.5 h-9 cursor-pointer"
                     >
                       <XCircle className="w-3.5 h-3.5 shrink-0" />
                       Close Ticket
@@ -1068,7 +1068,7 @@ export default function TicketsDashboardPage() {
                     size="sm"
                     onClick={() => setIsDeleteDialogOpen(true)}
                     disabled={isUpdating}
-                    className="text-red-650 hover:text-red-750 hover:bg-red-50 text-xs font-bold rounded-xl flex items-center gap-1.5 shrink-0 self-end sm:self-auto h-9 cursor-pointer"
+                    className="text-red-650 hover:text-red-750 hover:bg-red-50 text-xs font-medium rounded-xl flex items-center gap-1.5 shrink-0 self-end sm:self-auto h-9 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5 shrink-0" />
                     Delete Ticket
@@ -1097,7 +1097,7 @@ export default function TicketsDashboardPage() {
                       </Button>
                       <Button
                         onClick={() => handleDeleteTicket(selectedTicket._id)}
-                        className="w-full sm:w-auto bg-red-600 hover:bg-red-750 text-white font-bold rounded-xl"
+                        className="w-full sm:w-auto bg-red-600 hover:bg-red-750 text-white font-medium rounded-xl"
                         disabled={isUpdating}
                       >
                         {isUpdating ? 'Deleting...' : 'Confirm Delete'}
@@ -1114,7 +1114,7 @@ export default function TicketsDashboardPage() {
                   <Inbox className="w-8 h-8 text-zinc-350" />
                 </div>
                 <h3 className="text-base font-bold text-zinc-800 font-space">Select a ticket</h3>
-                <p className="text-xs text-zinc-400 font-semibold mt-1 max-w-[240px] leading-relaxed">
+                <p className="text-xs text-zinc-400 font-medium mt-1 max-w-[240px] leading-relaxed">
                   Click any ticket from the left panel to inspect customer requests, AI history, and resolution actions.
                 </p>
               </div>

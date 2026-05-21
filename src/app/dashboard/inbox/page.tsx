@@ -4,13 +4,13 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
-import { 
-  Inbox, 
-  Search, 
-  Bot, 
-  Copy, 
-  Check, 
-  ChevronLeft, 
+import {
+  Inbox,
+  Search,
+  Bot,
+  Copy,
+  Check,
+  ChevronLeft,
   MessageSquare,
   RotateCw,
   Clock
@@ -72,7 +72,7 @@ export default function InboxDashboardPage() {
       if (stored) {
         setViewedSessionIds(new Set(JSON.parse(stored)))
       }
-    } catch (e) {}
+    } catch (e) { }
   }, [])
 
   // Auto-scroll messages
@@ -115,14 +115,14 @@ export default function InboxDashboardPage() {
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv)
     setShowMobileDetail(true)
-    
+
     setViewedSessionIds(prev => {
       const next = new Set(prev)
       if (!next.has(conv._id)) {
         next.add(conv._id)
         try {
           localStorage.setItem('keli_viewed_sessions', JSON.stringify(Array.from(next)))
-        } catch (e) {}
+        } catch (e) { }
       }
       return next
     })
@@ -161,11 +161,11 @@ export default function InboxDashboardPage() {
   // Local client side filtering & search
   const filteredConversations = useMemo(() => {
     let list = [...conversations]
-    
+
     // Search query filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim()
-      list = list.filter(c => 
+      list = list.filter(c =>
         c.sessionId.toLowerCase().includes(q) ||
         (c.customerName || '').toLowerCase().includes(q) ||
         (c.customerEmail || '').toLowerCase().includes(q) ||
@@ -208,7 +208,7 @@ export default function InboxDashboardPage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-[calc(100vh-60px)] max-w-[1400px] mx-auto px-4 py-6 antialiased font-jakarta">
-        
+
         {/* HEADER */}
         <div className="flex items-center justify-between mb-6 shrink-0">
           <div>
@@ -224,10 +224,10 @@ export default function InboxDashboardPage() {
 
         {/* MAIN DISPLAY VIEW */}
         <div className="flex-1 flex gap-6 overflow-hidden rounded-3xl bg-white dark:bg-zinc-950/40 border border-zinc-200/60 dark:border-zinc-800/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)]">
-          
+
           {/* LEFT SIDEBAR: ALL SESSIONS LIST */}
           <div className={`w-full md:w-[360px] shrink-0 border-r border-zinc-200/60 dark:border-zinc-800/60 flex flex-col overflow-hidden ${selectedConversation && showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
-            
+
             {/* Header inside sidebar */}
             <div className="p-5 border-b border-zinc-100 dark:border-zinc-800/60 space-y-4 shrink-0 bg-zinc-50/50 dark:bg-zinc-900/20">
               <div className="relative">
@@ -268,23 +268,22 @@ export default function InboxDashboardPage() {
                 filteredConversations.map((conv: Conversation) => {
                   const isSelected = selectedConversation?._id === conv._id
                   const isUnread = !viewedSessionIds.has(conv._id)
-                  
+
                   return (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       key={conv._id}
                       onClick={() => handleSelectConversation(conv)}
-                      className={`relative p-5 cursor-pointer text-left transition-all ${
-                        isSelected
+                      className={`relative p-5 cursor-pointer text-left transition-all ${isSelected
                           ? 'bg-orange-50/50 dark:bg-orange-500/[0.04]'
                           : 'hover:bg-zinc-50/80 dark:hover:bg-zinc-900/30'
-                      }`}
+                        }`}
                     >
                       {isSelected && (
-                        <motion.div 
+                        <motion.div
                           layoutId="active-indicator"
-                          className="absolute left-0 top-0 bottom-0 w-[4px] bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.6)]" 
+                          className="absolute left-0 top-0 bottom-0 w-[4px] bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.6)]"
                         />
                       )}
 
@@ -307,14 +306,13 @@ export default function InboxDashboardPage() {
                       </div>
 
                       <div className="flex items-center justify-between gap-1.5 mt-auto">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest border ${
-                          conv.source === 'widget'
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest border ${conv.source === 'widget'
                             ? 'bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/40'
                             : 'bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
-                        }`}>
+                          }`}>
                           {conv.source || 'widget'}
                         </span>
-                        
+
                         <span className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
                           {conv.messageCount || 0} msgs
                         </span>
@@ -330,7 +328,7 @@ export default function InboxDashboardPage() {
           <div className={`flex-1 flex flex-col bg-zinc-50/30 dark:bg-zinc-950/20 overflow-hidden ${!selectedConversation || !showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
             {selectedConversation ? (
               <div className="flex-1 flex flex-col h-full overflow-hidden">
-                
+
                 {/* Top Header Card */}
                 <div className="px-6 py-5 border-b border-zinc-200/60 dark:border-zinc-800/60 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md flex items-center justify-between gap-4 shrink-0 shadow-sm relative z-10">
                   <div className="flex items-center gap-4">
@@ -340,7 +338,7 @@ export default function InboxDashboardPage() {
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    
+
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
@@ -400,11 +398,10 @@ export default function InboxDashboardPage() {
                             <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-extrabold mb-1.5 px-1">
                               {isUser ? (selectedConversation.customerName || 'Visitor') : 'AI Agent'}
                             </span>
-                            <div className={`px-5 py-3.5 rounded-2xl text-[14px] font-medium leading-relaxed max-w-[80%] break-words shadow-sm ${
-                              isUser
+                            <div className={`px-5 py-3.5 rounded-2xl text-[14px] font-medium leading-relaxed max-w-[80%] break-words shadow-sm ${isUser
                                 ? 'bg-orange-500 text-white rounded-tr-[4px]'
                                 : 'bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200 rounded-tl-[4px]'
-                            }`}>
+                              }`}>
                               {msg.content}
                             </div>
                             <span className="text-[10px] text-zinc-400 font-semibold mt-1.5 px-1">

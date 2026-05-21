@@ -19,7 +19,7 @@ function StatCard({ title, value, sub, icon: Icon, loading, gradient }: any) {
       <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-[40px] opacity-10 pointer-events-none bg-gradient-to-br ${gradient}`} />
       
       <div className="flex items-center justify-between mb-4">
-        <span className="text-[11px] font-bold tracking-wider uppercase text-zinc-400">{title}</span>
+        <span className="text-[11px] font-medium tracking-wider uppercase text-zinc-400">{title}</span>
         <div className={`h-9 w-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-sm`}>
           <Icon className="h-4.5 w-4.5" />
         </div>
@@ -79,7 +79,7 @@ export default function InsightsPage() {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-2">
           <div>
-            <div className="flex items-center gap-1.5 text-[11px] font-bold text-orange-500 tracking-wider uppercase mb-1.5">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-orange-500 tracking-wider uppercase mb-1.5">
               <Sparkles className="w-3.5 h-3.5" /> SYSTEM PERFORMANCE & VOLUME
             </div>
             <h1 className="text-3xl font-extrabold text-zinc-950 tracking-tight">Insights Dashboard</h1>
@@ -121,8 +121,8 @@ export default function InsightsPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-zinc-200/50 flex items-center justify-between shadow-xs">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Response Speed</p>
-              <p className="text-[15px] font-extrabold text-zinc-900 mt-0.5">~ 0.8s <span className="text-[10px] text-green-500 font-semibold">(Ultra-fast)</span></p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">Response Speed</p>
+              <p className="text-[15px] font-extrabold text-zinc-900 mt-0.5">~ 0.8s <span className="text-[10px] text-green-500 font-medium">(Ultra-fast)</span></p>
             </div>
             <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
               <Timer className="h-4.5 w-4.5" />
@@ -131,7 +131,7 @@ export default function InsightsPage() {
           
           <div className="bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-zinc-200/50 flex items-center justify-between shadow-xs">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Resolution Clearance</p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">Resolution Clearance</p>
               <p className="text-[15px] font-extrabold text-zinc-900 mt-0.5">{stats?.resolutionRate || 94}%</p>
             </div>
             <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
@@ -141,7 +141,7 @@ export default function InsightsPage() {
           
           <div className="bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-zinc-200/50 flex items-center justify-between shadow-xs">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Visitor CSAT rating</p>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-400">Visitor CSAT rating</p>
               <p className="text-[15px] font-extrabold text-zinc-900 mt-0.5">4.9 / 5.0</p>
             </div>
             <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500">
@@ -165,7 +165,7 @@ export default function InsightsPage() {
             {creditsUsed === 0 ? (
               <div className="h-full w-full flex flex-col items-center justify-center text-center border border-dashed border-zinc-200 rounded-2xl bg-zinc-50/50">
                 <MessageSquare className="h-7 w-7 text-zinc-300 mb-3" />
-                <h4 className="text-[14px] font-bold text-zinc-950">Awaiting Operation Analytics</h4>
+                <h4 className="text-[14px] font-semibold text-zinc-950">Awaiting Operation Analytics</h4>
                 <p className="text-xs text-zinc-400 mt-1 max-w-[240px]">
                   Integrate your HTML widget script to begin recording real-time volume maps.
                 </p>

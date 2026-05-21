@@ -85,7 +85,7 @@ export default function AgentPlaygroundPage() {
         <div className="flex h-[70vh] w-full items-center justify-center font-jakarta">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-            <p className="text-zinc-500 text-[13px] font-bold tracking-wide">Initializing agent connection...</p>
+            <p className="text-zinc-500 text-[13px] font-medium tracking-wide">Initializing agent connection...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -120,10 +120,10 @@ export default function AgentPlaygroundPage() {
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-extrabold text-orange-500 tracking-widest uppercase mb-2">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-orange-500 tracking-widest uppercase mb-2">
               <Sparkles className="w-3.5 h-3.5" /> Live Sandbox
             </div>
-            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight flex items-center gap-3">
               {capitalizedAgentName} Preview
             </h1>
             <p className="text-[14px] text-zinc-500 dark:text-zinc-400 mt-2 max-w-xl leading-relaxed font-medium">
@@ -132,10 +132,10 @@ export default function AgentPlaygroundPage() {
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            <div className="flex items-center gap-1.5 text-[11.5px] font-bold text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-xl shadow-xs">
+            <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-xl shadow-xs">
               <Cpu className="w-3.5 h-3.5 text-orange-500" /> GPT-4o
             </div>
-            <div className="flex items-center gap-1.5 text-[11.5px] font-bold text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-xl shadow-xs">
+            <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 rounded-xl shadow-xs">
               <Zap className="w-3.5 h-3.5 text-emerald-500" /> &lt;50ms Response
             </div>
           </div>
@@ -153,7 +153,7 @@ export default function AgentPlaygroundPage() {
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[15px] font-extrabold text-zinc-900 dark:text-zinc-100 truncate leading-tight tracking-tight">
+                  <span className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100 truncate leading-tight tracking-tight">
                     {capitalizedAgentName}
                   </span>
                 </div>
@@ -166,7 +166,7 @@ export default function AgentPlaygroundPage() {
             <button 
               onClick={resetConversation}
               title="Reset session history"
-              className="h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 text-[13px] font-bold text-zinc-600 bg-white dark:bg-zinc-900 shadow-sm hover:text-red-500 hover:border-red-500/30 dark:text-zinc-300 dark:hover:text-red-400 dark:hover:border-red-500/30 flex items-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+              className="h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-800 text-[13px] font-medium text-zinc-600 bg-white dark:bg-zinc-900 shadow-sm hover:text-red-500 hover:border-red-500/30 dark:text-zinc-300 dark:hover:text-red-400 dark:hover:border-red-500/30 flex items-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
             >
               <RefreshCw className="h-4 w-4" />
               <span>Reset</span>
@@ -184,7 +184,7 @@ export default function AgentPlaygroundPage() {
                 <Bot className="h-4.5 w-4.5 text-orange-600 dark:text-orange-400" />
               </div>
               <div className="flex flex-col gap-1.5">
-                <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-extrabold px-2 uppercase tracking-widest">Assistant</span>
+                <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium px-2 uppercase tracking-widest">Assistant</span>
                 <div className="px-5 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 text-zinc-800 dark:text-zinc-200 text-[14.5px] font-medium leading-relaxed rounded-[20px] rounded-bl-sm shadow-sm">
                   {welcomeMessage}
                 </div>
@@ -209,7 +209,7 @@ export default function AgentPlaygroundPage() {
                     )}
                     
                     <div className={`flex flex-col gap-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
-                      <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-extrabold px-2 uppercase tracking-widest">
+                      <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium px-2 uppercase tracking-widest">
                         {isUser ? 'You' : 'Assistant'}
                       </span>
                       <div 
@@ -241,7 +241,7 @@ export default function AgentPlaygroundPage() {
                   <Bot className="h-4.5 w-4.5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[11px] text-zinc-400 font-extrabold px-2 uppercase tracking-widest">Assistant</span>
+                  <span className="text-[11px] text-zinc-400 font-medium px-2 uppercase tracking-widest">Assistant</span>
                   <div className="px-5 py-4 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/80 rounded-[20px] rounded-bl-sm shadow-sm flex items-center h-[52px]">
                     <div className="flex gap-1.5">
                       <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" />
@@ -264,7 +264,7 @@ export default function AgentPlaygroundPage() {
                   <button 
                     key={i} 
                     onClick={() => handleChatSubmit(undefined, s)}
-                    className="shrink-0 px-4 py-2 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 text-[13px] font-bold rounded-xl transition-all active:scale-[0.98] whitespace-nowrap shadow-sm cursor-pointer"
+                    className="shrink-0 px-4 py-2 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 text-[13px] font-medium rounded-xl transition-all active:scale-[0.98] whitespace-nowrap shadow-sm cursor-pointer"
                   >
                     {s}
                   </button>
@@ -287,7 +287,7 @@ export default function AgentPlaygroundPage() {
               />
               
               <div className="flex items-center gap-2 shrink-0 px-2">
-                <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-extrabold text-zinc-400 bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800 shadow-xs">
+                <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-medium text-zinc-400 bg-white dark:bg-zinc-900 px-2.5 py-1.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800 shadow-xs">
                   <Command className="w-3 h-3" /> ENTER
                 </span>
                 <button 
