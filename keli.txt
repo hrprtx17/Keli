@@ -5,6 +5,8 @@ This document contains the core identity, technical architecture, and visual
 design system of Keli AI. It is structured to serve as an instant, ready-to-use
 blueprint for professional PPT slides, PDF whitepapers, or investor presentations.
 
+Last Updated: 2026-05-21
+
 --------------------------------------------------------------------------------
 1. EXECUTIVE OVERVIEW (THE ELEVATOR PITCH)
 --------------------------------------------------------------------------------
@@ -23,32 +25,44 @@ blueprint for professional PPT slides, PDF whitepapers, or investor presentation
   - E-commerce stores needing 24/7 checkout and order status guidance.
   - Digital Agencies looking to offer premium custom chat widgets to clients.
 
+* Live Deployment:
+  - Production URL: https://keliai.netlify.app
+  - Hosted on Netlify with @netlify/plugin-nextjs
+
 --------------------------------------------------------------------------------
 2. BRAND DESIGN SYSTEM (FONTS & COLOR SCHEMES)
 --------------------------------------------------------------------------------
-Keli AI features an elite, modern typography pairing and a sleek, light-mode
-curated palette optimized for dynamic web presentation.
+Keli AI features an elite, modern typography pairing and a sleek dual-mode
+(light + dark) curated palette optimized for dynamic web presentation.
 
 * Typography Pairing:
   1. Headings & High-Impact Numbers: "Space Grotesk" (Google Fonts)
      - Rationale: A geometric, slightly futuristic sans-serif that exudes 
        high-end boutique tech aesthetics. Gives numbers and titles a crisp,
        authoritative, and modern feel.
+     - CSS Variable: --font-heading (--font-space-grotesk)
   2. Body, Labels & Inputs: "Outfit" (Google Fonts)
      - Rationale: A premium, ultra-readable, round geometric typeface designed 
        specifically for fast legibility, modern SaaS dashboard cards, and 
        interactive web forms.
+     - CSS Variables: --font-sans, --font-jakarta (both map to --font-outfit)
 
 * Primary Color Palette:
-  - Core Brand Accent (Orange-Amber): HSL(17, 100%, 61%) / Hex #FF6B35
+  - Core Brand Accent (Orange-Amber): HSL(25, 95%, 53%) / Approx Hex #F97316
     - Rationale: Represents active support, warmth, energy, and high conversion.
-  - Pure Grounding Dark Accent: Hex #09090b (Tailwind Zinc-950)
-    - Rationale: Provides sophisticated, premium structure for active selections.
+    - Used for: Primary buttons, CTA rings, sidebar active states, chart accents.
+  - Pure Grounding Dark Accent: HSL(0, 0%, 4%) for dark mode background
+    - Rationale: Provides sophisticated, premium structure in dark mode.
   - Cool Status Accents:
     - In-Progress Blue: Hex #3b82f6 (Tailwind Blue-500)
     - Resolved Emerald: Hex #10b981 (Tailwind Emerald-600)
-    - Gray Muted Text: Hex #71717a (Tailwind Zinc-500)
-    - Soft Dashboard Borders: Hex #e4e4e7 (Tailwind Zinc-200)
+    - Gray Muted Text: HSL(0, 0%, 45%) light / HSL(0, 0%, 50%) dark
+    - Soft Dashboard Borders: HSL(0, 0%, 90%) light / HSL(0, 0%, 14%) dark
+
+* Dark Mode:
+  - Full dark theme support via next-themes ThemeProviderWrapper.
+  - All CSS tokens defined in both :root (light) and .dark (dark) modes.
+  - Cards shift to HSL(0, 0%, 8%) backgrounds with 97% white foregrounds.
 
 --------------------------------------------------------------------------------
 3. HIGH-PERFORMANCE TECH STACK
@@ -56,65 +70,264 @@ curated palette optimized for dynamic web presentation.
 Keli AI is built on a modern, robust framework tailored for sub-100ms response
 times and pristine type-safety:
 
-* Core Framework: Next.js (utilizing dynamic server-side dynamic routing)
-* Rendering & Bundle Optimization: React 19
-* Client-Side State: TanStack Query (React Query) for instant cache sync
-* Styling & Transitions: Tailwind CSS v4 & Framer Motion (page slide reveals)
-* Authentication: NextAuth.js (supporting Google OAuth secure sign-in)
-* Database Layer: Cloud Database with Prisma / Mongoose ODM
-* Toast Notifications: Sonner (premium micro-animations)
+* Core Framework: Next.js 16 (App Router with dynamic server-side routing)
+* Rendering & Bundle Optimization: React 19 (latest concurrent features)
+* Client-Side State: TanStack React Query v5 for instant cache sync
+* Global State: Zustand v5 (lightweight store management)
+* Styling & Transitions: Tailwind CSS v4, tw-animate-css, & Framer Motion v12
+* UI Component Library: shadcn/ui (Radix UI primitives + CVA)
+* Authentication: NextAuth.js v5 beta (Google OAuth + Email/Password Credentials)
+* Database: MongoDB Atlas with Mongoose v9 ODM
+* AI Inference: Groq SDK + Vercel AI SDK v6 (ai + @ai-sdk/groq)
+* Vector Embeddings: HuggingFace Inference API (sentence-transformers/all-MiniLM-L6-v2)
+* Vector Search: MongoDB Atlas $vectorSearch aggregation pipeline
+* Text Splitting: LangChain RecursiveCharacterTextSplitter
+* Web Crawling: Puppeteer v24 (headless Chrome) + Cheerio v1 (HTML parser)
+* Email Notifications: Resend API (branded HTML ticket & human escalation emails)
+* Payments & Billing: Dodo Payments (subscription management, webhook processing)
+* Toast Notifications: Sonner v2 (premium micro-animations)
+* Form Validation: React Hook Form + Zod v4
+* Charts & Analytics: Recharts v3 (AreaChart, responsive containers)
+* Date Utilities: date-fns v4
+* File Parsing: pdf-parse v2 (PDFs), mammoth v1 (DOCX)
+* Security: bcryptjs (password hashing), rate limiting with SecurityLog auditing
+* Icons: Lucide React v1
 
 --------------------------------------------------------------------------------
-4. HOW IT WORKS (THE CUSTOMER JOURNEY FLOW)
+4. DATABASE MODELS (MONGODB SCHEMAS)
+--------------------------------------------------------------------------------
+Keli AI uses 10 core Mongoose schemas:
+
+  1. User         — name, email, password (bcrypt), role, workspaceId
+  2. Workspace    — name, slug, ownerId, plan (free/premium), usage tracking
+                    (monthlyCredits, creditsUsedThisMonth, addonCredits, resetDate),
+                    limits (maxAgents, maxStorage), dodoSubscriptionId, dodoCustomerId
+  3. Agent        — workspaceId, name, description, avatar, systemPrompt,
+                    notificationEmail, model (default: llama-3.1-8b-instant),
+                    config (temperature, maxTokens, language, tone, role, guidelines,
+                    linkUsage), widgetConfig (primaryColor, position, welcomeMessage,
+                    placeholder, showBranding), apiKey (unique), isActive,
+                    totalConversations, totalMessages
+  4. Conversation — workspaceId, agentId, visitorId, metadata
+  5. Message      — conversationId, role, content, timestamps
+  6. Ticket       — workspaceId, agentId, conversationId, title, description,
+                    customerEmail, customerName, status (open/in-progress/resolved/closed),
+                    priority (low/medium/high/urgent), assignedTo, replies[]
+  7. DataSource   — agentId, workspaceId, type (pdf/docx/txt/csv/md/url/text/faq),
+                    name, content, status (pending/processing/ready/error),
+                    metadata (size, pages, url, wordCount)
+  8. KnowledgeChunk — agentId, workspaceId, dataSourceId, text, embedding (number[]),
+                    metadata (mixed)
+  9. FAQ          — agentId, workspaceId, question, answer, category, isActive
+  10. SecurityLog — eventType (rate_limit/auth_failure/unauthorized_domain/
+                    credit_exhausted/bot_detected/webhook_failure), ipAddress,
+                    userAgent, endpoint, details, workspaceId
+                    (auto-expires after 30 days via TTL index)
+
+--------------------------------------------------------------------------------
+5. HOW IT WORKS (THE CUSTOMER JOURNEY FLOW)
 --------------------------------------------------------------------------------
 [Step 1: Onboard & Source Data]
-Business owners paste website links or upload training manuals into Keli AI. 
-The system runs a deep crawl to parse and structure the knowledge base.
+Business owners paste website links or upload training manuals (PDF, DOCX, TXT,
+CSV, Markdown) into Keli AI. The system runs a deep Puppeteer-powered headless
+Chrome crawl to parse and structure the knowledge base. Content is split into 
+chunks via LangChain's RecursiveCharacterTextSplitter and embedded using 
+HuggingFace's all-MiniLM-L6-v2 model.
 
-[Step 2: Deploy custom AI Widget]
-An elegant, tiny javascript script widget code block is copied and pasted into
-the client's website. The widget automatically inherits custom theme settings.
+[Step 2: Deploy Custom AI Widget]
+An elegant, tiny JavaScript script (widget.js / keli.js) code block is copied
+and pasted into the client's website. The widget loads as a cross-origin iframe
+from keliai.netlify.app with configurable colors, greetings, and branding.
+CORS headers are configured in netlify.toml for seamless external embedding.
 
 [Step 3: Autonomous AI Handling]
-A website visitor chats with the widget. The Keli AI agent responds instantly,
-utilizing vector embeddings of the parsed site data.
+A website visitor chats with the widget. The Keli AI agent responds instantly
+using Groq inference (Llama 3.1-8B or configurable model). Relevant knowledge
+chunks are retrieved via MongoDB Atlas $vectorSearch with cosine similarity,
+injected as RAG context into the system prompt.
 
 [Step 4: Smart Human Escalation]
 If the visitor requests human assistance or exhibits high-intent purchase 
-behavior, the AI instantly creates a Ticket and sends a live payload to the
-Inbox dashboard.
+behavior, the AI instantly creates a Ticket and sends a branded HTML email
+notification via Resend to the agent's configured notification email.
 
 [Step 5: Live Human Dashboard Review]
 The business team logs in, views the continuous chat timeline history, inspects
 the auto-generated AI conversation summary, saves internal notes, resolves the
-ticket, or emails the visitor back.
+ticket, or emails the visitor back. All from a premium glassmorphic dashboard.
 
 --------------------------------------------------------------------------------
-5. KEY PRODUCT FEATURES
+6. KEY PRODUCT FEATURES
 --------------------------------------------------------------------------------
+* 📊 Insights Dashboard:
+  An analytics-first home screen with animated stat cards (conversation volume,
+  escalated tickets, credit utilisation), secondary KPI row (response speed,
+  resolution clearance, visitor CSAT), and a responsive Recharts AreaChart
+  showing temporal interaction flow across a 7-day calendar.
+  Gradient background glows and Framer Motion hover animations on cards.
+
 * 📋 Tickets Panel:
   An ultra-modern dual-pane dashboard containing glassmorphic cards, pulsing status
   LED indicators, custom priority weights (urgent, high, medium, low), and 
-  timeline-style messenger feeds.
+  timeline-style messenger feeds. Supports inline replies.
 
 * 📥 Unified Inbox:
   A clean center where support representatives can see active live chat queues 
   and switch dynamically between client chats and a sandbox AI Playground.
 
-* 🧠 Live AI Training Desk (Training Data):
-  Upload raw text, markdown documents, scrape URLs, or initiate recursively
-  nested website crawls. The AI instantly processes the corpus.
+* 🧠 Knowledge Base (Training Data):
+  Upload raw text, markdown documents, PDFs, DOCX files, scrape single URLs, or
+  initiate recursively nested website crawls (up to 15 pages). The AI instantly
+  processes the corpus into vector-embedded chunks. Supports FAQ management with
+  categorised question-answer pairs.
 
 * 🚀 Deploy Portal:
-  Easy-to-copy HTML scripts, dynamic API endpoints, and real-time custom configuration
-  widgets to modify button styles, greeting welcome messages, and colors.
+  Easy-to-copy HTML script tags (widget.js / keli.js), dynamic API endpoints,
+  and real-time custom configuration widgets to modify button styles, greeting
+  welcome messages, positions, and colors. Live preview on a test page
+  (widget-test.html).
+
+* 💰 Billing & Financial Overview:
+  Capacity lifecycle tracking with animated credit counters, operational load
+  progress bars, system invoices table, payment gateway display (Visa card
+  vault), and active plan status. Powered by Dodo Payments integration.
+
+* 📈 Usage Analytics:
+  Detailed usage page with comprehensive credit consumption tracking, addon
+  credit management, and monthly reset cycle monitoring.
+
+* 💎 Plans & Pricing:
+  Full pricing page with tier comparison matrix. Free plan (500 credits/month,
+  1 agent, 10 max storage) vs Premium Pro plan ($29/month with expanded limits).
+  Upgrade flow via Dodo Payments checkout.
 
 * 🛡️ Multi-Agent Identity & Settings:
-  Configure unique behavioral prompt systems, customize avatar images, select models
-  (GPT-4o vs lightweight models), and safely delete active agents.
+  Configure unique behavioral prompt systems, customize avatar images, select 
+  AI models, set temperature/maxTokens, configure language/tone/role/guidelines,
+  manage notification emails, and safely delete active agents.
+  Settings page for workspace profile, domain whitelisting, and account management.
+
+* 🔐 Security & Rate Limiting:
+  MongoDB-backed rate limiting with atomic token decrement. SecurityLog model
+  tracks abuse events (rate limits, auth failures, unauthorized domains, credit
+  exhaustion, bot detection, webhook failures). Logs auto-expire after 30 days.
+
+* 📧 Email Notification System:
+  Two branded HTML email templates via Resend API:
+  1. New Support Ticket — sent when AI creates a ticket.
+  2. Human Support Request — sent when visitor requests live human agent.
+  Both include deep links directly into the dashboard inbox.
+
+* 🔒 Authentication:
+  NextAuth.js v5 with dual providers: Google OAuth and Email/Password credentials.
+  Rate-limited login attempts (5 per 60 seconds). Protected routes enforced via
+  middleware (dashboard, agents, settings, onboarding).
+
+* 🌓 Dark Mode:
+  Full dark mode support via next-themes. Toggle available in sidebar.
+  All components, cards, and charts respect theme tokens.
+
+* 📄 Legal Pages:
+  Privacy Policy and Terms of Service pages.
+
+* 💬 Conversations Manager:
+  View and manage all visitor conversations across agents.
 
 --------------------------------------------------------------------------------
-6. READY-TO-USE PPT DECK SLIDE OUTLINE
+7. FULL APPLICATION ROUTE MAP
+--------------------------------------------------------------------------------
+PUBLIC ROUTES:
+  /                    — Marketing landing page (45KB, feature-rich)
+  /login               — Email/password + Google OAuth sign-in
+  /register            — New account registration
+  /plans               — Pricing tier comparison (35KB)
+  /privacy             — Privacy policy
+  /terms               — Terms of service
+  /widget/[id]         — Embeddable chat widget (iframe target)
+
+PROTECTED ROUTES (require auth):
+  /dashboard           — Insights dashboard (analytics home)
+  /dashboard/inbox     — Unified inbox (live chat + AI playground)
+  /dashboard/tickets   — Support tickets management
+  /dashboard/deploy    — Widget deployment & configuration
+  /dashboard/upgrade   — Plan upgrade checkout
+  /agents              — Agent listing
+  /agents/new          — Create new agent
+  /agents/[id]         — Agent detail/edit (settings, training, deploy)
+  /knowledge           — Knowledge base management (25KB)
+  /conversations       — Conversation history viewer
+  /billing             — Financial overview & invoices
+  /usage               — Credit usage analytics (22KB)
+  /settings            — Workspace & account settings (17KB)
+  /onboarding          — New user onboarding flow
+  /deploy              — Deploy configuration page
+
+API ROUTES:
+  /api/auth/*           — NextAuth.js authentication handlers
+  /api/agents/*         — Agent CRUD + public agent info
+  /api/billing/*        — Billing checkout (Dodo Payments)
+  /api/chat             — AI chat inference (Groq + RAG)
+  /api/conversations/*  — Conversation management
+  /api/dashboard/*      — Dashboard stats aggregation
+  /api/datasources/*    — Data source upload & processing
+  /api/payments         — Payment processing
+  /api/tickets/*        — Ticket CRUD & replies
+  /api/usage/*          — Usage metrics
+  /api/webhooks/dodo/*  — Dodo Payments webhook receiver
+  /api/widget/*         — Widget configuration API
+  /api/widget-chat      — Widget-facing chat API (CORS-enabled)
+  /api/workspace        — Workspace settings & info
+
+STATIC ASSETS:
+  /widget.js            — Embeddable widget loader script (5.5KB)
+  /keli.js              — Alternative widget loader script (5.5KB)
+  /widget-test.html     — Widget integration test page (13KB)
+
+--------------------------------------------------------------------------------
+8. INFRASTRUCTURE & DEPLOYMENT
+--------------------------------------------------------------------------------
+* Hosting: Netlify (with @netlify/plugin-nextjs v5)
+* Build Command: npm run build
+* Publish Directory: .next
+* Node Version: >=20.9.0
+* CORS Configuration: netlify.toml headers for widget.js, keli.js, widget/*,
+  widget-test.html, /api/widget-chat, /api/agents/public/*
+* Security Headers: X-Content-Type-Options, X-XSS-Protection,
+  Referrer-Policy, Permissions-Policy (camera, microphone, geolocation disabled)
+* Middleware Bypass: Static assets (widget.js, keli.js, widget-test.html,
+  favicon, icons) and /api/* routes bypass auth middleware.
+
+--------------------------------------------------------------------------------
+9. COMPONENT ARCHITECTURE
+--------------------------------------------------------------------------------
+* components/
+  - Logo.tsx                         — Brand logo component
+  - dashboard/DashboardLayout.tsx    — Protected page wrapper with sidebar
+  - dashboard/DashboardOnboarding.tsx — New user onboarding wizard
+  - dashboard/Sidebar.tsx            — Main navigation sidebar (14KB)
+  - chat/                            — Chat interface components
+  - landing/                         — Marketing landing page sections
+  - shared/                          — Reusable shared components
+  - ui/                              — shadcn/ui primitives (Button, Card, etc.)
+
+* providers/
+  - QueryProvider.tsx                — TanStack React Query provider
+  - SessionProvider.tsx              — NextAuth session provider
+  - ThemeProvider.tsx                — next-themes dark/light mode provider
+
+* lib/
+  - crawler.ts                       — Puppeteer website crawler (headless Chrome)
+  - db.ts                            — MongoDB connection manager
+  - email.ts                         — Resend email notification templates
+  - mongodb.ts                       — MongoDB client singleton
+  - rag.ts                           — RAG pipeline (chunk, embed, vector search)
+  - rate-limit.ts                    — Token bucket rate limiter + abuse logging
+  - ratelimit.ts                     — Utility rate limit helpers
+  - types.ts                         — Shared TypeScript type definitions
+  - utils.ts                         — General utility functions (cn helper)
+
+--------------------------------------------------------------------------------
+10. READY-TO-USE PPT DECK SLIDE OUTLINE
 --------------------------------------------------------------------------------
 
 SLIDE 1: Title Slide (The Face of Support)
@@ -137,40 +350,58 @@ SLIDE 3: The Solution (Introducing Keli AI)
 - Title: The Intelligent Co-Pilot
 - Subtitle: Bespoke support agents trained on your proprietary data.
 - Bullet Points:
-  - Data Crawling: AI crawls and parses your links/PDFs in seconds.
-  - 85% Resolution: Solves repetitive visitor tickets autonomously.
-  - Seamless Transfers: Automatically transitions complex requests to live agents.
+  - Data Crawling: Puppeteer-powered headless Chrome crawls your pages in seconds.
+  - RAG Pipeline: HuggingFace embeddings + MongoDB Atlas Vector Search.
+  - 85% Resolution: Solves repetitive visitor tickets autonomously via Groq AI.
+  - Seamless Transfers: Auto-creates tickets and sends branded email alerts to humans.
 
 SLIDE 4: Core Features Deep Dive
 - Title: Engineered to Convert
 - Subtitle: Features that power modern customer success.
 - Bullet Points:
+  - Insights Dashboard: Real-time analytics with animated KPI cards and Recharts.
   - Unified Inbox: Instant, cozy dialogue widgets for live chats.
   - Support Tickets: Dynamic prioritization matrices, automated AI summaries, and 
     private internal agent notebooks.
+  - Knowledge Base: Upload PDFs, DOCX, crawl websites — auto-embedded into vectors.
   - AI Playground: Sandbox environment to preview, prompts, test, and polish.
 
 SLIDE 5: Visual Excellence & Identity
 - Title: Designer Aesthetics
-- Subtitle: Beautifully spaced, typography-optimized, light-mode only interface.
+- Subtitle: Beautifully spaced, typography-optimized, light + dark mode interface.
 - Bullet Points:
   - Typography: Space Grotesk (Clean, Technical) paired with Outfit (Highly Readable).
-  - Harmony: Rich, high-conversion orange HSL(17, 100%, 61%) and crisp slate darks.
-  - Motion: Fluid Framer Motion grid pattern backgrounds and button accent rings.
+  - Harmony: Rich, high-conversion orange HSL(25, 95%, 53%) and crisp slate darks.
+  - Motion: Fluid Framer Motion card hovers, animated counters, and gradient glows.
+  - Dark Mode: Full theme support via next-themes with complete token system.
 
 SLIDE 6: Under the Hood (Technical Framework)
 - Title: Production-Grade Tech Stack
 - Subtitle: Sub-100ms response times, optimized bundles.
 - Bullet Points:
-  - Framework: Next.js & React 19 for instantaneous layout generation.
-  - State Sync: TanStack Query for lag-free client-side indexing.
-  - Auth: NextAuth secure federated accounts.
+  - Framework: Next.js 16 (App Router) & React 19 for instantaneous layout generation.
+  - AI: Groq SDK + Vercel AI SDK v6 for blazing-fast LLM inference.
+  - RAG: HuggingFace embeddings → MongoDB Atlas $vectorSearch.
+  - State Sync: TanStack Query v5 for lag-free client-side indexing.
+  - Auth: NextAuth v5 with Google OAuth + rate-limited credentials.
+  - Payments: Dodo Payments for subscription billing & webhook processing.
 
-SLIDE 7: Summary & Future Vision
+SLIDE 7: Security & Reliability
+- Title: Enterprise-Grade Protection
+- Subtitle: Every request is monitored, rate-limited, and audited.
+- Bullet Points:
+  - MongoDB-backed token bucket rate limiting with atomic decrements.
+  - SecurityLog audit trail for abuse events (auto-expires after 30 days).
+  - bcrypt password hashing for credential-based authentication.
+  - CORS-controlled widget embedding with domain whitelisting.
+  - Middleware-enforced route protection for all dashboard pages.
+
+SLIDE 8: Summary & Future Vision
 - Title: Accelerating Customer Success
 - Subtitle: Deploy once, scale support infinitely.
 - Bullet Points:
-  - Ready to copy-paste dynamic script widgets.
-  - Robust analytics pipeline.
+  - Ready to copy-paste dynamic script widgets (widget.js / keli.js).
+  - Robust analytics pipeline with real-time Recharts visualizations.
+  - Email notification system for instant human escalation alerts.
   - Designed to look spectacular, feel alive, and run flawlessly.
 ================================================================================

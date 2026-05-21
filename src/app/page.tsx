@@ -11,42 +11,42 @@ import {
 } from 'lucide-react';
 import { KeliAiLogo } from '@/components/Logo';
 
-// --- COMPONENT: TYPING EFFECT LOOP ---
-const TYPING_WORDS = ["Ready", "Online", "Watching", "Learning", "Working"];
+// --- COMPONENT: TYPING EFFECT ---
+const TYPING_WORDS = ["speed.", "scale.", "teams.", "customers."];
 
 function TypingText() {
-  const [index, setIndex] = useState(0);
-  const [subIndex, setSubIndex] = useState(0);
-  const [reverse, setReverse] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (subIndex === TYPING_WORDS[index].length + 1 && !reverse) {
-      const timer = setTimeout(() => setReverse(true), 1500);
-      return () => clearTimeout(timer);
+    const currentWord = TYPING_WORDS[wordIndex];
+
+    if (!isDeleting && charIndex === currentWord.length) {
+      // Pause at full word, then start deleting
+      const pause = setTimeout(() => setIsDeleting(true), 1800);
+      return () => clearTimeout(pause);
     }
-    if (subIndex === 0 && reverse) {
-      setReverse(false);
-      setIndex((prev) => (prev + 1) % TYPING_WORDS.length);
+
+    if (isDeleting && charIndex === 0) {
+      // Move to next word
+      setIsDeleting(false);
+      setWordIndex((prev) => (prev + 1) % TYPING_WORDS.length);
       return;
     }
-    const timeout = setTimeout(() => {
-      setSubIndex((prev) => prev + (reverse ? -1 : 1));
-    }, reverse ? 40 : 60);
 
-    return () => clearTimeout(timeout);
-  }, [subIndex, index, reverse]);
+    const speed = isDeleting ? 50 : 80;
+    const timer = setTimeout(() => {
+      setCharIndex((prev) => prev + (isDeleting ? -1 : 1));
+    }, speed);
 
-  useEffect(() => {
-    if (subIndex === TYPING_WORDS[index].length && !reverse) {
-      const timer = setTimeout(() => setReverse(true), 1800);
-      return () => clearTimeout(timer);
-    }
-  }, [subIndex, index, reverse]);
+    return () => clearTimeout(timer);
+  }, [charIndex, wordIndex, isDeleting]);
 
   return (
-    <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-650 via-orange-550 to-amber-400 inline-block min-w-[150px]">
-      {TYPING_WORDS[index].substring(0, subIndex)}
-      <span className="text-orange-400 animate-[blink_1s_infinite]">|</span>
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-500 to-amber-400 inline-block">
+      {TYPING_WORDS[wordIndex].substring(0, charIndex)}
+      <span className="text-orange-500 animate-[blink_1s_infinite] ml-[1px]">|</span>
     </span>
   );
 }
@@ -260,12 +260,10 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-[34px] xs:text-[44px] sm:text-[64px] md:text-[80px] lg:text-[98px] xl:text-[106px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[0.95] select-none font-space"
+            className="text-[36px] xs:text-[44px] sm:text-[60px] md:text-[76px] lg:text-[92px] xl:text-[106px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[1.0] select-none font-space"
           >
-            Your AI Support Team<br />is Always{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-650 via-orange-500 to-amber-400">
-              <TypingText />
-            </span>
+            AI support built for<br />
+            <TypingText />
           </motion.h1>
           
           <motion.p 
