@@ -22,6 +22,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Keli AI",
   description: "Train custom AI agents on your data. Deploy to your website in minutes.",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23FF6B35'/><text x='50' y='68' font-size='56' font-family='system-ui, -apple-system, sans-serif' font-weight='900' fill='white' text-anchor='middle'>K</text></svg>",
+  },
 };
 
 export default function RootLayout({

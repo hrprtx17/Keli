@@ -227,11 +227,11 @@ export default function OnboardingPage() {
             >
               {/* Animated logo */}
               <motion.div
-                animate={{ scale: [1, 1.08, 1] }}
+                animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl shadow-orange-500/30"
+                className="w-16 h-16 rounded-[20px] bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center shadow-xl"
               >
-                <div className="w-6 h-6 bg-white rounded rotate-45" />
+                <span className="font-sans font-black text-2xl text-white dark:text-zinc-950 select-none">K</span>
               </motion.div>
 
               {/* Steps checklist */}

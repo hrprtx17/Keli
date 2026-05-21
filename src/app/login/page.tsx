@@ -117,8 +117,8 @@ export default function LoginPage() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/[0.06] rounded-full blur-[140px]" />
         <div className="max-w-md space-y-8 relative">
           <div className="inline-flex rounded-[28px] bg-white dark:bg-zinc-900 p-6 shadow-2xl shadow-black/5 border border-gray-100 dark:border-zinc-800">
-            <div className="w-14 h-14 rounded-[18px] bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/25">
-              <div className="w-5 h-5 bg-white rounded rotate-45" />
+            <div className="w-14 h-14 rounded-[18px] bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center shadow-lg">
+              <span className="font-sans font-black text-2xl text-white dark:text-zinc-950 select-none">K</span>
             </div>
           </div>
           <div>

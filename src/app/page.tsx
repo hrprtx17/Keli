@@ -81,14 +81,12 @@ export default function LandingPage() {
       <motion.nav 
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed z-50 transition-all duration-500 ease-in-out
-          md:top-0 md:inset-x-0 
-          top-3 inset-x-3 sm:top-4 sm:inset-x-6 rounded-[22px] sm:rounded-[26px] md:rounded-none
-          border border-zinc-200/40 dark:border-zinc-800/40 md:border-0
-          bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-xl md:backdrop-blur-none
+        className={`fixed z-50 transition-all duration-300 ease-in-out
+          top-4 inset-x-4 max-w-5xl md:mx-auto rounded-[24px] md:rounded-[28px]
+          border border-zinc-200/50 dark:border-zinc-850/85 bg-white/65 dark:bg-zinc-950/65 backdrop-blur-xl
           ${scrolled 
-            ? 'shadow-[0_12px_40px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.4)] py-2 md:py-3 bg-white/80 dark:bg-[#09090b]/80 border-zinc-200/70 dark:border-zinc-800/70 md:border-b md:border-zinc-200/50 md:dark:border-zinc-800/50' 
-            : 'py-3 md:py-5 bg-white/50 dark:bg-[#09090b]/50 md:bg-transparent md:backdrop-blur-none md:border-0'
+            ? 'shadow-[0_12px_40px_-12px_rgba(249,115,22,0.12)] dark:shadow-[0_12px_40px_-12px_rgba(0,0,0,0.6)] py-2 md:py-3 border-zinc-250 dark:border-zinc-800' 
+            : 'shadow-[0_8px_30px_rgba(0,0,0,0.03)] py-3 md:py-4 border-zinc-200/50 dark:border-zinc-850/85'
           }
         `}
       >
@@ -116,11 +114,11 @@ export default function LandingPage() {
             <Link href="/login" className="hidden sm:block text-sm font-bold hover:text-orange-500 transition-colors">Login</Link>
             <Link href="/register" className="hidden sm:block">
               <motion.button 
-                whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(249, 115, 22, 0.3)' }}
-                whileTap={{ scale: 0.95 }}
-                className="px-5 py-2.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white rounded-full text-sm font-bold shadow-md flex items-center gap-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-5 py-2.5 bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-900 dark:hover:bg-zinc-150 text-white dark:text-zinc-950 rounded-full text-xs font-bold transition-all duration-200"
               >
-                Try Now <ArrowRight className="w-4 h-4" />
+                Try Now <ArrowRight className="w-3.5 h-3.5 ml-1 inline-block" />
               </motion.button>
             </Link>
             <button className="md:hidden p-1.5 border border-zinc-200/60 dark:border-zinc-800/60 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -204,14 +202,20 @@ export default function LandingPage() {
 
             <div className="flex flex-wrap items-center gap-3">
               <Link href="/register">
-                <motion.button whileHover={{ scale: 1.02, y: -1 }} whileTap={{ scale: 0.98 }}
-                  className="h-13 px-8 py-3.5 bg-black dark:bg-white text-white dark:text-zinc-900 rounded-2xl font-bold text-[15px] shadow-lg flex items-center gap-2 transition-all">
-                  Start Free — No Card Needed <ArrowRight className="w-4 h-4" />
+                <motion.button 
+                  whileHover={{ scale: 1.02 }} 
+                  whileTap={{ scale: 0.98 }}
+                  className="h-13 px-8 py-3.5 bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-900 dark:hover:bg-zinc-150 text-white dark:text-zinc-950 rounded-2xl font-bold text-[14px] shadow-xs flex items-center gap-2 transition-all duration-200"
+                >
+                  Start Free — No Card Needed <ArrowRight className="w-3.5 h-3.5" />
                 </motion.button>
               </Link>
               <a href="#how-it-works">
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  className="h-13 px-8 py-3.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl font-bold text-[15px] shadow-sm flex items-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all">
+                <motion.button 
+                  whileHover={{ scale: 1.02 }} 
+                  whileTap={{ scale: 0.98 }}
+                  className="h-13 px-8 py-3.5 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 border border-zinc-200 dark:border-zinc-800 rounded-2xl font-bold text-[14px] shadow-xs hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200"
+                >
                   See How It Works
                 </motion.button>
               </a>
@@ -583,16 +587,18 @@ export default function LandingPage() {
                <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
                   <Link href="/register">
                      <motion.button 
-                        whileHover={{ scale: 1.03, y: -2 }} 
-                        className="h-14 px-10 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl font-bold text-base shadow-lg shadow-orange-500/30 transition-all"
+                        whileHover={{ scale: 1.02 }} 
+                        whileTap={{ scale: 0.98 }}
+                        className="h-14 px-10 bg-zinc-950 dark:bg-zinc-50 hover:bg-zinc-900 dark:hover:bg-zinc-150 text-white dark:text-zinc-950 rounded-2xl font-bold text-base shadow-sm transition-all duration-200 flex items-center justify-center"
                      >
                         Get Started for Free
                      </motion.button>
                   </Link>
                   <Link href="/login">
                      <motion.button 
-                        whileHover={{ scale: 1.03 }} 
-                        className="h-14 px-10 bg-white text-zinc-900 border border-zinc-200 rounded-2xl font-bold text-base shadow-sm hover:bg-zinc-50 transition-all"
+                        whileHover={{ scale: 1.02 }} 
+                        whileTap={{ scale: 0.98 }}
+                        className="h-14 px-10 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 border border-zinc-200 dark:border-zinc-800 rounded-2xl font-bold text-base shadow-xs hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-200 flex items-center justify-center"
                      >
                         Login to Dashboard
                      </motion.button>
@@ -603,57 +609,33 @@ export default function LandingPage() {
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800/50 pt-20 pb-10 px-6">
-         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-16">
-            <div className="col-span-2">
-               <div className="mb-5"><KeliAiLogo size="md" /></div>
-               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium max-w-xs leading-relaxed">Intelligent AI agents that resolve customer issues 24/7, automatically.</p>
+      <footer className="bg-white dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-900/60 py-16 px-6 relative overflow-hidden">
+         {/* Background soft ambient glow */}
+         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-orange-500/5 dark:bg-orange-500/[0.03] rounded-full blur-3xl pointer-events-none" />
+         
+         <div className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
+            {/* Giant Modern Holographic Typographic Text */}
+            <h2 className="text-[55px] sm:text-[90px] md:text-[115px] font-sans font-black uppercase tracking-[0.25em] leading-none mb-10 select-none bg-gradient-to-r from-orange-600 via-[#FF6B35] to-amber-500 dark:from-white dark:via-zinc-300 dark:to-zinc-800 bg-clip-text text-transparent drop-shadow-[0_8px_30px_rgba(255,107,53,0.18)] dark:drop-shadow-[0_8px_30px_rgba(255,255,255,0.05)] transition-all duration-500">
+               Keli AI
+            </h2>
+
+            {/* Minimal Info */}
+            <p className="text-zinc-500 dark:text-zinc-400 text-xs sm:text-sm font-semibold max-w-md leading-relaxed mb-6">
+               Superhuman 24/7 customer support automation engine powered by state-of-the-art AI.
+            </p>
+
+            {/* Links and Copyright */}
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[10.5px] font-bold text-zinc-400 uppercase tracking-widest mb-6">
+               <Link href="/privacy" className="hover:text-orange-500 transition-colors">Privacy Policy</Link>
+               <span className="text-zinc-200 dark:text-zinc-800">•</span>
+               <Link href="/terms" className="hover:text-orange-500 transition-colors">Terms of Service</Link>
+               <span className="text-zinc-200 dark:text-zinc-800">•</span>
+               <Link href="/dashboard" className="hover:text-orange-500 transition-colors">Console</Link>
             </div>
-            {[
-              { t: 'Product', links: [
-                { n: 'Features', h: '#features' },
-                { n: 'Pricing', h: '#pricing' },
-                { n: 'Widget', h: '/dashboard/deploy' },
-                { n: 'Integrations', h: '#' }
-              ] },
-              { t: 'Company', links: [
-                { n: 'About', h: '#' },
-                { n: 'Careers', h: '#' },
-                { n: 'Blog', h: '#' },
-                { n: 'Media Kit', h: '#' }
-              ] },
-              { t: 'Support', links: [
-                { n: 'Documentation', h: '#' },
-                { n: 'API Access', h: '#' },
-                { n: 'Guides', h: '#' },
-                { n: 'Status', h: '#' }
-              ] },
-            ].map((group, i) => (
-              <div key={i}>
-                 <h5 className="font-bold text-sm mb-6 text-zinc-900 dark:text-white">{group.t}</h5>
-                 <ul className="space-y-4">
-                    {group.links.map(l => (
-                      <li key={l.n}>
-                        <a 
-                          href={l.h} 
-                          title={l.h === '#' ? 'Coming soon' : ''}
-                          className="text-sm font-medium text-zinc-500 hover:text-orange-500 transition-colors"
-                        >
-                          {l.n}
-                        </a>
-                      </li>
-                    ))}
-                 </ul>
-              </div>
-            ))}
-         </div>
-         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-zinc-200 dark:border-zinc-800/50 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-            <p>© 2026 Keli AI Inc. All rights reserved.</p>
-            <div className="flex gap-6">
-               <a href="#" title="Coming soon">Privacy</a>
-               <a href="#" title="Coming soon">Terms</a>
-               <a href="#" title="Coming soon">GDPR</a>
-            </div>
+
+            <p className="text-[10px] font-bold text-zinc-400/70 tracking-widest uppercase">
+               © {new Date().getFullYear()} Keli AI Inc. All rights reserved.
+            </p>
          </div>
       </footer>
 

@@ -29,7 +29,7 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|widget\\.js|keli\\.js|widget-test\\.html|api/widget-chat|api/agents/public|api/tickets).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|favicon\\.svg|icon\\.svg|widget\\.js|keli\\.js|widget-test\\.html|api/widget-chat|api/agents/public|api/tickets).*)',
   ],
 }
 

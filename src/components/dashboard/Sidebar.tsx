@@ -196,7 +196,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
           className={`w-full flex items-center justify-between bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md border ${dropdownOpen ? 'border-orange-500/50 shadow-[0_0_0_3px_rgba(249,115,22,0.1)] dark:border-orange-500/40' : 'border-gray-200/60 dark:border-zinc-800/60 shadow-sm hover:border-gray-300 dark:hover:border-zinc-700'} rounded-xl px-2.5 py-2 transition-all`}
         >
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-5.5 h-5.5 rounded-md bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white shrink-0 shadow-sm">
+            <div className="w-5.5 h-5.5 rounded-md bg-zinc-950 dark:bg-zinc-100 flex items-center justify-center text-white dark:text-zinc-900 shrink-0 shadow-sm">
               <Bot className="w-3 h-3" />
             </div>
             <span className="font-bold text-[13.5px] text-gray-900 dark:text-zinc-100 truncate">

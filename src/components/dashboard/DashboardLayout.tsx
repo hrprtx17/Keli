@@ -61,7 +61,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <div className="font-semibold text-[15px] tracking-tight font-heading">Keli AI</div>
+          <div className="font-sans font-black uppercase tracking-[0.16em] text-[14px] bg-gradient-to-r from-zinc-950 via-zinc-800 to-zinc-700 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
+            Keli AI
+          </div>
           <div className="w-5" />
         </header>
 

@@ -2,27 +2,25 @@ import Link from 'next/link';
 
 interface LogoProps {
   href?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'giant';
   className?: string;
 }
 
 const sizes = {
-  sm: { icon: 'w-7 h-7 rounded-[9px]', dot: 'w-2.5 h-2.5', text: 'text-[15px]', gap: 'gap-2' },
-  md: { icon: 'w-8 h-8 rounded-[10px]', dot: 'w-3 h-3', text: 'text-[17px]', gap: 'gap-2.5' },
-  lg: { icon: 'w-10 h-10 rounded-[12px]', dot: 'w-4 h-4', text: 'text-[20px]', gap: 'gap-3' },
+  sm: { text: 'text-[13px] sm:text-[14px]' },
+  md: { text: 'text-[16px] sm:text-[18px]' },
+  lg: { text: 'text-[22px] sm:text-[24px]' },
+  xl: { text: 'text-[28px] sm:text-[32px]' },
+  giant: { text: 'text-[40px] sm:text-[48px]' },
 };
 
 export function KeliAiLogo({ href = '/', size = 'md', className = '' }: LogoProps) {
   const s = sizes[size];
+  
   const inner = (
-    <span className={`inline-flex items-center ${s.gap} group ${className}`}>
-      <span
-        className={`${s.icon} bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-md shadow-orange-500/30 group-hover:scale-105 transition-transform flex-shrink-0`}
-      >
-        <span className={`${s.dot} bg-white rounded-sm rotate-45 shadow-sm`} />
-      </span>
-      <span className={`font-bold ${s.text} tracking-tight text-zinc-900 dark:text-zinc-100`}>
-        Keli AI
+    <span className={`inline-flex items-center group ${className}`}>
+      <span className={`font-sans font-black uppercase tracking-[0.22em] ${s.text} bg-gradient-to-r from-zinc-950 via-zinc-850 to-zinc-700 dark:from-white dark:via-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent transition-all duration-300 select-none flex items-center`}>
+        Keli AI<span className="text-[#FF6B35] font-black tracking-normal ml-0.5 animate-pulse">.</span>
       </span>
     </span>
   );
@@ -30,3 +28,4 @@ export function KeliAiLogo({ href = '/', size = 'md', className = '' }: LogoProp
   if (!href) return inner;
   return <Link href={href}>{inner}</Link>;
 }
+export default KeliAiLogo;
