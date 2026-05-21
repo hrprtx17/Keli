@@ -1,0 +1,176 @@
+================================================================================
+                        K E L I   A I   -   B R I E F
+================================================================================
+This document contains the core identity, technical architecture, and visual
+design system of Keli AI. It is structured to serve as an instant, ready-to-use
+blueprint for professional PPT slides, PDF whitepapers, or investor presentations.
+
+--------------------------------------------------------------------------------
+1. EXECUTIVE OVERVIEW (THE ELEVATOR PITCH)
+--------------------------------------------------------------------------------
+* Tagline:
+  "Custom AI Support Agents trained on your data. Deployed in minutes."
+
+* Mission:
+  Keli AI bridges the gap between autonomous customer support and human agent
+  escalations. It allows businesses to train bespoke AI chat widgets on their
+  knowledge base (documents, links, crawls), resolve up to 85% of queries
+  instantly, and seamlessly transfer complex or high-intent leads to human 
+  representatives in a gorgeous, glassmorphic central dashboard.
+
+* Target Audience:
+  - SaaS & Web Applications seeking to reduce customer support overhead.
+  - E-commerce stores needing 24/7 checkout and order status guidance.
+  - Digital Agencies looking to offer premium custom chat widgets to clients.
+
+--------------------------------------------------------------------------------
+2. BRAND DESIGN SYSTEM (FONTS & COLOR SCHEMES)
+--------------------------------------------------------------------------------
+Keli AI features an elite, modern typography pairing and a sleek, light-mode
+curated palette optimized for dynamic web presentation.
+
+* Typography Pairing:
+  1. Headings & High-Impact Numbers: "Space Grotesk" (Google Fonts)
+     - Rationale: A geometric, slightly futuristic sans-serif that exudes 
+       high-end boutique tech aesthetics. Gives numbers and titles a crisp,
+       authoritative, and modern feel.
+  2. Body, Labels & Inputs: "Outfit" (Google Fonts)
+     - Rationale: A premium, ultra-readable, round geometric typeface designed 
+       specifically for fast legibility, modern SaaS dashboard cards, and 
+       interactive web forms.
+
+* Primary Color Palette:
+  - Core Brand Accent (Orange-Amber): HSL(17, 100%, 61%) / Hex #FF6B35
+    - Rationale: Represents active support, warmth, energy, and high conversion.
+  - Pure Grounding Dark Accent: Hex #09090b (Tailwind Zinc-950)
+    - Rationale: Provides sophisticated, premium structure for active selections.
+  - Cool Status Accents:
+    - In-Progress Blue: Hex #3b82f6 (Tailwind Blue-500)
+    - Resolved Emerald: Hex #10b981 (Tailwind Emerald-600)
+    - Gray Muted Text: Hex #71717a (Tailwind Zinc-500)
+    - Soft Dashboard Borders: Hex #e4e4e7 (Tailwind Zinc-200)
+
+--------------------------------------------------------------------------------
+3. HIGH-PERFORMANCE TECH STACK
+--------------------------------------------------------------------------------
+Keli AI is built on a modern, robust framework tailored for sub-100ms response
+times and pristine type-safety:
+
+* Core Framework: Next.js (utilizing dynamic server-side dynamic routing)
+* Rendering & Bundle Optimization: React 19
+* Client-Side State: TanStack Query (React Query) for instant cache sync
+* Styling & Transitions: Tailwind CSS v4 & Framer Motion (page slide reveals)
+* Authentication: NextAuth.js (supporting Google OAuth secure sign-in)
+* Database Layer: Cloud Database with Prisma / Mongoose ODM
+* Toast Notifications: Sonner (premium micro-animations)
+
+--------------------------------------------------------------------------------
+4. HOW IT WORKS (THE CUSTOMER JOURNEY FLOW)
+--------------------------------------------------------------------------------
+[Step 1: Onboard & Source Data]
+Business owners paste website links or upload training manuals into Keli AI. 
+The system runs a deep crawl to parse and structure the knowledge base.
+
+[Step 2: Deploy custom AI Widget]
+An elegant, tiny javascript script widget code block is copied and pasted into
+the client's website. The widget automatically inherits custom theme settings.
+
+[Step 3: Autonomous AI Handling]
+A website visitor chats with the widget. The Keli AI agent responds instantly,
+utilizing vector embeddings of the parsed site data.
+
+[Step 4: Smart Human Escalation]
+If the visitor requests human assistance or exhibits high-intent purchase 
+behavior, the AI instantly creates a Ticket and sends a live payload to the
+Inbox dashboard.
+
+[Step 5: Live Human Dashboard Review]
+The business team logs in, views the continuous chat timeline history, inspects
+the auto-generated AI conversation summary, saves internal notes, resolves the
+ticket, or emails the visitor back.
+
+--------------------------------------------------------------------------------
+5. KEY PRODUCT FEATURES
+--------------------------------------------------------------------------------
+* 📋 Tickets Panel:
+  An ultra-modern dual-pane dashboard containing glassmorphic cards, pulsing status
+  LED indicators, custom priority weights (urgent, high, medium, low), and 
+  timeline-style messenger feeds.
+
+* 📥 Unified Inbox:
+  A clean center where support representatives can see active live chat queues 
+  and switch dynamically between client chats and a sandbox AI Playground.
+
+* 🧠 Live AI Training Desk (Training Data):
+  Upload raw text, markdown documents, scrape URLs, or initiate recursively
+  nested website crawls. The AI instantly processes the corpus.
+
+* 🚀 Deploy Portal:
+  Easy-to-copy HTML scripts, dynamic API endpoints, and real-time custom configuration
+  widgets to modify button styles, greeting welcome messages, and colors.
+
+* 🛡️ Multi-Agent Identity & Settings:
+  Configure unique behavioral prompt systems, customize avatar images, select models
+  (GPT-4o vs lightweight models), and safely delete active agents.
+
+--------------------------------------------------------------------------------
+6. READY-TO-USE PPT DECK SLIDE OUTLINE
+--------------------------------------------------------------------------------
+
+SLIDE 1: Title Slide (The Face of Support)
+- Title: Keli AI
+- Subtitle: The Modern Intersection of Custom AI and Human Support
+- Bullet Points:
+  - Custom trained customer agents.
+  - Zero-latency human transfers.
+  - Gorgeous, designer-first user interface.
+
+SLIDE 2: The Problem (Support Bottlenecks)
+- Title: The Support Paradox
+- Subtitle: Customer expectations are rising; human queues are slowing.
+- Bullet Points:
+  - 78% of customers expect instantaneous responses to standard FAQs.
+  - Human support desks are backlogged with repetitive questions.
+  - Existing chat solutions are generic, rigid, or lack seamless human transfers.
+
+SLIDE 3: The Solution (Introducing Keli AI)
+- Title: The Intelligent Co-Pilot
+- Subtitle: Bespoke support agents trained on your proprietary data.
+- Bullet Points:
+  - Data Crawling: AI crawls and parses your links/PDFs in seconds.
+  - 85% Resolution: Solves repetitive visitor tickets autonomously.
+  - Seamless Transfers: Automatically transitions complex requests to live agents.
+
+SLIDE 4: Core Features Deep Dive
+- Title: Engineered to Convert
+- Subtitle: Features that power modern customer success.
+- Bullet Points:
+  - Unified Inbox: Instant, cozy dialogue widgets for live chats.
+  - Support Tickets: Dynamic prioritization matrices, automated AI summaries, and 
+    private internal agent notebooks.
+  - AI Playground: Sandbox environment to preview, prompts, test, and polish.
+
+SLIDE 5: Visual Excellence & Identity
+- Title: Designer Aesthetics
+- Subtitle: Beautifully spaced, typography-optimized, light-mode only interface.
+- Bullet Points:
+  - Typography: Space Grotesk (Clean, Technical) paired with Outfit (Highly Readable).
+  - Harmony: Rich, high-conversion orange HSL(17, 100%, 61%) and crisp slate darks.
+  - Motion: Fluid Framer Motion grid pattern backgrounds and button accent rings.
+
+SLIDE 6: Under the Hood (Technical Framework)
+- Title: Production-Grade Tech Stack
+- Subtitle: Sub-100ms response times, optimized bundles.
+- Bullet Points:
+  - Framework: Next.js & React 19 for instantaneous layout generation.
+  - State Sync: TanStack Query for lag-free client-side indexing.
+  - Auth: NextAuth secure federated accounts.
+
+SLIDE 7: Summary & Future Vision
+- Title: Accelerating Customer Success
+- Subtitle: Deploy once, scale support infinitely.
+- Bullet Points:
+  - Ready to copy-paste dynamic script widgets.
+  - Robust analytics pipeline.
+  - Designed to look spectacular, feel alive, and run flawlessly.
+================================================================================

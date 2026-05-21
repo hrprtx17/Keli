@@ -304,7 +304,7 @@ export function Sidebar({ onNavClick }: { onNavClick?: () => void }) {
       <div className="p-3.5 mt-auto border-t border-zinc-200/30 dark:border-zinc-800/40 bg-white/20 dark:bg-zinc-950/20 backdrop-blur-xl">
         <button 
           onClick={() => {
-            signOut({ callbackUrl: '/login' });
+            signOut({ callbackUrl: '/' });
           }}
           className="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-bold text-zinc-500 hover:text-red-600 dark:text-zinc-400 dark:hover:text-red-400 bg-zinc-900/[0.02] dark:bg-white/[0.02] hover:bg-red-500/5 dark:hover:bg-red-500/10 border border-zinc-200/40 dark:border-zinc-800/40 hover:border-red-500/20 dark:hover:border-red-500/30 shadow-xs transition-all duration-200 cursor-pointer"
           title="Sign Out"
