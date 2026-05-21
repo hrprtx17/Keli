@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Inter, Poppins, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 import SessionProvider from "@/providers/SessionProvider";
@@ -19,6 +19,13 @@ const poppins = Poppins({
   display: "swap",
 });
 
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Keli AI",
   description: "Train custom AI agents on your data. Deploy to your website in minutes.",
@@ -33,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${poppins.variable} ${plusJakarta.variable} antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProviderWrapper>
           <SessionProvider>
