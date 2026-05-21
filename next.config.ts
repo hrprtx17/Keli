@@ -3,8 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: any = {
   async headers() {
     return [
+      // All pages EXCEPT widget routes get strict security headers
       {
-        source: "/:path*",
+        source: "/((?!widget).*)",
         headers: [
           {
             key: "X-DNS-Prefetch-Control",
@@ -32,6 +33,21 @@ const nextConfig: any = {
           },
         ],
       },
+      // Widget chat page — allow embedding in any iframe
+      {
+        source: "/widget/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+        ],
+      },
+      // Widget API routes — open CORS
       {
         source: "/api/widget/:path*",
         headers: [
@@ -47,11 +63,6 @@ const nextConfig: any = {
             key: "Access-Control-Allow-Headers",
             value: "Content-Type, Authorization",
           },
-          // Allow framing only for widget
-          {
-            key: "X-Frame-Options",
-            value: "ALLOWALL",
-          }
         ],
       }
     ];

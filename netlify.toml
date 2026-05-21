@@ -27,7 +27,7 @@
   status = 200
   force = true
 
-# Headers for static files and CORS
+# Widget JS files — allow cross-origin loading
 [[headers]]
   for = "/widget.js"
   [headers.values]
@@ -42,11 +42,19 @@
     Access-Control-Allow-Origin = "*"
     Cache-Control = "public, max-age=60"
 
+# Widget chat page — MUST allow iframe embedding on external sites
+[[headers]]
+  for = "/widget/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+# Widget test page
 [[headers]]
   for = "/widget-test.html"
   [headers.values]
-    X-Frame-Options = "ALLOWALL"
+    Access-Control-Allow-Origin = "*"
 
+# Widget chat API
 [[headers]]
   for = "/api/widget-chat"
   [headers.values]
@@ -54,6 +62,7 @@
     Access-Control-Allow-Methods = "POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
 
+# Public agent API
 [[headers]]
   for = "/api/agents/public/*"
   [headers.values]
@@ -61,10 +70,10 @@
     Access-Control-Allow-Methods = "GET, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
 
+# Default security headers for all OTHER pages
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
