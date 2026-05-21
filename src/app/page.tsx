@@ -12,26 +12,22 @@ import {
 import { KeliAiLogo } from '@/components/Logo';
 
 // --- COMPONENT: TYPING EFFECT ---
-const TYPING_WORDS = ["speed.", "scale.", "teams.", "customers."];
-
-function TypingText() {
+function TypingText({ words }: { words: string[] }) {
   const [wordIndex, setWordIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const currentWord = TYPING_WORDS[wordIndex];
+    const currentWord = words[wordIndex];
 
     if (!isDeleting && charIndex === currentWord.length) {
-      // Pause at full word, then start deleting
       const pause = setTimeout(() => setIsDeleting(true), 1800);
       return () => clearTimeout(pause);
     }
 
     if (isDeleting && charIndex === 0) {
-      // Move to next word
       setIsDeleting(false);
-      setWordIndex((prev) => (prev + 1) % TYPING_WORDS.length);
+      setWordIndex((prev) => (prev + 1) % words.length);
       return;
     }
 
@@ -41,11 +37,11 @@ function TypingText() {
     }, speed);
 
     return () => clearTimeout(timer);
-  }, [charIndex, wordIndex, isDeleting]);
+  }, [charIndex, wordIndex, isDeleting, words]);
 
   return (
     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-500 to-amber-400 inline-block">
-      {TYPING_WORDS[wordIndex].substring(0, charIndex)}
+      {words[wordIndex].substring(0, charIndex)}
       <span className="text-orange-500 animate-[blink_1s_infinite] ml-[1px]">|</span>
     </span>
   );
@@ -262,11 +258,11 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="md:hidden text-[36px] xs:text-[44px] sm:text-[56px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[1.0] select-none font-space"
           >
-            AI support built for<br />
-            <TypingText />
+            Resolve customer<br />conversations{' '}
+            <TypingText words={["faster.", "instantly.", "automatically.", "24/7."]} />
           </motion.h1>
 
-          {/* DESKTOP HERO TITLE — static */}
+          {/* DESKTOP HERO TITLE — typing effect */}
           <motion.h1 
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
@@ -274,7 +270,7 @@ export default function LandingPage() {
             className="hidden md:block text-[76px] lg:text-[92px] xl:text-[106px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[0.95] select-none font-space"
           >
             Your AI Support Team<br />is Always{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-500 to-amber-400">Online</span>
+            <TypingText words={["Ready.", "Online.", "Watching.", "Learning.", "Working."]} />
           </motion.h1>
           
           <motion.p 
