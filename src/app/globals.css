@@ -7,10 +7,10 @@
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-outfit), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-poppins), "Helvetica Neue", sans-serif;
-  --font-jakarta: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-heading: var(--font-space-grotesk), sans-serif;
+  --font-jakarta: var(--font-outfit), system-ui, sans-serif;
   --color-sidebar-ring: hsl(var(--sidebar-ring));
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));

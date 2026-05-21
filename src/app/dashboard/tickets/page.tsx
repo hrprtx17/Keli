@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 import { 
   Inbox, 
@@ -295,7 +296,7 @@ export default function TicketsDashboardPage() {
         body: JSON.stringify({ status: nextStatus })
       })
       if (!res.ok) throw new Error('Status update failed')
-      toast.success('Ticket status updated successfully')
+      toast.success('Ticket status updated')
     } catch (err) {
       console.error(err)
       toast.error('Could not save status. Reverting...')
@@ -324,7 +325,7 @@ export default function TicketsDashboardPage() {
         body: JSON.stringify({ priority: nextPriority })
       })
       if (!res.ok) throw new Error('Priority update failed')
-      toast.success('Priority updated successfully')
+      toast.success('Priority updated')
     } catch (err) {
       console.error(err)
       toast.error('Could not save priority. Reverting...')
@@ -354,7 +355,7 @@ export default function TicketsDashboardPage() {
         body: JSON.stringify({ agentNotes: notesText })
       })
       if (!res.ok) throw new Error('Save notes failed')
-      toast.success('Saved!')
+      toast.success('Notes saved successfully')
     } catch (err) {
       console.error(err)
       toast.error('Failed to save notes. Reverting...')
@@ -430,12 +431,12 @@ export default function TicketsDashboardPage() {
     switch (priority) {
       case 'high':
       case 'urgent':
-        return 'text-red-700 bg-red-50 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30'
+        return 'text-red-700 bg-red-50 border-red-200/60'
       case 'medium':
-        return 'text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30'
+        return 'text-amber-700 bg-amber-50 border-amber-200/60'
       case 'low':
       default:
-        return 'text-slate-700 bg-slate-50 border-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700'
+        return 'text-zinc-650 bg-zinc-100 border-zinc-200/60'
     }
   }
 
@@ -443,7 +444,7 @@ export default function TicketsDashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'bg-[#FF6B35]'
+        return 'bg-orange-500'
       case 'in_progress':
       case 'in-progress':
         return 'bg-blue-500'
@@ -451,7 +452,7 @@ export default function TicketsDashboardPage() {
         return 'bg-green-500'
       case 'closed':
       default:
-        return 'bg-gray-500'
+        return 'bg-zinc-400'
     }
   }
 
@@ -471,53 +472,58 @@ export default function TicketsDashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-[calc(100vh-100px)] max-w-7xl mx-auto space-y-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col h-[calc(100vh-120px)] max-w-7xl mx-auto space-y-6 px-4 md:px-0 font-outfit"
+      >
         
         {/* PAGE HEADER */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-shrink-0">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-zinc-150 tracking-tight">Tickets</h1>
-            <p className="text-[13px] text-gray-500 dark:text-zinc-400 mt-0.5">Manage customer support requests</p>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 flex-shrink-0">
+          <div className="text-left">
+            <h1 className="text-3xl font-black tracking-tight text-zinc-900 font-space">Tickets Panel</h1>
+            <p className="text-[13px] text-zinc-500 font-semibold mt-0.5">Manage customer support requests and transfers</p>
           </div>
 
-          {/* Stats Bar */}
-          <div className="p-2.5 bg-gray-50 dark:bg-zinc-950/40 border border-gray-200 dark:border-zinc-800 rounded-lg grid grid-cols-2 sm:flex sm:flex-row gap-3 w-full md:w-auto shadow-sm">
-            <div className="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800/80 rounded-md min-w-[90px] text-left flex flex-col justify-center shadow-xs">
-              <span className="text-[20px] font-bold text-gray-800 dark:text-zinc-100 leading-none">
+          {/* Stats Bar (Redesigned with Premium Glassmorphism) */}
+          <div className="p-1.5 bg-zinc-100/60 border border-zinc-200/50 rounded-[20px] grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full lg:w-auto shadow-xs backdrop-blur-md">
+            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
+              <span className="text-[20px] font-black text-zinc-900 leading-none font-space">
                 {isLoading ? '—' : stats.total}
               </span>
-              <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1.5">Total</span>
+              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Total</span>
             </div>
             
-            <div className="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800/80 rounded-md min-w-[90px] text-left flex flex-col justify-center shadow-xs">
-              <span className="text-[20px] font-bold text-[#FF6B35] leading-none">
+            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
+              <span className="text-[20px] font-black text-orange-600 leading-none font-space animate-pulse">
                 {isLoading ? '—' : stats.open}
               </span>
-              <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1.5">Open</span>
+              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Open</span>
             </div>
 
-            <div className="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800/80 rounded-md min-w-[90px] text-left flex flex-col justify-center shadow-xs">
-              <span className="text-[20px] font-bold text-blue-500 leading-none">
+            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs">
+              <span className="text-[20px] font-black text-blue-600 leading-none font-space">
                 {isLoading ? '—' : stats.active}
               </span>
-              <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1.5">Active</span>
+              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Active</span>
             </div>
 
-            <div className="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800/80 rounded-md min-w-[90px] text-left flex flex-col justify-center shadow-xs col-span-2 sm:col-span-1">
-              <span className="text-[20px] font-bold text-green-500 leading-none">
+            <div className="px-5 py-2.5 bg-white border border-zinc-200/50 rounded-2xl min-w-[95px] text-left flex flex-col justify-center shadow-[0_4px_12px_rgba(0,0,0,0.01)] transition-all hover:shadow-xs col-span-2 sm:col-span-1">
+              <span className="text-[20px] font-black text-emerald-600 leading-none font-space">
                 {isLoading ? '—' : stats.resolvedToday}
               </span>
-              <span className="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-1.5">Resolved</span>
+              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest mt-1.5">Resolved</span>
             </div>
           </div>
         </div>
 
-        {/* FILTER TOOLBAR */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-shrink-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-3 rounded-lg shadow-sm">
+        {/* FILTER TOOLBAR (Redesigned) */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 flex-shrink-0 bg-white border border-zinc-200/60 p-3.5 rounded-[22px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] backdrop-blur-md">
           {/* Status Tabs (Left Side) */}
-          <div className="flex bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 p-1 rounded-md text-xs font-semibold overflow-x-auto scrollbar-none gap-1 w-full md:w-auto">
+          <div className="flex bg-zinc-100/70 p-1 rounded-xl text-xs font-semibold overflow-x-auto scrollbar-none gap-1 w-full lg:w-auto">
             {([
-              { id: 'all', label: 'All' },
+              { id: 'all', label: 'All Requests' },
               { id: 'open', label: 'Open' },
               { id: 'in_progress', label: 'In Progress' },
               { id: 'resolved', label: 'Resolved' },
@@ -531,10 +537,10 @@ export default function TicketsDashboardPage() {
                     setActiveTab(tab.id)
                     setPage(1)
                   }}
-                  className={`flex-1 md:flex-none py-1.5 px-4 rounded-md capitalize whitespace-nowrap transition-all ${
+                  className={`flex-1 lg:flex-none py-2 px-4.5 rounded-lg capitalize whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
                     isActive 
-                      ? 'bg-[#FF6B35] text-white shadow-xs' 
-                      : 'text-gray-550 hover:text-gray-900 dark:hover:text-zinc-150'
+                      ? 'bg-zinc-950 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)]' 
+                      : 'text-zinc-500 hover:text-zinc-900'
                   }`}
                 >
                   {tab.label}
@@ -543,17 +549,17 @@ export default function TicketsDashboardPage() {
             })}
           </div>
 
-          {/* Filters on Right Side */}
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+          {/* Filters (Right Side) */}
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
             {/* Search Input */}
-            <div className="relative flex-1 md:flex-none md:w-[220px]">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div className="relative flex-1 lg:flex-none lg:w-[240px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search by name or email..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 rounded-md outline-hidden focus:border-[#FF6B35] focus:ring-2 focus:ring-[#FF6B35]/15 transition-all text-gray-800 dark:text-zinc-200 placeholder:text-gray-450"
+                placeholder="Search visitor, email, subject..."
+                className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-zinc-50 border border-zinc-200/70 rounded-xl outline-hidden focus:border-orange-500/50 focus:bg-white transition-all text-zinc-800 placeholder:text-zinc-400 font-medium"
               />
             </div>
 
@@ -562,14 +568,14 @@ export default function TicketsDashboardPage() {
               value={priorityFilter} 
               onValueChange={(val) => setPriorityFilter(val as any)}
             >
-              <SelectTrigger className="h-8 text-xs font-semibold border-gray-250 dark:border-zinc-800 w-[125px]">
+              <SelectTrigger className="h-10 text-xs font-bold border-zinc-200 w-[125px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                 <SelectValue placeholder="All priorities" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All priorities</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="low">Low Priority</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="high">High Priority</SelectItem>
               </SelectContent>
             </Select>
 
@@ -578,25 +584,24 @@ export default function TicketsDashboardPage() {
               value={sortBy} 
               onValueChange={(val) => setSortBy(val as any)}
             >
-              <SelectTrigger className="h-8 text-xs font-semibold border-gray-250 dark:border-zinc-800 w-[120px]">
+              <SelectTrigger className="h-10 text-xs font-bold border-zinc-200 w-[125px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                 <SelectValue placeholder="Newest first" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest first</SelectItem>
                 <SelectItem value="oldest">Oldest first</SelectItem>
-                <SelectItem value="priority">Priority</SelectItem>
+                <SelectItem value="priority">Priority weight</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        {/* TWO-PANEL WORKSPACE CONTAINER */}
+        {/* WORKSPACE VIEWPORTS */}
         <div className="flex-1 flex gap-5 min-h-[480px] overflow-hidden">
           
-          {/* LEFT PANEL: TICKET LIST */}
-          <div className={`w-full md:w-[280px] lg:w-[400px] shrink-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl flex flex-col overflow-hidden shadow-xs ${selectedTicket && showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
+          {/* TICKET LIST PANEL (Left Column) */}
+          <div className={`w-full md:w-[290px] lg:w-[390px] shrink-0 bg-white border border-zinc-200/60 rounded-3xl flex flex-col overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.015)] ${selectedTicket && showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
             
-            {/* Banner alert if count increased */}
             {hasNewTickets && (
               <button
                 onClick={() => {
@@ -606,44 +611,40 @@ export default function TicketsDashboardPage() {
                     setFreshTicketsData(null)
                   }
                 }}
-                className="w-full bg-[#FF6B35] hover:bg-[#FF6B35]/95 text-white py-2 px-4 text-xs font-bold text-center transition-all flex items-center justify-center gap-2"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 px-4 text-xs font-bold text-center transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
               >
                 <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                New tickets available. Click to refresh
+                New tickets. Click to reload
               </button>
             )}
 
-            {/* Scrollable list */}
-            <ScrollArea className="flex-1 divide-y divide-gray-100 dark:divide-zinc-800">
+            <ScrollArea className="flex-1 divide-y divide-zinc-100">
               <div className="flex flex-col">
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={idx} className="h-[88px] p-4 flex flex-col justify-between border-b border-gray-100 dark:border-zinc-800 animate-pulse">
+                    <div key={idx} className="h-[96px] p-4.5 flex flex-col justify-between border-b border-zinc-100 animate-pulse">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-gray-200 dark:bg-zinc-800" />
-                          <div className="h-4 bg-gray-200 dark:bg-zinc-800 rounded w-28" />
+                          <div className="w-2 h-2 rounded-full bg-zinc-200" />
+                          <div className="h-4 bg-zinc-200 rounded w-28" />
                         </div>
-                        <div className="h-3 bg-gray-200 dark:bg-zinc-800 rounded w-12" />
+                        <div className="h-3 bg-zinc-200 rounded w-12" />
                       </div>
-                      <div className="h-3.5 bg-gray-200 dark:bg-zinc-800 rounded w-3/4" />
+                      <div className="h-3.5 bg-zinc-200 rounded w-3/4" />
                       <div className="flex justify-between items-center">
-                        <div className="h-3 bg-gray-100 dark:bg-zinc-800 rounded w-36" />
-                        <div className="flex gap-2">
-                          <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded w-10" />
-                          <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded w-14" />
-                        </div>
+                        <div className="h-3 bg-zinc-150 rounded w-36" />
+                        <div className="h-4 bg-zinc-150 rounded w-14" />
                       </div>
                     </div>
                   ))
                 ) : filteredAndSortedTickets.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-8 py-24 text-center">
-                    <div className="w-14 h-14 bg-gray-50 dark:bg-zinc-950 rounded-2xl flex items-center justify-center mb-4 text-gray-300 dark:text-zinc-550 border border-gray-100 dark:border-zinc-800 shadow-xs">
-                      <Inbox className="w-7 h-7" />
+                  <div className="flex flex-col items-center justify-center p-8 py-28 text-center">
+                    <div className="w-16 h-16 bg-zinc-50 rounded-2xl flex items-center justify-center mb-5 text-zinc-350 border border-zinc-200/50 shadow-xs">
+                      <Inbox className="w-8 h-8" />
                     </div>
-                    <h3 className="text-[14px] font-semibold text-gray-700 dark:text-zinc-300">No tickets yet</h3>
-                    <p className="text-[11px] text-gray-400 dark:text-zinc-500 mt-1.5 max-w-[230px] leading-relaxed">
-                      When visitors request human support, tickets will appear here
+                    <h3 className="text-base font-bold text-zinc-800 font-space">No support tickets</h3>
+                    <p className="text-[12px] text-zinc-400 font-semibold mt-1.5 max-w-[240px] leading-relaxed">
+                      Escalations from custom widget chats will automatically display here
                     </p>
                   </div>
                 ) : (
@@ -657,55 +658,54 @@ export default function TicketsDashboardPage() {
                           setSelectedTicket(ticket)
                           setShowMobileDetail(true)
                         }}
-                        className={`relative w-full h-[88px] flex flex-col justify-between py-2.5 px-4 cursor-pointer transition-all border-b border-gray-100 dark:border-zinc-800 ${
+                        className={`relative w-full h-[96px] flex flex-col justify-between py-3 px-4.5 cursor-pointer transition-all border-b border-zinc-100 ${
                           isSelected 
-                            ? 'bg-[#FFF5F0] dark:bg-orange-950/10 rounded-r-md rounded-l-none' 
-                            : 'hover:bg-gray-50/50 dark:hover:bg-zinc-900/30'
+                            ? 'bg-orange-500/[0.04]' 
+                            : 'hover:bg-zinc-50/50'
                         }`}
                       >
-                        {/* Status Left Strip */}
-                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${
-                          isSelected ? 'bg-[#FF6B35]' : getStatusColor(ticket.status)
+                        {/* Selected Indicator Bar */}
+                        <div className={`absolute left-0 top-0 bottom-0 w-[4px] transition-colors ${
+                          isSelected ? 'bg-orange-500' : getStatusColor(ticket.status)
                         }`} />
 
-                        {/* Unread Orange Dot indicator (top-right) */}
                         {isUnread && (
-                          <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-[#FF6B35]" />
+                          <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-orange-500 shadow-md shadow-orange-500/20" />
                         )}
 
-                        {/* Row 1: Status Dot + Visitor Name + Time */}
+                        {/* Top: Status Pill + Visitor Name + Timestamp */}
                         <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                              ticket.status === 'open' ? 'bg-[#FF6B35] animate-pulse' :
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${
+                              ticket.status === 'open' ? 'bg-orange-500 animate-pulse' :
                               ((ticket.status as string) === 'in-progress' || (ticket.status as string) === 'in_progress') ? 'bg-blue-500' :
-                              ticket.status === 'resolved' ? 'bg-green-500' : 'bg-gray-500'
+                              ticket.status === 'resolved' ? 'bg-green-500' : 'bg-zinc-400'
                             }`} />
-                            <span className="font-semibold text-sm text-gray-900 dark:text-zinc-150 truncate">
-                              {ticket.visitorName || 'Anonymous'}
+                            <span className="font-bold text-sm text-zinc-800 truncate">
+                              {ticket.visitorName || 'Anonymous User'}
                             </span>
                           </div>
-                          <span className="text-[11px] text-gray-400 dark:text-zinc-500 shrink-0">
+                          <span className="text-[11px] font-semibold text-zinc-400 shrink-0">
                             {timeAgo(ticket.createdAt)}
                           </span>
                         </div>
 
-                        {/* Row 2: Truncated Subject Line */}
-                        <div className="text-[12.5px] text-gray-500 dark:text-zinc-400 truncate text-left pr-4">
+                        {/* Subject */}
+                        <div className="text-[12.5px] font-semibold text-zinc-500 truncate text-left pr-4">
                           {ticket.subject || 'Support Request'}
                         </div>
 
-                        {/* Row 3: Email + priority badge + agent pill */}
+                        {/* Info details row */}
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[11.5px] text-gray-400 dark:text-zinc-500 truncate text-left max-w-[150px] lg:max-w-[200px]">
+                          <span className="text-[11.5px] font-semibold text-zinc-400 truncate text-left max-w-[140px] lg:max-w-[190px]">
                             {ticket.visitorEmail}
                           </span>
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${getPriorityStyle(ticket.priority)}`}>
+                            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${getPriorityStyle(ticket.priority)}`}>
                               {ticket.priority}
                             </span>
                             {ticket.agentName && (
-                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-semibold border border-[#FF6B35] text-[#FF6B35] max-w-[70px] truncate">
+                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold border border-orange-500/30 text-orange-650 bg-orange-50/20 max-w-[70px] truncate">
                                 {ticket.agentName}
                               </span>
                             )}
@@ -719,177 +719,176 @@ export default function TicketsDashboardPage() {
             </ScrollArea>
           </div>
 
-          {/* RIGHT PANEL: TICKET DETAIL */}
-          <div className={`flex-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl flex flex-col overflow-hidden shadow-xs ${!selectedTicket || !showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
+          {/* TICKET DETAILS DETAIL VIEW (Right Column) */}
+          <div className={`flex-1 bg-white border border-zinc-200/60 rounded-3xl flex flex-col overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.015)] ${!selectedTicket || !showMobileDetail ? 'hidden md:flex' : 'flex'}`}>
             {selectedTicket ? (
               <div className="flex-1 flex flex-col overflow-hidden">
                 
-                {/* --- DETAIL TOP BAR --- */}
-                <div className="p-4 border-b border-gray-150 dark:border-zinc-800 bg-gray-50/20 dark:bg-zinc-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
+                {/* Detail Header bar */}
+                <div className="p-5 border-b border-zinc-200/60 bg-zinc-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-shrink-0">
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setShowMobileDetail(false)}
-                      className="p-1 border border-gray-250 dark:border-zinc-800 rounded-md md:hidden text-gray-500 hover:bg-gray-50 dark:hover:bg-zinc-800"
+                      className="p-2 border border-zinc-200 rounded-xl md:hidden text-zinc-500 hover:bg-zinc-100 transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                     <div className="min-w-0 text-left">
-                      <h2 className="text-[20px] font-bold text-gray-900 dark:text-zinc-100 truncate">
-                        {selectedTicket.visitorName || 'Anonymous'}
+                      <h2 className="text-[20px] font-black text-zinc-900 font-space truncate">
+                        {selectedTicket.visitorName || 'Anonymous Visitor'}
                       </h2>
-                      <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                      <div className="flex flex-wrap items-center gap-2 mt-1">
                         <a 
                           href={`mailto:${selectedTicket.visitorEmail}`}
-                          className="text-[14px] font-medium text-[#FF6B35] hover:underline truncate"
+                          className="text-[13.5px] font-bold text-orange-600 hover:underline truncate"
                         >
                           {selectedTicket.visitorEmail}
                         </a>
-                        <span className="text-gray-300 dark:text-zinc-700 text-xs font-light">•</span>
-                        <span className="text-[12px] text-gray-400 dark:text-zinc-500">
+                        <span className="text-zinc-350 text-xs font-light">•</span>
+                        <span className="text-[12px] font-semibold text-zinc-400">
                           Submitted {timeAgo(selectedTicket.createdAt)}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    {/* Status Dropdown */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Status selection */}
                     <Select
                       value={selectedTicket.status}
                       onValueChange={(val) => handleUpdateStatus(selectedTicket._id, val as any)}
                       disabled={isUpdating}
                     >
-                      <SelectTrigger className="h-8 text-xs font-semibold border-gray-250 dark:border-zinc-800 w-[120px]">
+                      <SelectTrigger className="h-9 text-xs font-bold border-zinc-200 w-[120px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="open">
-                          <span className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400">
-                            <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                          <span className="flex items-center gap-1.5 font-bold text-orange-600">
+                            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
                             Open
                           </span>
                         </SelectItem>
                         <SelectItem value="in-progress">
-                          <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                          <span className="flex items-center gap-1.5 font-bold text-blue-600">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                             In Progress
                           </span>
                         </SelectItem>
                         <SelectItem value="resolved">
-                          <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                          <span className="flex items-center gap-1.5 font-bold text-green-600">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
                             Resolved
                           </span>
                         </SelectItem>
                         <SelectItem value="closed">
-                          <span className="flex items-center gap-1.5 text-gray-500 dark:text-zinc-400">
-                            <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                          <span className="flex items-center gap-1.5 font-bold text-zinc-500">
+                            <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
                             Closed
                           </span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
 
-                    {/* Priority Dropdown */}
+                    {/* Priority selection */}
                     <Select
                       value={selectedTicket.priority}
                       onValueChange={(val) => handleUpdatePriority(selectedTicket._id, val as any)}
                       disabled={isUpdating}
                     >
-                      <SelectTrigger className="h-8 text-xs font-semibold border-gray-250 dark:border-zinc-800 w-[100px]">
+                      <SelectTrigger className="h-9 text-xs font-bold border-zinc-200 w-[100px] rounded-xl bg-white hover:bg-zinc-50 transition-colors">
                         <SelectValue placeholder="Priority" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="low">
-                          <span className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400 font-medium">Low</span>
+                          <span className="font-bold text-zinc-500">Low</span>
                         </SelectItem>
                         <SelectItem value="medium">
-                          <span className="flex items-center gap-1.5 text-amber-500 dark:text-amber-400 font-medium">Medium</span>
+                          <span className="font-bold text-amber-500">Medium</span>
                         </SelectItem>
                         <SelectItem value="high">
-                          <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400 font-medium">High</span>
+                          <span className="font-bold text-red-500">High</span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
 
-                    {/* Mark Resolved Quick button */}
                     {selectedTicket.status !== 'resolved' && (
                       <Button
                         size="sm"
                         onClick={() => handleUpdateStatus(selectedTicket._id, 'resolved')}
                         disabled={isUpdating}
-                        className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1 shadow-xs h-8"
+                        className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl flex items-center gap-1 shadow-xs h-9 cursor-pointer"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        Mark Resolved
+                        Resolve
                       </Button>
                     )}
                   </div>
                 </div>
 
-                {/* scrollable detail viewport */}
+                {/* Viewport Details Scroll */}
                 <ScrollArea className="flex-1">
-                  <div className="p-5 space-y-6">
+                  <div className="p-6 space-y-6">
                     
-                    {/* Subject highlight */}
-                    <div className="text-left bg-gray-50/50 dark:bg-zinc-950/20 p-4 border border-gray-100 dark:border-zinc-800 rounded-lg">
-                      <span className="text-[10px] tracking-widest font-bold uppercase text-[#FF6B35] block">Subject</span>
-                      <h3 className="text-base font-bold text-gray-900 dark:text-zinc-150 mt-1">
+                    {/* Subject Card */}
+                    <div className="text-left bg-zinc-50/50 p-4.5 border border-zinc-200/50 rounded-2xl shadow-xs">
+                      <span className="text-[10px] tracking-widest font-black uppercase text-orange-500 block font-space">Subject</span>
+                      <h3 className="text-lg font-black text-zinc-800 font-space mt-1 leading-snug">
                         {selectedTicket.subject || 'Support Request'}
                       </h3>
                     </div>
 
-                    {/* --- AI SUMMARY CARD --- */}
-                    <div className="border-l-3 border-[#FF6B35] bg-[#FFF8F5] dark:bg-orange-950/5 rounded-r-lg p-4 text-left shadow-xs space-y-1.5">
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-[#FF6B35] uppercase">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        AI Summary
+                    {/* AI SUMMARY HIGHLIGHT */}
+                    <div className="border-l-3 border-orange-500 bg-orange-500/[0.03] rounded-r-2xl p-5 text-left shadow-xs space-y-2">
+                      <div className="flex items-center gap-2 text-[10.5px] font-black tracking-widest text-orange-650 uppercase font-space">
+                        <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" />
+                        AI Conversation Summary
                       </div>
-                      <p className="text-[14px] text-gray-800 dark:text-zinc-200 leading-relaxed font-medium">
+                      <p className="text-[14px] text-zinc-700 leading-relaxed font-semibold">
                         {getAiSummary(selectedTicket)}
                       </p>
                     </div>
 
-                    {/* --- VISITOR INFO ROW --- */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
-                      <div className="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-lg p-3 shadow-xs">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block">From</span>
-                        <span className="text-sm font-semibold text-gray-800 dark:text-zinc-200 mt-1 block truncate">
+                    {/* Visitor Metadata blocks */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
+                      <div className="bg-zinc-50/30 border border-zinc-200/50 rounded-2xl p-3.5 shadow-xs">
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 block font-space">Visitor Name</span>
+                        <span className="text-sm font-bold text-zinc-800 mt-1 block truncate">
                           {selectedTicket.visitorName || 'Anonymous'}
                         </span>
                       </div>
                       
-                      <div className="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-lg p-3 shadow-xs flex items-center justify-between">
+                      <div className="bg-zinc-50/30 border border-zinc-200/50 rounded-2xl p-3.5 shadow-xs flex items-center justify-between">
                         <div className="min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block">Email</span>
-                          <span className="text-sm font-semibold text-gray-800 dark:text-zinc-200 mt-1 block truncate">
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 block font-space">Email Address</span>
+                          <span className="text-sm font-bold text-zinc-800 mt-1 block truncate">
                             {selectedTicket.visitorEmail}
                           </span>
                         </div>
                         <button
                           onClick={() => copyId(selectedTicket.visitorEmail, 'Email')}
-                          className="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded text-gray-400 hover:text-gray-900 dark:hover:text-zinc-100 shrink-0 ml-1 transition-colors"
+                          className="p-1.5 hover:bg-zinc-100 rounded-lg text-zinc-400 hover:text-zinc-900 transition-colors"
                         >
                           {copiedField === selectedTicket.visitorEmail ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                       </div>
                       
-                      <div className="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-lg p-3 shadow-xs">
-                        <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block">Agent</span>
-                        <span className="text-sm font-semibold text-gray-800 dark:text-zinc-200 mt-1 block truncate flex items-center gap-1.5">
-                          <Bot className="w-4 h-4 text-[#FF6B35]" />
-                          {selectedTicket.agentName || 'AI Agent'}
+                      <div className="bg-zinc-50/30 border border-zinc-200/50 rounded-2xl p-3.5 shadow-xs">
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 block font-space">Assigned Agent</span>
+                        <span className="text-sm font-bold text-zinc-800 mt-1 block truncate flex items-center gap-1.5">
+                          <Bot className="w-4 h-4 text-orange-500 animate-pulse" />
+                          {selectedTicket.agentName || 'Keli AI'}
                         </span>
                       </div>
                     </div>
 
-                    {/* --- CONVERSATION HISTORY --- */}
-                    <div className="space-y-2 text-left">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">
-                        Conversation
+                    {/* Chat log visual timeline (Cozy modern iOS style chat bubbles) */}
+                    <div className="space-y-3 text-left">
+                      <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 font-space">
+                        Previous Chat Dialogue
                       </h4>
                       {selectedTicket.conversationHistory && selectedTicket.conversationHistory.length > 0 ? (
-                        <div className="border border-gray-200 dark:border-zinc-800 rounded-xl bg-gray-50/20 dark:bg-zinc-950/20 p-4 space-y-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="border border-zinc-200/60 rounded-[24px] bg-zinc-50/30 p-5 space-y-4 max-h-[350px] overflow-y-auto pr-3 custom-scrollbar">
                           {selectedTicket.conversationHistory.map((msg, index) => {
                             const isUser = msg.role === 'user'
                             return (
@@ -897,17 +896,17 @@ export default function TicketsDashboardPage() {
                                 key={index} 
                                 className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
                               >
-                                <span className="text-[9px] text-gray-450 dark:text-zinc-500 font-semibold mb-1 uppercase tracking-wider">
+                                <span className="text-[9.5px] text-zinc-400 font-bold mb-1 uppercase tracking-wider font-space">
                                   {isUser ? 'Visitor' : `AI Agent (${selectedTicket.agentName || 'Keli AI'})`}
                                 </span>
-                                <div className={`px-4 py-2.5 rounded-2xl text-xs max-w-[85%] break-words shadow-xs leading-relaxed ${
+                                <div className={`px-4.5 py-3 rounded-2xl text-[13px] max-w-[80%] break-words shadow-[0_1px_6px_rgba(0,0,0,0.015)] leading-relaxed font-medium ${
                                   isUser 
-                                    ? 'bg-[#FF6B35] text-white rounded-tr-none' 
-                                    : 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none border border-gray-100 dark:border-zinc-800'
+                                    ? 'bg-zinc-950 text-white rounded-tr-none' 
+                                    : 'bg-white text-zinc-800 rounded-tl-none border border-zinc-200/50'
                                 }`}>
                                   {msg.content}
                                 </div>
-                                <span className="text-[9px] text-gray-400 mt-1">
+                                <span className="text-[9px] text-zinc-400 font-semibold mt-1">
                                   {timeAgo(selectedTicket.createdAt)}
                                 </span>
                               </div>
@@ -915,38 +914,38 @@ export default function TicketsDashboardPage() {
                           })}
                         </div>
                       ) : (
-                        <div className="py-10 text-center text-gray-400 dark:text-zinc-550 text-xs border border-dashed border-gray-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900">
-                          No conversation history recorded
+                        <div className="py-12 text-center text-zinc-400 text-xs border border-dashed border-zinc-200 rounded-[22px] bg-white">
+                           No previous conversation history logged
                         </div>
                       )}
                     </div>
 
-                    {/* --- CUSTOMER DESCRIPTION --- */}
-                    <div className="space-y-2 text-left">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">
-                        Issue description
+                    {/* Visitor original request */}
+                    <div className="space-y-3 text-left">
+                      <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 font-space">
+                        Visitor original description
                       </h4>
-                      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-4 shadow-xs">
-                        <p className="text-sm text-gray-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap">
+                      <div className="bg-white border border-zinc-200/60 rounded-[22px] p-5 shadow-xs">
+                        <p className="text-[13.5px] text-zinc-700 leading-relaxed font-semibold whitespace-pre-wrap">
                           {selectedTicket.description || 'No description provided.'}
                         </p>
                       </div>
                     </div>
 
-                    {/* --- TICKET META --- */}
-                    <div className="space-y-2 text-left">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">
-                        Details
+                    {/* Metadata specs */}
+                    <div className="space-y-3 text-left">
+                      <h4 className="text-xs font-black uppercase tracking-widest text-zinc-400 font-space">
+                        Technical specifications
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50/50 dark:bg-zinc-950/20 border border-gray-200 dark:border-zinc-800 rounded-xl p-4 text-xs">
-                        <div className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-zinc-50/50 border border-zinc-200/60 rounded-[24px] p-5 text-[12px] font-semibold text-zinc-650">
+                        <div className="space-y-3.5">
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block mb-1">Ticket ID</span>
-                            <div className="flex items-center gap-1.5 font-mono text-gray-700 dark:text-zinc-300 font-semibold">
+                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Ticket UID</span>
+                            <div className="flex items-center gap-1.5 font-mono text-zinc-800">
                               <span>{selectedTicket._id}</span>
                               <button
                                 onClick={() => copyId(selectedTicket._id, 'Ticket ID')}
-                                className="p-1 hover:bg-gray-250 dark:hover:bg-zinc-800 rounded text-gray-400 hover:text-gray-900 dark:hover:text-zinc-150 transition-colors"
+                                className="p-1 hover:bg-zinc-200 rounded-md text-zinc-400 transition-colors"
                               >
                                 {copiedField === selectedTicket._id ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                               </button>
@@ -954,22 +953,22 @@ export default function TicketsDashboardPage() {
                           </div>
                           
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block mb-1">Created At</span>
-                            <span className="text-gray-750 dark:text-zinc-300 font-medium">
+                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Created Timestamp</span>
+                            <span className="text-zinc-800">
                               {new Date(selectedTicket.createdAt).toLocaleString(undefined, { dateStyle: 'long', timeStyle: 'medium' })}
                             </span>
                           </div>
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-3.5">
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block mb-1">Session ID</span>
-                            <div className="flex items-center gap-1.5 font-mono text-gray-700 dark:text-zinc-300 font-semibold">
-                              <span className="truncate max-w-[130px]">{selectedTicket.sessionId || 'unknown'}</span>
+                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Session ID (Chat Node)</span>
+                            <div className="flex items-center gap-1.5 font-mono text-zinc-800">
+                              <span className="truncate max-w-[130px]">{selectedTicket.sessionId || 'anonymous'}</span>
                               {selectedTicket.sessionId && selectedTicket.sessionId !== 'unknown' && (
                                 <button
                                   onClick={() => copyId(selectedTicket.sessionId, 'Session ID')}
-                                  className="p-1 hover:bg-gray-255 dark:hover:bg-zinc-800 rounded text-gray-400 hover:text-gray-900 dark:hover:text-zinc-150 transition-colors"
+                                  className="p-1 hover:bg-zinc-200 rounded-md text-zinc-400 transition-colors"
                                 >
                                   {copiedField === selectedTicket.sessionId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
                                 </button>
@@ -978,33 +977,33 @@ export default function TicketsDashboardPage() {
                           </div>
                           
                           <div>
-                            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-zinc-500 block mb-1">Source URL</span>
-                            <span className="text-gray-750 dark:text-zinc-300 font-medium break-all flex items-center gap-1">
-                              {selectedTicket.sourceUrl || selectedTicket.source || '—'}
+                            <span className="text-[9px] uppercase font-bold text-zinc-400 block mb-1 font-space">Traffic Source URL</span>
+                            <span className="text-zinc-800 break-all flex items-center gap-1 leading-snug">
+                              {selectedTicket.sourceUrl || selectedTicket.source || 'Direct Dashboard Injection'}
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* --- INTERNAL NOTES --- */}
-                    <div className="space-y-2.5 text-left border-t border-gray-150 dark:border-zinc-800 pt-5">
+                    {/* Internal Agent Notes Section */}
+                    <div className="space-y-3 text-left border-t border-zinc-200/60 pt-6">
                       <div>
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400">
-                          Internal notes
+                        <h4 className="text-xs font-black uppercase tracking-widest text-zinc-450 font-space">
+                          Internal Agent notes
                         </h4>
-                        <p className="text-[10px] text-gray-400 dark:text-zinc-550 italic">
-                          Only visible to you — not shown to the customer
+                        <p className="text-[10px] text-zinc-400 font-semibold italic">
+                          Internal team comments only — completely hidden from customer view
                         </p>
                       </div>
                       
-                      <div className="space-y-2">
+                      <div className="space-y-3.5">
                         <Textarea
                           rows={4}
                           value={notesText}
                           onChange={e => setNotesText(e.target.value)}
-                          placeholder="Add notes about this ticket..."
-                          className="w-full p-3 text-xs bg-white dark:bg-zinc-900 border border-gray-250 dark:border-zinc-800 rounded-lg outline-hidden focus-visible:border-[#FF6B35] focus-visible:ring-[#FF6B35]/15 transition-all text-gray-800 dark:text-zinc-200 placeholder:text-gray-450 resize-none shadow-xs"
+                          placeholder="Type internal comments, status notes or resolution summary..."
+                          className="w-full p-4 text-[13px] bg-white border border-zinc-200 rounded-2xl outline-hidden focus-visible:border-orange-500/50 focus-visible:ring-0 text-zinc-800 placeholder:text-zinc-400 resize-none font-semibold shadow-xs"
                         />
                         <div className="flex justify-end">
                           <Button
@@ -1012,10 +1011,10 @@ export default function TicketsDashboardPage() {
                             size="sm"
                             onClick={handleSaveNotes}
                             disabled={isUpdating}
-                            className="border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35]/10 text-xs font-semibold rounded-md flex items-center gap-1.5 transition-all"
+                            className="border-orange-500 text-orange-650 hover:bg-orange-500/10 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all h-9 cursor-pointer"
                           >
                             <Save className="w-3.5 h-3.5" />
-                            Save notes
+                            Save Internal Notes
                           </Button>
                         </div>
                       </div>
@@ -1024,8 +1023,8 @@ export default function TicketsDashboardPage() {
                   </div>
                 </ScrollArea>
 
-                {/* --- ACTION BUTTONS ROW --- */}
-                <div className="p-4 border-t border-gray-150 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 flex-shrink-0">
+                {/* Bottom Action controls footer bar */}
+                <div className="p-4.5 border-t border-zinc-200/60 bg-white flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 flex-shrink-0">
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Mark In Progress */}
                     <Button
@@ -1033,10 +1032,10 @@ export default function TicketsDashboardPage() {
                       size="sm"
                       onClick={() => handleUpdateStatus(selectedTicket._id, 'in-progress')}
                       disabled={isUpdating || selectedTicket.status === 'in-progress'}
-                      className="border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 text-xs font-semibold rounded-md flex items-center gap-1.5"
+                      className="border-blue-500 text-blue-600 hover:bg-blue-50 text-xs font-bold rounded-xl flex items-center gap-1.5 h-9 cursor-pointer"
                     >
                       <CircleDot className="w-3.5 h-3.5 shrink-0" />
-                      Mark In Progress
+                      In Progress
                     </Button>
                     
                     {/* Mark Resolved */}
@@ -1044,10 +1043,10 @@ export default function TicketsDashboardPage() {
                       size="sm"
                       onClick={() => handleUpdateStatus(selectedTicket._id, 'resolved')}
                       disabled={isUpdating || selectedTicket.status === 'resolved'}
-                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-md flex items-center gap-1.5 shadow-xs"
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-xs h-9 cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                      Mark Resolved
+                      Resolve Request
                     </Button>
                     
                     {/* Close Ticket */}
@@ -1056,7 +1055,7 @@ export default function TicketsDashboardPage() {
                       size="sm"
                       onClick={() => handleUpdateStatus(selectedTicket._id, 'closed')}
                       disabled={isUpdating || selectedTicket.status === 'closed'}
-                      className="border-gray-300 text-gray-650 hover:bg-gray-50 dark:hover:bg-zinc-800 text-xs font-semibold rounded-md flex items-center gap-1.5"
+                      className="border-zinc-300 text-zinc-650 hover:bg-zinc-50 text-xs font-bold rounded-xl flex items-center gap-1.5 h-9 cursor-pointer"
                     >
                       <XCircle className="w-3.5 h-3.5 shrink-0" />
                       Close Ticket
@@ -1069,39 +1068,39 @@ export default function TicketsDashboardPage() {
                     size="sm"
                     onClick={() => setIsDeleteDialogOpen(true)}
                     disabled={isUpdating}
-                    className="text-red-650 hover:text-red-750 hover:bg-red-50 dark:hover:bg-red-950/20 text-xs font-semibold rounded-md flex items-center gap-1.5 shrink-0 self-end sm:self-auto"
+                    className="text-red-650 hover:text-red-750 hover:bg-red-50 text-xs font-bold rounded-xl flex items-center gap-1.5 shrink-0 self-end sm:self-auto h-9 cursor-pointer"
                   >
                     <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                    Delete
+                    Delete Ticket
                   </Button>
                 </div>
 
                 {/* DELETE DIALOG CONFIRM */}
                 <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                  <DialogContent className="sm:max-w-md">
+                  <DialogContent className="sm:max-w-md rounded-3xl">
                     <DialogHeader>
-                      <DialogTitle className="text-gray-900 dark:text-zinc-150 flex items-center gap-2 text-base">
+                      <DialogTitle className="text-zinc-900 flex items-center gap-2 text-base font-space font-black">
                         <ShieldAlert className="w-5 h-5 text-red-550 shrink-0" />
                         Delete Support Ticket
                       </DialogTitle>
-                      <DialogDescription className="text-gray-500 dark:text-zinc-400 mt-2 text-xs leading-relaxed">
-                        Are you sure you want to permanently delete this ticket from the system? This will remove all message history, visitor info, and notes. This action cannot be undone.
+                      <DialogDescription className="text-zinc-500 mt-2 text-xs leading-relaxed font-semibold">
+                        Are you sure you want to permanently delete this ticket? This will purge all message logs, visitor metadata, and agent internal notes from the cloud database. This action is irreversible.
                       </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="mt-4 flex gap-2">
+                    <DialogFooter className="mt-4 flex gap-2 font-outfit">
                       <Button
                         variant="outline"
                         onClick={() => setIsDeleteDialogOpen(false)}
-                        className="w-full sm:w-auto"
+                        className="w-full sm:w-auto rounded-xl"
                       >
                         Cancel
                       </Button>
                       <Button
                         onClick={() => handleDeleteTicket(selectedTicket._id)}
-                        className="w-full sm:w-auto bg-red-600 hover:bg-red-750 text-white font-semibold"
+                        className="w-full sm:w-auto bg-red-600 hover:bg-red-750 text-white font-bold rounded-xl"
                         disabled={isUpdating}
                       >
-                        {isUpdating ? 'Deleting...' : 'Delete permanently'}
+                        {isUpdating ? 'Deleting...' : 'Confirm Delete'}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -1109,14 +1108,14 @@ export default function TicketsDashboardPage() {
 
               </div>
             ) : (
-              // CENTRED DEFAULT PLACEHOLDER
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-gray-50/20 dark:bg-zinc-950/10">
-                <div className="w-20 h-20 bg-gray-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mb-4 text-gray-400 dark:text-zinc-650 border border-gray-150 dark:border-zinc-800 shadow-xs">
-                  <Inbox className="w-9 h-9" />
+              // DEFAULT VIEW INJECTION PLACEHOLDER
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-zinc-50/20">
+                <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mb-5 text-zinc-400 border border-zinc-200/50 shadow-xs">
+                  <Inbox className="w-8 h-8 text-zinc-350" />
                 </div>
-                <h3 className="text-base font-bold text-gray-900 dark:text-zinc-150">Select a ticket</h3>
-                <p className="text-xs text-gray-500 dark:text-zinc-450 mt-1 max-w-[245px] leading-relaxed">
-                  Click any ticket on the left to view details
+                <h3 className="text-base font-bold text-zinc-800 font-space">Select a ticket</h3>
+                <p className="text-xs text-zinc-400 font-semibold mt-1 max-w-[240px] leading-relaxed">
+                  Click any ticket from the left panel to inspect customer requests, AI history, and resolution actions.
                 </p>
               </div>
             )}
@@ -1124,7 +1123,7 @@ export default function TicketsDashboardPage() {
 
         </div>
 
-      </div>
+      </motion.div>
     </DashboardLayout>
   )
 }
