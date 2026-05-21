@@ -255,15 +255,26 @@ export default function LandingPage() {
             <Sparkles className="w-3.5 h-3.5 text-orange-500 animate-pulse" /> AI-Powered Customer Support
           </motion.div>
           
-          {/* UPSCALED SPACE GROTESK HERO TITLE */}
+          {/* MOBILE HERO TITLE — typing effect */}
           <motion.h1 
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-[36px] xs:text-[44px] sm:text-[60px] md:text-[76px] lg:text-[92px] xl:text-[106px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[1.0] select-none font-space"
+            className="md:hidden text-[36px] xs:text-[44px] sm:text-[56px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[1.0] select-none font-space"
           >
             AI support built for<br />
             <TypingText />
+          </motion.h1>
+
+          {/* DESKTOP HERO TITLE — static */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="hidden md:block text-[76px] lg:text-[92px] xl:text-[106px] font-black tracking-[-0.04em] mb-10 max-w-5xl w-full text-center leading-[0.95] select-none font-space"
+          >
+            Your AI Support Team<br />is Always{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-500 to-amber-400">Online</span>
           </motion.h1>
           
           <motion.p 
